@@ -1,0 +1,2 @@
+class IncreaseEntanglementFidelity:
+    pass

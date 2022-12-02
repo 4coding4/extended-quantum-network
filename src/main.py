@@ -1,5 +1,3 @@
-from netsquid.nodes import Network
-
 from src.network.StarNetwork import StarNetwork
 
 
