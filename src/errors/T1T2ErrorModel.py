@@ -12,7 +12,7 @@ class T1T2ErrorModel:
         Note that this is what is called T2 Hahn, as opposed to free induction decay T2*
     """
 
-    t1: float = 0.0001
+    t1: float = 0.0000
     t2: float = 0.0001
     t1t2_noise_model: qerrormodels.T1T2NoiseModel = qerrormodels.T1T2NoiseModel(t1, t2)
 
