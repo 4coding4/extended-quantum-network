@@ -1,13 +1,10 @@
 import netsquid.qubits.ketstates as ketstates
-
-from pydynaa import EventExpression
-from netsquid.nodes import Network, node
-from netsquid.qubits import StateSampler
 from netsquid import sim_run, qubits, b00
-from netsquid.protocols.protocol import Signals
+from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, Port
+from netsquid.nodes import Network, node
 from netsquid.protocols.nodeprotocols import NodeProtocol
-from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, INSTR_SWAP, \
-    Port
+from netsquid.protocols.protocol import Signals
+from netsquid.qubits import StateSampler
 
 
 PROCESS_POSITIONS: int = 3
@@ -19,123 +16,42 @@ class EntangleNodes(NodeProtocol):
     """
     Cooperate with another node to generate shared entanglement.
     """
-    _num_pairs: int = 0
     _is_source: bool = False
     _qsource_name: node = None
-    _mem_positions: list = None
     _input_mem_position: int = 0
     _qmem_input_port: Port = None
 
-    entangled_pairs_n: int = 0
-    start_expression: EventExpression = None
 
-
-    def __init__(self, on_node: node, is_source: bool, name: str, start_expression: EventExpression=None,
-                 input_mem_pos: int=0, num_pairs: int=1) -> None:
+    def __init__(self, on_node: node, is_source: bool, name: str, input_mem_pos: int = 1) -> None:
         """
         Constructor for the EntangleNode protocol class.
 
         :param on_node: Node to run this protocol on
         :param is_source: Whether this protocol should act as a source or a receiver. Both are needed
         :param name: Name of the protocol
-        :param start_expression: Event Expression to wait for before starting entanglement round
         :param input_mem_pos: Index of quantum memory position to expect incoming qubits on. Default is 0
-        :param num_pairs: Number of entanglement pairs to create per round. If more than one, the extra qubits will be
-                          stored on available memory positions
         """
         super().__init__(node=on_node, name=name)
 
-        if start_expression is not None and not isinstance(start_expression, EventExpression):
-            raise TypeError(f"Start expression should be a {EventExpression}, not a {type(start_expression)}")
-
-        if self.node.qmemory is None:
-            raise ValueError(f"Node {self.node} does not have a quantum memory assigned.")
-
         self._is_source = is_source
-        self._num_pairs = num_pairs
-        self._input_mem_position = input_mem_pos
-        self._qmem_input_port = self.node.qmemory.ports[f"qin{self._input_mem_position}"]
 
-        self.start_expression = start_expression
-        self.node.qmemory.mem_positions[self._input_mem_position].in_use = True
-
-    def start(self) -> NodeProtocol:
-        """
-        Start up the protocol by first claiming extra memory positions (if needed).
-
-        :return: The Node Protocol
-        """
-        self._mem_positions = [self._input_mem_position]
-
-        # Claim extra memory positions if needed
-        extra_memory: int = self._num_pairs - 1
-
-        if extra_memory > 0:
-            unused_positions = self.node.qmemory.unused_positions
-
-            if extra_memory > len(unused_positions):
-                raise RuntimeError(f"Not enough unused memory: need {extra_memory}, have {len(unused_positions)}")
-            for i in unused_positions[:extra_memory]:
-                self._mem_positions.append(i)
-                self.node.qmemory.mem_positions[i].in_use = True
-
-        return super().start()
-
-    def stop(self) -> None:
-        """
-        Stop the Node Protocol and unclaim all the claimed memory.
-        """
-        # Unclaim all memory positions
-        if self._mem_positions:
-            for i in self._mem_positions[1:]:
-                self.node.qmemory.mem_positions[i].in_use = False
-
-            self._mem_positions.clear()
-
-        super().stop()
+        if not self._is_source:
+            self._input_mem_position = input_mem_pos
+            self._qmem_input_port = self.node.qmemory.ports[f"qin{self._input_mem_position}"]
+            self.node.qmemory.mem_positions[self._input_mem_position].in_use = True
 
     def run(self) -> None:
         """
         Send entangled qubits of the source and destination nodes.
         """
-
-        while True:
-            # If no start expression specified, then limit generation to one round
-            if self.start_expression is not None:
-                yield self.start_expression
-            elif self._is_source and self.entangled_pairs_n >= self._num_pairs:
-                break
-
-            # Iterate in reverse so that input_mem_pos is handled last
-            for mem_pos in self._mem_positions[::-1]:
-                if self._is_source:
-                    self.node.subcomponents[self._qsource_name].trigger()
-
-                yield self.await_port_input(self._qmem_input_port)
-
-                if mem_pos != self._input_mem_position:
-                    self.node.qmemory.execute_instruction(INSTR_SWAP, [self._input_mem_position, mem_pos])
-
-                    if self.node.qmemory.busy:
-                        yield self.await_program(self.node.qmemory)
-
-                self.entangled_pairs_n += 1
-                self.send_signal(Signals.SUCCESS, mem_pos)
+        if self._is_source:
+            self.node.subcomponents[self._qsource_name].trigger()
+        else:
+            yield self.await_port_input(self._qmem_input_port)
+            self.send_signal(Signals.SUCCESS, self._input_mem_position)
 
     @property
     def is_connected(self) -> bool:
-        if not super().is_connected:
-            return False
-
-        if self.node.qmemory is None:
-            return False
-
-        if self._mem_positions is None and len(self.node.qmemory.unused_positions) < self._num_pairs - 1:
-            return False
-
-        if self._mem_positions is not None and len(self._mem_positions) != self._num_pairs:
-            return False
-
         if self._is_source:
             for name, subcomp in self.node.subcomponents.items():
                 if isinstance(subcomp, QSource):

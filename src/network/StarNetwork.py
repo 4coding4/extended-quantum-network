@@ -1,8 +1,10 @@
+from netsquid import sim_run, qubits, b00
 from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler, ketstates
 
 from src.network.PortPair import PortPair
+from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
 class StarNetwork:
@@ -51,9 +53,14 @@ class StarNetwork:
 
     Network properties
     ------------------
-    destinations_n: The number of destination nodes in the network (default: 4)
-    source_delay: Delay of the delay model of the quantum source (default: 5.0)
-    channels_length: The length of the quantum channels in km (default: 10)
+    destinations_n (default: 4):
+        The number of destination nodes in the network
+
+    source_delay (default: 5.0):
+        Delay of the delay model of the quantum source in nanoseconds
+
+    channels_length (default: 10):
+        The length of the quantum channels in km
     """
     _destinations_n: int = 4
     _source_delay: float = 5.0
@@ -178,7 +185,7 @@ class StarNetwork:
         :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n]
         :raises: Exception If both of the ports are already connected to a node
         """
-        assert (1 < n <= self._destinations_n)
+        assert (1 <= n <= self._destinations_n)
 
         source: node = self._source
         destination: node = self._destinations[n - 1]
@@ -202,7 +209,7 @@ class StarNetwork:
         :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n]
         :raises: Exception If the given node is not connected to the source's quantum source component
         """
-        assert (1 < n <= self._destinations_n)
+        assert (1 <= n <= self._destinations_n)
 
         ports: dict = self._source.subcomponents["QuantumSource"].ports
         q0: dict = ports["qout0"].forwarded_ports
@@ -220,15 +227,46 @@ class StarNetwork:
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
     ############################################
 
-    def entangle_nodes(self, node1: int, node2: int):
+    def entangle_nodes(self, node1: int, node2: int) -> dict:
+        """
+        Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
+        function then returns the two qubits and the fidelity of their entanglement compared to the entangled state
+        `|00> + |11>`.
+
+        :param node1: The index of the first node
+        :param node2: The index of the second node
+        :raises: AssertionError If the index of one of the nodes is either smaller than 0 or bigger than
+                 `self._destinations_n`
+        :return: A dictionary containing the two qubits and the fidelity of their entanglement
+        """
+        assert (1 <= node1 <= self._destinations_n and 1 <= node2 <= self._destinations_n)
+
         # Connect the source to the nodes
         self._connect_source_to_destination(node1)
         self._connect_source_to_destination(node2)
 
-        # TODO: Implement entanglement generation protocol
-        # protocol_source = EntangleNodes(on_node=qnetwork.subcomponents["Source"], is_source=True, name="ProtocolSource")
-        # protocol_node1 = EntangleNodes(on_node=qnetwork.subcomponents[f"Node{node1}"], is_source=False, name=f"ProtocolNode{node1}")
-        # protocol_node2 = EntangleNodes(on_node=qnetwork.subcomponents[f"Node{node2}"], is_source=False, name=f"ProtocolNode{node2}")
+        # Initialize and start the protocols
+        protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
+                                                                     is_source=True, name="ProtocolSource")
+        protocol_node1: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
+                                                                    is_source=False, name=f"ProtocolNode{node1}")
+        protocol_node2: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
+                                                                    is_source=False, name=f"ProtocolNode{node2}")
 
+        protocol_source.start()
+        protocol_node1.start()
+        protocol_node2.start()
+
+        # Run the simulation
+        sim_run()
+
+        # Disconnect the source from the nodes
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
+
+        # Read the destination's memory
+        qubit_node1, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0)
+        qubit_node2, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0)
+        entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+
+        return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}

@@ -1,2 +1,6 @@
-class IncreaseEntanglementFidelity:
+class Filter:
+    pass
+
+
+class Distill:
     pass
