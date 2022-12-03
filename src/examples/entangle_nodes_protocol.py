@@ -5,7 +5,7 @@ from netsquid.nodes import Network, node
 from netsquid.protocols.nodeprotocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
 from netsquid.qubits import StateSampler
-
+from src.errors.FibreErrorModel import FibreErrorModel
 
 PROCESS_POSITIONS: int = 3
 SOURCE_MODEL_DELAY: int = 5
@@ -20,7 +20,6 @@ class EntangleNodes(NodeProtocol):
     _qsource_name: node = None
     _input_mem_position: int = 0
     _qmem_input_port: Port = None
-
 
     def __init__(self, on_node: node, is_source: bool, name: str, input_mem_pos: int = 1) -> None:
         """
@@ -128,9 +127,12 @@ def network_setup() -> Network:
                 status=SourceStatus.EXTERNAL, models={"emission_delay_model": FixedDelayModel(delay=5)})
     )
 
+    # Create a dictionary of models for the models parameter of QuantumChannel
+    models = dict(quantum_loss_model=FibreErrorModel.fibre_loss_model)
+
     # Create a quantum channel and add the connection to the network. The connection is made between nodes Alice and
     # Bob. The quantum channel is placed from Alice to Bob.
-    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", delay=100)
+    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", delay=100, models=models)
     port_alice, port_bob = network.add_connection(alice, bob, channel_to=quantum_channel, label="quantum")
 
     # Set up ports in Alice's nodes. The method `forward_output` when called on a port forwards the value of that port
@@ -157,8 +159,15 @@ if __name__ == '__main__':
 
     sim_run()
 
-    q1, = qnetwork.subcomponents["Alice"].qmemory.peek(0)
-    q2, = qnetwork.subcomponents["Bob"].qmemory.peek(0)
+    try:
+        q1, = qnetwork.subcomponents["Alice"].qmemory.peek(0)
+        q2, = qnetwork.subcomponents["Bob"].qmemory.peek(0)
 
-    # Compute the fidelity between the qubits quantum state and the reference state (`|00> + |11>`)
-    print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
+        # Compute the fidelity between the qubits quantum state and the reference state (`|00> + |11>`)
+        print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
+    except:
+        # If one or more of the qubits are dead, display the memories
+        print("Current situation of the qubits: (Alice, Bob)")
+        print(qnetwork.subcomponents["Alice"].qmemory.peek(0))
+        print(qnetwork.subcomponents["Bob"].qmemory.peek(0))
+
