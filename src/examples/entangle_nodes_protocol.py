@@ -6,6 +6,7 @@ from netsquid.protocols.nodeprotocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
 from netsquid.qubits import StateSampler
 from src.errors.FibreErrorModel import FibreErrorModel
+from src.errors.T1T2ErrorModel import T1T2ErrorModel
 
 PROCESS_POSITIONS: int = 3
 SOURCE_MODEL_DELAY: int = 5
@@ -128,7 +129,8 @@ def network_setup() -> Network:
     )
 
     # Create a dictionary of models for the models parameter of QuantumChannel
-    models = dict(quantum_loss_model=FibreErrorModel.fibre_loss_model)
+    models = dict(quantum_loss_model=FibreErrorModel.fibre_loss_model,
+                  quantum_noise_model=T1T2ErrorModel.t1t2_noise_model)
 
     # Create a quantum channel and add the connection to the network. The connection is made between nodes Alice and
     # Bob. The quantum channel is placed from Alice to Bob.
