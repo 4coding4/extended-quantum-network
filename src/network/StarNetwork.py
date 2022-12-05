@@ -1,5 +1,6 @@
-from netsquid import sim_run, qubits, b00
-from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor
+from netsquid import sim_run, qubits, b00, b01, s00
+from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
+    FibreDelayModel
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler, ketstates
 
@@ -63,8 +64,9 @@ class StarNetwork:
         The length of the quantum channels in km
     """
     _destinations_n: int = 4
-    _source_delay: float = 5.0
+    _source_delay: float = 1e5
     _channels_length: int = 10
+    _source_fidelity_sq: float = 0.8
 
     # Network object and network components
     _network: Network = Network("StarNetwork")
@@ -74,7 +76,6 @@ class StarNetwork:
 
     _quantum_channels: [QuantumChannel] = []
     _quantum_channels_port_pairs: [PortPair] = []
-
 
     def __init__(self):
         """
@@ -145,7 +146,10 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            QSource("QuantumSource", state_sampler=StateSampler([ketstates.b00]), status=SourceStatus.EXTERNAL,
+            QSource("QuantumSource", state_sampler=StateSampler([b01, s00], probabilities=[
+                self._source_fidelity_sq,
+                1 - self._source_fidelity_sq]),
+                    status=SourceStatus.EXTERNAL,
                     models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
                     num_ports=2)
         )
@@ -166,7 +170,9 @@ class StarNetwork:
         """
         for (index, destination) in enumerate(self._destinations):
             # TODO: Add noise model (possibly custom) to the Quantum Channels
-            channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", delay=100, length=self._channels_length)
+            channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", delay=100, length=self._channels_length,
+                                                     models={"quantum_loss_model": None,
+                                                             "delay_model": FibreDelayModel(c=200e3)})
 
             self._quantum_channels.append(channel)
             port_source, port_destination = self.network.add_connection(self._source, destination, channel_to=channel,
