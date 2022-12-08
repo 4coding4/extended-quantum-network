@@ -1,7 +1,8 @@
 from netsquid import sim_run, qubits, b00
-from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor
+from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
+    FibreDelayModel
 from netsquid.nodes import Network, node
-from netsquid.qubits import StateSampler, ketstates
+from netsquid.qubits import StateSampler
 
 from src.network.PortPair import PortPair
 from src.protocols.GenerateEntanglement import GenerateEntanglement
@@ -63,7 +64,7 @@ class StarNetwork:
         The length of the quantum channels in km
     """
     _destinations_n: int = 4
-    _source_delay: float = 5.0
+    _source_delay: float = 1e5
     _channels_length: int = 10
 
     # Network object and network components
@@ -145,9 +146,8 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            QSource("QuantumSource", state_sampler=StateSampler([ketstates.b00]), status=SourceStatus.EXTERNAL,
-                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                    num_ports=2)
+            QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
         )
 
     def _init_destinations(self):
@@ -166,7 +166,8 @@ class StarNetwork:
         """
         for (index, destination) in enumerate(self._destinations):
             # TODO: Add noise model (possibly custom) to the Quantum Channels
-            channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", delay=100, length=self._channels_length)
+            channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=self._channels_length,
+                                                     models={"delay_model": FibreDelayModel(c=200e3)})
 
             self._quantum_channels.append(channel)
             port_source, port_destination = self.network.add_connection(self._source, destination, channel_to=channel,
