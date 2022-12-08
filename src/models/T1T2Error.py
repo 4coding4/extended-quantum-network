@@ -50,7 +50,6 @@ class T1T2Error:
 
     _noise_model: T1T2NoiseModel = None
 
-
     def __init__(self):
         self._noise_model = T1T2NoiseModel(self._t1, self._t2)
 

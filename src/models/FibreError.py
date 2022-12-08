@@ -27,7 +27,6 @@ class FibreError:
 
     _loss_model: FibreLossModel = None
 
-
     def __init__(self):
         self._loss_model: FibreLossModel = FibreLossModel(self._p_loss_init, self._p_loss_length, self._rng)
 
