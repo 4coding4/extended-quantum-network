@@ -12,7 +12,7 @@ class StarNetwork:
     """
     Class to create a star network topology. The center of the network is composed of a Node with only a Quantum Source
     as a component. All the other nodes are composed by quantum processors, and are connected to the source node by
-    means of quantum connections.
+    means of quantum connections. One of the points of the stars is a repeater, which is connected to another node.
 
 
     Default network topology
@@ -24,9 +24,9 @@ class StarNetwork:
                     |
                    QC1
                     |
-    +----+        +---+        +----+
-    | N4 | <-QC4- | S | -QC2-> | N2 |
-    +----+        +---+        +----+
+    +----+        +---+        +----+        +----+
+    | N2 | <-QC2- | S | -QC4-> | R  | <-QC5- | RN |
+    +----+        +---+        +----+        +----+
                     |
                    QC3
                     |
@@ -39,33 +39,47 @@ class StarNetwork:
     Nodes
     -----
     S:
-        - Quantum Source
+        - Quantum Source (generates |00> + |11>)
+
+    R:
+        - Quantum Processor
+        - Quantum Memory (2x memory positions)
 
     Ni:
         - Quantum Processor
-        - Quantum Memory (3x Memory positions)
+        - Quantum Memory (1x memory position)
+
+    RN:
+        - Quantum Source (generates |00> + |11>)
+        - Quantum Processor
+        - Quantum Memory (1x memory position)
 
 
     Channels
     --------
     QCi:
-        - Unidirectional Quantum Channel (s -> Ni)
+        - Unidirectional Quantum Channel (S -> [Ni | R])
+
+    QC5:
+        - Unidirectional Quantum Channel (S <- RN)
 
 
     Network properties
     ------------------
-    destinations_n (default: 4):
-        The number of destination nodes in the network
+    destinations_n (default: 5):
+        The number of destination nodes in the network (one of which is a repeater)
 
-    source_delay (default: 5.0):
+    source_delay (default: 1e5):
         Delay of the delay model of the quantum source in nanoseconds
 
     channels_length (default: 10):
         The length of the quantum channels in km
     """
-    _destinations_n: int = 4
+    _destinations_n: int = 5
     _source_delay: float = 1e5
     _channels_length: int = 10
+    _node_mem_positions: int = 1
+    _repeater_mem_positions: int = 2
 
     # Network object and network components
     _network: Network = Network("StarNetwork")
@@ -84,6 +98,8 @@ class StarNetwork:
         self._init_source()
         self._init_destinations()
         self._init_quantum_channels()
+
+        self._connect_remote_node()
 
     ###########
     # GETTERS #
@@ -146,6 +162,7 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
+            # TODO: Change to `SourceStatus.INTERNAL` and add clock
             QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
                     models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
         )
@@ -155,24 +172,77 @@ class StarNetwork:
         Initialize the destination nodes of the network.
         """
         for destination_n in range(1, self._destinations_n + 1):
-            self._destinations.append(self._network.add_node(f"Node{destination_n}"))
-            self._destinations[destination_n - 1].add_subcomponent(
-                QuantumProcessor(f"QP_Node{destination_n}", num_positions=3, fallback_to_nonphysical=True)
-            )
+            if destination_n == self._destinations_n - 1:
+                # Initialization of the repeater
+                self._destinations.append(self._network.add_node(f"Repeater"))
+                self._destinations[destination_n - 1].add_subcomponent(
+                    QuantumProcessor(f"QP_Repeater", num_positions=self._repeater_mem_positions,
+                                     fallback_to_nonphysical=True)
+                )
+            elif destination_n == self._destinations_n:
+                # Initialize the remote node
+                self._destinations.append(self._network.add_node(f"RemoteNode"))
+                self._destinations[destination_n - 1].add_subcomponent(
+                    QuantumProcessor(f"QP_RemoteNode", num_positions=self._node_mem_positions,
+                                     fallback_to_nonphysical=True)
+                )
+                self._destinations[destination_n - 1].add_subcomponent(
+                    # TODO: Change to `SourceStatus.INTERNAL` and add clock
+                    QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
+                )
+            else:
+                # Initialize normal nodes
+                self._destinations.append(self._network.add_node(f"Node{destination_n}"))
+                self._destinations[destination_n - 1].add_subcomponent(
+                    QuantumProcessor(f"QP_Node{destination_n}", num_positions=self._node_mem_positions,
+                                     fallback_to_nonphysical=True)
+                )
 
     def _init_quantum_channels(self):
         """
         Initialize the quantum channels of the network.
         """
         for (index, destination) in enumerate(self._destinations):
-            # TODO: Add noise model (possibly custom) to the Quantum Channels
-            channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=self._channels_length,
-                                                     models={"delay_model": FibreDelayModel(c=200e3)})
+            if index == self._destinations_n - 2:
+                # Initialize quantum channel for the repeater
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=self._channels_length,
+                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                self._quantum_channels.append(channel)
 
-            self._quantum_channels.append(channel)
-            port_source, port_destination = self.network.add_connection(self._source, destination, channel_to=channel,
-                                                                        label=f"C_Source->Node{index + 1}")
-            self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination))
+                port_source, port_repeater = self.network.add_connection(self._source, destination, channel_to=channel,
+                                                                         label=f"C_Source->Repeater")
+                self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater))
+            elif index == self._destinations_n - 1:
+                # Initialize quantum channel for the remote node
+                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=self._channels_length,
+                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                self._quantum_channels.append(channel)
+
+                repeater = self._network.subcomponents["Repeater"]
+                port_remote, port_repeater = self.network.add_connection(destination, repeater, channel_to=channel,
+                                                                         label=f"C_RemoteNode->Repeater")
+                self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater))
+            else:
+                # Initialize quantum channels for normal nodes
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=self._channels_length,
+                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                self._quantum_channels.append(channel)
+
+                port_source, port_destination = self.network.add_connection(self._source, destination,
+                                                                            channel_to=channel,
+                                                                            label=f"C_Source->Node{index + 1}")
+                self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination))
+
+    def _connect_remote_node(self):
+        repeater: node = self._destinations[-2]
+        remote_node: node = self._destinations[-1]
+        port_pair: PortPair = self._quantum_channels_port_pairs[-1]
+
+        remote_node.subcomponents["QuantumSource"].ports["qout0"].forward_output(remote_node.ports[port_pair.source])
+        remote_node.subcomponents["QuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
+
+        repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
 
     ###################################################################
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
@@ -183,10 +253,10 @@ class StarNetwork:
         Given the number of a node, connect it to the source's quantum source component.
 
         :param n: The number of the node to connect
-        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n]
+        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n - 1]
         :raises: Exception If both of the ports are already connected to a node
         """
-        assert (1 <= n <= self._destinations_n)
+        assert (1 <= n <= self._destinations_n - 1)
 
         source: node = self._source
         destination: node = self._destinations[n - 1]
@@ -207,10 +277,10 @@ class StarNetwork:
         Given the number of a node, disconnect it from the source's quantum source component.
 
         :param n: The number of the node to disconnect
-        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n]
+        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n - 1]
         :raises: Exception If the given node is not connected to the source's quantum source component
         """
-        assert (1 <= n <= self._destinations_n)
+        assert (1 <= n <= self._destinations_n - 1)
 
         ports: dict = self._source.subcomponents["QuantumSource"].ports
         q0: dict = ports["qout0"].forwarded_ports
