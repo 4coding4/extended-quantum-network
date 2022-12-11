@@ -1,7 +1,7 @@
 from netsquid.components import FibreDelayModel
 
 
-class DynamicFibreDelayModel:
+class DynamicFibreDelay:
     """
     Transmission delay model based on constant speed of photons through fibre. The travel distance is given by length
     of channel.
@@ -19,7 +19,6 @@ class DynamicFibreDelayModel:
     _c: float = 200000
     _fibre_delay_model: FibreDelayModel = None
 
-
     def __init__(self):
         self.fibre_delay_model: FibreDelayModel = FibreDelayModel(self._c)
 
@@ -35,7 +34,7 @@ class DynamicFibreDelayModel:
         return self._c
 
     @property
-    def noise_model(self) -> FibreDelayModel:
+    def delay_model(self) -> FibreDelayModel:
         """
         :type: FibreDelayModel
         """
