@@ -73,10 +73,14 @@ class EntangleNodes(NodeProtocol):
 def network_setup(length=0) -> Network:
     """
     This function creates and returns a quantum network.
+
+
     Parameters
     ----------------
     length:
         (float, optional) – Length of channel [m]. May be used by delay, loss and noise models.
+
+
     Nodes
     -----
     Alice:
@@ -85,14 +89,19 @@ def network_setup(length=0) -> Network:
         - Quantum Source
             - qout0: Forwards output to Quantum Channel
             - qout1: Connected to Quantum Memory
+
     Bob:
         - Quantum Processor
             - qin0: input from Quantum Channel is forwarded to Quantum Memory
+
+
     Channels
     --------
     QuantumChannel:
         - From: Alice
         - To: Bob
+
+
     Diagram
     -------
     +---------------------+                                      +---------------------+
@@ -102,6 +111,8 @@ def network_setup(length=0) -> Network:
     | "QuantumProcessor"  | |                                  | |                     |
     |                     | +----------------------------------+ |                     |
     +---------------------+                                      +---------------------+
+
+
     :return: The assembled quantum network
     """
 
@@ -160,7 +171,7 @@ def network_setup(length=0) -> Network:
 
 if __name__ == '__main__':
     # array of lengths of the quantum channel, in meters, from 0 to 2000 meters 10 meter apart
-    lengths = np.arange(0, 2001, 10)
+    lengths = np.arange(10, 1000, 10)
     verbose = False
     num_each_sim = 100
     csv_file = "data.csv"
@@ -203,10 +214,13 @@ if __name__ == '__main__':
     f.close()
     #Plot the results
     df = pd.read_csv(csv_file)
+    a, b = np.polyfit(df["length"], df["fidelity"], 1)
+
     fig = plt.figure(figsize=(20, 10))
     name = "Fidelity of entanglement over distance"
     plt.title(name)
     plt.plot(df["length"], df["fidelity"], 'o')
+    plt.plot(df["length"], a*df["length"]+b)
     plt.xlabel("Length of quantum channel (m)")
     plt.ylabel("Fidelity")
     plt.xscale("linear")

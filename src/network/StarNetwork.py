@@ -24,9 +24,9 @@ class StarNetwork:
                     |
                    QC1
                     |
-    +----+        +---+        +----+        +----+
-    | N2 | <-QC2- | S | -QC4-> | R  | <-QC5- | RN |
-    +----+        +---+        +----+        +----+
+    +----+        +---+        +---+        +-----+
+    | N2 | <-QC2- | S | -QC4-> | R | <-QC5- | RN4 |
+    +----+        +---+        +---+        +-----+
                     |
                    QC3
                     |
@@ -49,7 +49,7 @@ class StarNetwork:
         - Quantum Processor
         - Quantum Memory (1x memory position)
 
-    RN:
+    RNi:
         - Quantum Source (generates |00> + |11>)
         - Quantum Processor
         - Quantum Memory (1x memory position)
@@ -74,6 +74,12 @@ class StarNetwork:
 
     channels_length (default: 10):
         The length of the quantum channels in km
+
+    node_mem_positions (default: 1):
+        The memory positions of the node's quantum memories
+
+    repeater_mem_positions (default: 2):
+        The memory positions of the repeater's quantum memory
     """
     _destinations_n: int = 5
     _source_delay: float = 1e5
@@ -188,7 +194,7 @@ class StarNetwork:
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
                     # TODO: Change to `SourceStatus.INTERNAL` and add clock
-                    QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+                    QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
                             models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
                 )
             else:
@@ -239,8 +245,8 @@ class StarNetwork:
         remote_node: node = self._destinations[-1]
         port_pair: PortPair = self._quantum_channels_port_pairs[-1]
 
-        remote_node.subcomponents["QuantumSource"].ports["qout0"].forward_output(remote_node.ports[port_pair.source])
-        remote_node.subcomponents["QuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
+        remote_node.subcomponents["RemoteQuantumSource"].ports["qout0"].forward_output(remote_node.ports[port_pair.source])
+        remote_node.subcomponents["RemoteQuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
 
         repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
 
@@ -287,9 +293,11 @@ class StarNetwork:
         q1: dict = ports["qout1"].forwarded_ports
 
         # Look for the node n and disconnect it. If not found, raise an exception
-        if len(q0) != 0 and q0["output"].name == f"conn|{n}|C_Source->Node{n}":
+        if len(q0) != 0 and (q0["output"].name == f"conn|{n}|C_Source->Node{n}"
+                             or q0["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout0"].disconnect()
-        elif len(q1) != 0 and q1["output"].name == f"conn|{n}|C_Source->Node{n}":
+        elif len(q1) != 0 and (q1["output"].name == f"conn|{n}|C_Source->Node{n}"
+                               or q1["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout1"].disconnect()
         else:
             raise Exception(f"The source node is not connected to Node {n}")
@@ -307,10 +315,13 @@ class StarNetwork:
         :param node1: The index of the first node
         :param node2: The index of the second node
         :raises: AssertionError If the index of one of the nodes is either smaller than 0 or bigger than
-                 `self._destinations_n`
+                 `self._destinations_n` - 1
         :return: A dictionary containing the two qubits and the fidelity of their entanglement
         """
-        assert (1 <= node1 <= self._destinations_n and 1 <= node2 <= self._destinations_n)
+        assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1)
+
+        protocol_node1: GenerateEntanglement
+        protocol_node2: GenerateEntanglement
 
         # Connect the source to the nodes
         self._connect_source_to_destination(node1)
@@ -319,10 +330,29 @@ class StarNetwork:
         # Initialize and start the protocols
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
                                                                      is_source=True, name="ProtocolSource")
-        protocol_node1: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
-                                                                    is_source=False, name=f"ProtocolNode{node1}")
-        protocol_node2: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
-                                                                    is_source=False, name=f"ProtocolNode{node2}")
+
+        if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
+            protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
+                                                   is_remote=True, name="ProtocolRemote")
+
+            protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
+                                                     is_repeater= True, name=f"ProtocolRepeater")
+
+            if node1 == self._destinations_n - 1:
+                protocol_node1 = protocol_repeater
+                protocol_node2 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
+                                                      name=f"ProtocolNode{node2}")
+            elif node2 == self._destinations_n - 1:
+                protocol_node1 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
+                                                      name=f"ProtocolNode{node1}")
+                protocol_node2 = protocol_repeater
+
+            protocol_remote.start()
+        else:
+            protocol_node1 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
+                                                  name=f"ProtocolNode{node1}")
+            protocol_node2 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
+                                                  name=f"ProtocolNode{node2}")
 
         protocol_source.start()
         protocol_node1.start()
@@ -336,8 +366,8 @@ class StarNetwork:
         self._disconnect_source_from_destination(node2)
 
         # Read the destination's memory
-        qubit_node1, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0)
-        qubit_node2, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0)
-        entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
-
-        return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}
+        # qubit_node1, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0)
+        # qubit_node2, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0)
+        # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+        #
+        # return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}

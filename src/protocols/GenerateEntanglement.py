@@ -1,4 +1,4 @@
-from netsquid.components import QSource, Port
+from netsquid.components import QSource, Port, INSTR_SWAP
 from netsquid.nodes import node
 from netsquid.protocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
@@ -9,42 +9,62 @@ class GenerateEntanglement(NodeProtocol):
     Generate shared entanglement between two nodes.
     """
     _is_source: bool = False
+    _is_repeater: bool = False
+    _is_remote: bool = False
     _qsource_name: node = None
-    _input_mem_position: int = 0
-    _qmem_input_port: Port = None
+    _qmem_input_ports: [Port] = []
 
 
-    def __init__(self, on_node: node, is_source: bool, name: str, input_mem_pos: int = 0):
+    def __init__(self, on_node: node, name: str, is_source: bool = False, is_repeater: bool = False,
+                 is_remote: bool = False):
         """
         Constructor for the GenerateEntanglement protocol class.
 
         :param on_node: Node to run this protocol on
         :param is_source: Whether this protocol should act as a source or a receiver. Both are needed
+        :param is_repeater: Whether this protocol should act as a repeater
+        :param is_remote: Whether this protocol should act as a remote_source
         :param name: Name of the protocol
-        :param input_mem_pos: Index of quantum memory position to expect incoming qubits on. Default is 0
         """
         super().__init__(node=on_node, name=name)
 
         self._is_source = is_source
+        self._is_repeater = is_repeater
+        self._is_remote = is_remote
 
         if not self._is_source:
-            self._input_mem_position = input_mem_pos
-            self._qmem_input_port = self.node.qmemory.ports[f"qin{self._input_mem_position}"]
-            self.node.qmemory.mem_positions[self._input_mem_position].in_use = True
+            self._qmem_input_ports.append(self.node.qmemory.ports["qin0"])
+            self.node.qmemory.mem_positions[0].in_use = True
+
+        if self._is_repeater:
+            self._qmem_input_ports.append(self.node.qmemory.ports["qin1"])
+            self.node.qmemory.mem_positions[1].in_use = True
+
 
     def run(self) -> None:
         """
         Send entangled qubits of the source to the two destination nodes.
         """
-        if self._is_source:
+        if self._is_source or self._is_remote:
             self.node.subcomponents[self._qsource_name].trigger()
-        else:
-            yield self.await_port_input(self._qmem_input_port)
-            self.send_signal(Signals.SUCCESS, self._input_mem_position)
+
+        if not self._is_source:
+            yield self.await_port_input(self._qmem_input_ports[0])
+            # self.send_signal(Signals.SUCCESS, 0)
+
+        if self._is_remote:
+            yield self.await_port_input(self._qmem_input_ports[1])
+
+        if self._is_repeater:
+            self.node.qmemory.execute_instruction(INSTR_SWAP, [0, 1])
+            if self.node.qmemory.busy:
+                yield self.await_program(self.node.qmemory)
+
+            self.send_signal(Signals.SUCCESS, 1)
 
     @property
     def is_connected(self) -> bool:
-        if self._is_source:
+        if self._is_source or self._is_remote:
             for name, subcomp in self.node.subcomponents.items():
                 if isinstance(subcomp, QSource):
                     self._qsource_name = name
