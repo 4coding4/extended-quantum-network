@@ -1,17 +1,24 @@
 import netsquid.qubits.ketstates as ketstates
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from netsquid import sim_run, qubits, b00
-from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, Port
+from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, Port, \
+    FibreDelayModel, FibreLossModel, T1T2NoiseModel
 from netsquid.nodes import Network, node
 from netsquid.protocols.nodeprotocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
 from netsquid.qubits import StateSampler
 
-from src.models.FibreError import FibreError
-from src.models.T1T2Error import T1T2Error
+# from src.models.FibreError import FibreError
+# from src.models.T1T2Error import T1T2Error
+# from src.models.DynamicFibreDelay import DynamicFibreDelay
 
 PROCESS_POSITIONS: int = 3
-SOURCE_MODEL_DELAY: int = 5
-QUANTUM_CHANNEL_DELAY: int = 100
+
+
+# SOURCE_MODEL_DELAY: int = 5
+# QUANTUM_CHANNEL_DELAY: int = 100
 
 
 class EntangleNodes(NodeProtocol):
@@ -63,9 +70,13 @@ class EntangleNodes(NodeProtocol):
         return True
 
 
-def network_setup() -> Network:
+def network_setup(length=0) -> Network:
     """
     This function creates and returns a quantum network.
+    Parameters
+    ----------------
+    length:
+        (float, optional) – Length of channel [m]. May be used by delay, loss and noise models.
     Nodes
     -----
     Alice:
@@ -120,12 +131,18 @@ def network_setup() -> Network:
     )
 
     # Create a dictionary of models for the models parameter of QuantumChannel
-    models = dict(quantum_loss_model=FibreError.loss_model,
-                  quantum_noise_model=T1T2Error.noise_model)
+    models = dict(
+        quantum_loss_model=FibreLossModel(p_loss_init=0.2, p_loss_length=0.25),
+        quantum_noise_model=T1T2NoiseModel(T1=49 * 10 ** -6, T2=(95 / (100 + 93.877)) * 10 ** -6),
+        # quantum_loss_model=FibreError.loss_model()
+        #               quantum_noise_model=T1T2Error.noise_model(),
+        #               quantum_delay_model=DynamicFibreDelay.delay_model()
+        quantum_delay_model=FibreDelayModel(c=200e3)
+    )
 
     # Create a quantum channel and add the connection to the network. The connection is made between nodes Alice and
     # Bob. The quantum channel is placed from Alice to Bob.
-    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", delay=100, models=models)
+    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", length=length / 1000, models=models)
     port_alice, port_bob = network.add_connection(alice, bob, channel_to=quantum_channel, label="quantum")
 
     # Set up ports in Alice's nodes. The method `forward_output` when called on a port forwards the value of that port
@@ -142,24 +159,58 @@ def network_setup() -> Network:
 
 
 if __name__ == '__main__':
-    qnetwork: Network = network_setup()
+    # array of lengths of the quantum channel, in meters, from 0 to 2000 meters 10 meter apart
+    lengths = np.arange(0, 2001, 10)
+    verbose = False
+    num_each_sim = 100
+    csv_file = "data.csv"
+    f=open(csv_file, "w+")
+    f.write(f"length,fidelity\r\n")
+    for length in lengths:
+        print(f"Nodes are entangled after {length} meters")
+        fidelity_values = []
+        for i in range(num_each_sim):
+            # Create a network with a quantum channel of length `length`
+            qnetwork: Network = network_setup(length=length)
+            # Create a protocol that entangles the nodes Alice and Bob
+            protocol_alice = EntangleNodes(on_node=qnetwork.subcomponents["Alice"], is_source=True, name="ProtocolAlice")
+            protocol_bob = EntangleNodes(on_node=qnetwork.subcomponents["Bob"], is_source=False, name="ProtocolBob")
+            # Run the protocol
+            protocol_alice.start()
+            protocol_bob.start()
+            # Run the network simulation
+            sim_run()
+            # Print the results
+            try:
+                q1, = qnetwork.subcomponents["Alice"].qmemory.peek(0)
+                q2, = qnetwork.subcomponents["Bob"].qmemory.peek(0)
 
-    protocol_alice = EntangleNodes(on_node=qnetwork.subcomponents["Alice"], is_source=True, name="ProtocolAlice")
-    protocol_bob = EntangleNodes(on_node=qnetwork.subcomponents["Bob"], is_source=False, name="ProtocolBob")
+                # Compute the fidelity between the qubits quantum state and the reference state (`|00> + |11>`)
+                if verbose:
+                    print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
+                fidelity_values.append(qubits.fidelity([q1, q2], b00))
+            except:
+                # If one or more of the qubits are dead, display the memories
+                if verbose:
+                    print("Current situation of the qubits: (Alice, Bob)")
+                    print(qnetwork.subcomponents["Alice"].qmemory.peek(0))
+                    print(qnetwork.subcomponents["Bob"].qmemory.peek(0))
+                fidelity_values.append(0)
+        # print to file the mean/avg fidelity
+        print(f"Average fidelity: {np.mean(fidelity_values)}")
+        f.write(f"{length},{np.mean(fidelity_values)}\r\n")
 
-    protocol_alice.start()
-    protocol_bob.start()
-
-    sim_run()
-
-    try:
-        q1, = qnetwork.subcomponents["Alice"].qmemory.peek(0)
-        q2, = qnetwork.subcomponents["Bob"].qmemory.peek(0)
-
-        # Compute the fidelity between the qubits quantum state and the reference state (`|00> + |11>`)
-        print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
-    except:
-        # If one or more of the qubits are dead, display the memories
-        print("Current situation of the qubits: (Alice, Bob)")
-        print(qnetwork.subcomponents["Alice"].qmemory.peek(0))
-        print(qnetwork.subcomponents["Bob"].qmemory.peek(0))
+    f.close()
+    #Plot the results
+    df = pd.read_csv(csv_file)
+    fig = plt.figure(figsize=(20, 10))
+    name = "Fidelity of entanglement over distance"
+    plt.title(name)
+    plt.plot(df["length"], df["fidelity"], 'o')
+    plt.xlabel("Length of quantum channel (m)")
+    plt.ylabel("Fidelity")
+    plt.xscale("linear")
+    plt.yscale("linear")
+    plt.show()
+    # Save the plot
+    fig.savefig('fidelity-over-length.png')
