@@ -37,6 +37,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          secrets: |
+          build-args: |
             "USERNAME=${{ secrets.USERNAME }}"
             "PASSWORD=${{ secrets.PASSWORD }}"
