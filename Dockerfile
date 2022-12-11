@@ -1,5 +1,10 @@
 FROM --platform=linux/amd64 python:3.7.15-slim
 
+RUN --mount=type=secret,id=USERNAME \
+    --mount=type=secret,id=PASSWORD \
+    export USERNAME=$(cat /run/secrets/USERNAME) && \
+    export PASSWORD=$(cat /run/secrets/PASSWORD)
+
 ARG USERNAME
 ARG PASSWORD
 
