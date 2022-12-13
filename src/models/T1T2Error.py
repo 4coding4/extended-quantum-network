@@ -48,7 +48,4 @@ class T1T2Error:
     _t1: float = 49 * 10 ** -6
     _t2: float = (95 / (100 + _constant)) * 10 ** -6
 
-    noise_model: T1T2NoiseModel = None
-
-    def __init__(self):
-        self.noise_model = T1T2NoiseModel(self._t1, self._t2)
+    noise_model: T1T2NoiseModel = T1T2NoiseModel(_t1, _t2)

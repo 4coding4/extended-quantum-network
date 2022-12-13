@@ -25,7 +25,4 @@ class FibreError:
     _p_loss_length: float = 0.25
     _rng: RandomState = None
 
-    loss_model: FibreLossModel = None
-
-    def __init__(self):
-        self.loss_model: FibreLossModel = FibreLossModel(self._p_loss_init, self._p_loss_length, self._rng)
+    loss_model: FibreLossModel = FibreLossModel(_p_loss_init, _p_loss_length, _rng)
