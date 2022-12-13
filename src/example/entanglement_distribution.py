@@ -3,20 +3,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from netsquid import sim_run, qubits, b00
-from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, Port, \
-    FibreDelayModel, FibreLossModel, T1T2NoiseModel
+from netsquid.components import QuantumProcessor, QSource, SourceStatus, FixedDelayModel, QuantumChannel, Port
 from netsquid.nodes import Network, node
 from netsquid.protocols.nodeprotocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
 from netsquid.qubits import StateSampler
 
-from src.models.DynamicFibreDelay import DynamicFibreDelay
-from src.models.FibreError import FibreError
-from src.models.T1T2Error import T1T2Error
-
-# from src.models.FibreError import FibreError
-# from src.models.T1T2Error import T1T2Error
-# from src.models.DynamicFibreDelay import DynamicFibreDelay
+from src.models.Combined import Combined
 
 PROCESS_POSITIONS: int = 3
 
@@ -145,19 +138,9 @@ def network_setup(length=0) -> Network:
                 status=SourceStatus.EXTERNAL, models={"emission_delay_model": FixedDelayModel(delay=5)})
     )
 
-    # Create a dictionary of models for the models parameter of QuantumChannel
-    models = dict(
-        quantum_loss_model=FibreLossModel(p_loss_init=0.2, p_loss_length=0.25),
-        quantum_noise_model=T1T2NoiseModel(T1=49 * 10 ** -6, T2=(95 / (100 + 93.877)) * 10 ** -6),
-        # quantum_loss_model=FibreError.loss_model,
-        # quantum_noise_model=T1T2Error.noise_model,
-        # quantum_delay_model=DynamicFibreDelay.fibre_delay_model
-        quantum_delay_model=FibreDelayModel(c=200e3)
-    )
-
     # Create a quantum channel and add the connection to the network. The connection is made between nodes Alice and
     # Bob. The quantum channel is placed from Alice to Bob.
-    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", length=length / 1000, models=models)
+    quantum_channel: QuantumChannel = QuantumChannel("QuantumChannel", length=length / 1000, models=Combined.models)
     port_alice, port_bob = network.add_connection(alice, bob, channel_to=quantum_channel, label="quantum")
 
     # Set up ports in Alice's nodes. The method `forward_output` when called on a port forwards the value of that port
@@ -175,7 +158,7 @@ def network_setup(length=0) -> Network:
 
 if __name__ == '__main__':
     # array of lengths of the quantum channel, in meters, from 0 to 2000 meters 10 meter apart
-    lengths = np.arange(10, 1000, 10)
+    lengths = np.arange(10, 1000+10, 10)
     verbose = False
     num_each_sim = 100
     csv_file = "data.csv"
