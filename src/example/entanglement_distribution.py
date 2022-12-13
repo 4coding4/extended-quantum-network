@@ -10,6 +10,10 @@ from netsquid.protocols.nodeprotocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
 from netsquid.qubits import StateSampler
 
+from src.models.DynamicFibreDelay import DynamicFibreDelay
+from src.models.FibreError import FibreError
+from src.models.T1T2Error import T1T2Error
+
 # from src.models.FibreError import FibreError
 # from src.models.T1T2Error import T1T2Error
 # from src.models.DynamicFibreDelay import DynamicFibreDelay
@@ -145,9 +149,9 @@ def network_setup(length=0) -> Network:
     models = dict(
         quantum_loss_model=FibreLossModel(p_loss_init=0.2, p_loss_length=0.25),
         quantum_noise_model=T1T2NoiseModel(T1=49 * 10 ** -6, T2=(95 / (100 + 93.877)) * 10 ** -6),
-        # quantum_loss_model=FibreError.loss_model()
-        #               quantum_noise_model=T1T2Error.noise_model(),
-        #               quantum_delay_model=DynamicFibreDelay.delay_model()
+        # quantum_loss_model=FibreError.loss_model,
+        # quantum_noise_model=T1T2Error.noise_model,
+        # quantum_delay_model=DynamicFibreDelay.fibre_delay_model
         quantum_delay_model=FibreDelayModel(c=200e3)
     )
 

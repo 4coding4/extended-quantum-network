@@ -48,32 +48,7 @@ class T1T2Error:
     _t1: float = 49 * 10 ** -6
     _t2: float = (95 / (100 + _constant)) * 10 ** -6
 
-    _noise_model: T1T2NoiseModel = None
+    noise_model: T1T2NoiseModel = None
 
     def __init__(self):
-        self._noise_model = T1T2NoiseModel(self._t1, self._t2)
-
-    ###########
-    # GETTERS #
-    ###########
-
-    @property
-    def t1(self) -> float:
-        """
-        :type: float
-        """
-        return self._t1
-
-    @property
-    def t2(self) -> float:
-        """
-        :type: float
-        """
-        return self._t2
-
-    @property
-    def noise_model(self) -> T1T2NoiseModel:
-        """
-        :type: T1T2NoiseModel
-        """
-        return self._noise_model
+        self.noise_model = T1T2NoiseModel(self._t1, self._t2)

@@ -1,6 +1,6 @@
 from netsquid import sim_run, qubits, b00
 from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
-    FibreDelayModel
+    FibreDelayModel, INSTR_MEASURE_BELL
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler
 
@@ -306,7 +306,22 @@ class StarNetwork:
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
     ############################################
 
-    def entangle_nodes(self, node1: int, node2: int) -> dict:
+    def entangle_nodes(self, node1: int, node2: int):
+        """
+        Perform the steps of entangling two nodes given their indices.
+
+        :param node1: The index of the first node
+        :param node2: The index of the second node
+        :raise AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1`
+        :return: A dictionary containing the qubits and their fidelity
+        """
+        assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1)
+
+        self._perform_entanglement(node1, node2)
+        self._perform_entanglement_swapping(node1, node2)
+        return self._perform_fidelity_measurement(node1, node2)
+
+    def _perform_entanglement(self, node1: int, node2: int):
         """
         Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
         function then returns the two qubits and the fidelity of their entanglement compared to the entangled state
@@ -314,11 +329,7 @@ class StarNetwork:
 
         :param node1: The index of the first node
         :param node2: The index of the second node
-        :raises: AssertionError If the index of one of the nodes is either smaller than 0 or bigger than
-                 `self._destinations_n` - 1
-        :return: A dictionary containing the two qubits and the fidelity of their entanglement
         """
-        assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1)
 
         protocol_node1: GenerateEntanglement
         protocol_node2: GenerateEntanglement
@@ -365,9 +376,29 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-        # Read the destination's memory
-        # qubit_node1, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0)
-        # qubit_node2, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0)
-        # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
-        #
-        # return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}
+    def _perform_entanglement_swapping(self, node1: int, node2: int):
+        """
+        Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
+
+        :param node1: The index of the first node
+        :param node2: The index of the second node
+        """
+        if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
+            self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
+
+    def _perform_fidelity_measurement(self, node1: int, node2: int):
+        """
+        Given two nodes, measure the fidelity of their entangled qubits.
+
+        :param node1: The index of the first node
+        :param node2: The index of the second node
+        :return: A dictionary containing the qubits and their fidelity
+        """
+        node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+        node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+
+        qubit_node1, = self._network.subcomponents[node1_label].qmemory.peek(0)
+        qubit_node2, = self._network.subcomponents[node2_label].qmemory.peek(0)
+        entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+
+        return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}

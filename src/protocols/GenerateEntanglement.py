@@ -50,17 +50,12 @@ class GenerateEntanglement(NodeProtocol):
 
         if not self._is_source:
             yield self.await_port_input(self._qmem_input_ports[0])
-            # self.send_signal(Signals.SUCCESS, 0)
+            self.send_signal(Signals.SUCCESS, 0)
 
         if self._is_remote:
             yield self.await_port_input(self._qmem_input_ports[1])
-
-        if self._is_repeater:
-            self.node.qmemory.execute_instruction(INSTR_SWAP, [0, 1])
-            if self.node.qmemory.busy:
-                yield self.await_program(self.node.qmemory)
-
             self.send_signal(Signals.SUCCESS, 1)
+
 
     @property
     def is_connected(self) -> bool:

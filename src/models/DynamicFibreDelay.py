@@ -17,25 +17,7 @@ class DynamicFibreDelay:
         (float, optional) – Fixed speed of photons through the channel [km/s].
     """
     _c: float = 200000
-    _fibre_delay_model: FibreDelayModel = None
+    fibre_delay_model: FibreDelayModel = None
 
     def __init__(self):
         self.fibre_delay_model: FibreDelayModel = FibreDelayModel(self._c)
-
-    ###########
-    # GETTERS #
-    ###########
-
-    @property
-    def c(self) -> float:
-        """
-        :type: float
-        """
-        return self._c
-
-    @property
-    def delay_model(self) -> FibreDelayModel:
-        """
-        :type: FibreDelayModel
-        """
-        return self._fibre_delay_model
