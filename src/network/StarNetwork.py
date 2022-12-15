@@ -1,6 +1,7 @@
 from netsquid import sim_run, qubits, b00
 from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
-    FibreDelayModel, INSTR_MEASURE_BELL
+    INSTR_MEASURE_BELL, INSTR_SWAP
+from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler
 
@@ -81,9 +82,10 @@ class StarNetwork:
     repeater_mem_positions (default: 2):
         The memory positions of the repeater's quantum memory
     """
+    _models: dict = None
     _destinations_n: int = 5
     _source_delay: float = 1e5
-    _channels_length: int = 10
+    _channels_length: float = 1
     _node_mem_positions: int = 1
     _repeater_mem_positions: int = 2
 
@@ -97,14 +99,15 @@ class StarNetwork:
     _quantum_channels_port_pairs: [PortPair] = []
 
 
-    def __init__(self):
+    def __init__(self, models: dict = None):
         """
         Constructor for the StarNetwork class.
         """
+        self._models = models
+        
         self._init_source()
         self._init_destinations()
         self._init_quantum_channels()
-
         self._connect_remote_node()
 
     ###########
@@ -132,6 +135,20 @@ class StarNetwork:
         """
         return self._destinations_n
 
+    @property
+    def channels_length(self) -> float:
+        """
+        :type: float
+        """
+        return self._channels_length
+    
+    @property
+    def models(self) -> dict:
+        """
+        :type: dict
+        """
+        return self._models 
+
     ###########
     # SETTERS #
     ###########
@@ -142,7 +159,7 @@ class StarNetwork:
         Set the source delay in nanoseconds (ns).
 
         :param ns: The amount of nanoseconds
-        :raise: AssertionError If ns is 0.0 or less
+        :raises AssertionError: If ns is 0.0 or less
         """
         assert (ns >= 0.0)
         self._source_delay = ns
@@ -153,10 +170,30 @@ class StarNetwork:
         Set the number of destination nodes in the network.
 
         :param n: The number of nodes
-        :raise: AssertionError If n is 0 or less
+        :raises AssertionError: If n is 0 or less
+        """
+        assert (n > 0.0)
+        self._destinations_n = n
+
+    @channels_length.setter
+    def channels_length(self, n: float):
+        """
+        Set the number of channel length in the network.
+
+        :param n: The channel length (in meters)
+        :raises AssertionError: If n is 0 or less
         """
         assert (n > 0)
-        self._destinations_n = n
+        self._channels_length = n / 1000
+    
+    @models.setter
+    def models(self, models_dict: dict):
+        """
+        Set the dictionary of the models for the quantum channels.
+        
+        :param models_dict: The dictionary of models
+        """
+        self._models = models_dict
 
     #############################################
     # PRIVATE HELPERS USED TO BUILD THE NETWORK #
@@ -168,7 +205,6 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            # TODO: Change to `SourceStatus.INTERNAL` and add clock
             QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
                     models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
         )
@@ -193,7 +229,6 @@ class StarNetwork:
                                      fallback_to_nonphysical=True)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    # TODO: Change to `SourceStatus.INTERNAL` and add clock
                     QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
                             models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
                 )
@@ -212,8 +247,8 @@ class StarNetwork:
         for (index, destination) in enumerate(self._destinations):
             if index == self._destinations_n - 2:
                 # Initialize quantum channel for the repeater
-                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=self._channels_length,
-                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=self._channels_length / 2,
+                                                         models=self._models)
                 self._quantum_channels.append(channel)
 
                 port_source, port_repeater = self.network.add_connection(self._source, destination, channel_to=channel,
@@ -221,8 +256,8 @@ class StarNetwork:
                 self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater))
             elif index == self._destinations_n - 1:
                 # Initialize quantum channel for the remote node
-                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=self._channels_length,
-                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=self._channels_length / 2,
+                                                         models=self._models)
                 self._quantum_channels.append(channel)
 
                 repeater = self._network.subcomponents["Repeater"]
@@ -232,23 +267,13 @@ class StarNetwork:
             else:
                 # Initialize quantum channels for normal nodes
                 channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=self._channels_length,
-                                                         models={"delay_model": FibreDelayModel(c=200e3)})
+                                                         models=self._models)
                 self._quantum_channels.append(channel)
 
                 port_source, port_destination = self.network.add_connection(self._source, destination,
                                                                             channel_to=channel,
                                                                             label=f"C_Source->Node{index + 1}")
                 self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination))
-
-    def _connect_remote_node(self):
-        repeater: node = self._destinations[-2]
-        remote_node: node = self._destinations[-1]
-        port_pair: PortPair = self._quantum_channels_port_pairs[-1]
-
-        remote_node.subcomponents["RemoteQuantumSource"].ports["qout0"].forward_output(remote_node.ports[port_pair.source])
-        remote_node.subcomponents["RemoteQuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
-
-        repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
 
     ###################################################################
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
@@ -259,8 +284,8 @@ class StarNetwork:
         Given the number of a node, connect it to the source's quantum source component.
 
         :param n: The number of the node to connect
-        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n - 1]
-        :raises: Exception If both of the ports are already connected to a node
+        :raises AssertionError: If the index of the node is not in the range [1, self._destinations_n - 1]
+        :raises Exception: If both of the ports are already connected to a node
         """
         assert (1 <= n <= self._destinations_n - 1)
 
@@ -283,8 +308,8 @@ class StarNetwork:
         Given the number of a node, disconnect it from the source's quantum source component.
 
         :param n: The number of the node to disconnect
-        :raises: AssertionError If the index of the node is not in the range [1, self._destinations_n - 1]
-        :raises: Exception If the given node is not connected to the source's quantum source component
+        :raises AssertionError: If the index of the node is not in the range [1, self._destinations_n - 1]
+        :raises Exception: If the given node is not connected to the source's quantum source component
         """
         assert (1 <= n <= self._destinations_n - 1)
 
@@ -292,7 +317,7 @@ class StarNetwork:
         q0: dict = ports["qout0"].forwarded_ports
         q1: dict = ports["qout1"].forwarded_ports
 
-        # Look for the node n and disconnect it. If not found, raise an exception
+        # Look for the node n and disconnect it. If not found, raises an exception
         if len(q0) != 0 and (q0["output"].name == f"conn|{n}|C_Source->Node{n}"
                              or q0["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout0"].disconnect()
@@ -301,6 +326,20 @@ class StarNetwork:
             ports["qout1"].disconnect()
         else:
             raise Exception(f"The source node is not connected to Node {n}")
+
+    def _connect_remote_node(self):
+        """
+        Connect the remote node ports to the quantum repeater.
+        """
+        repeater: node = self._destinations[-2]
+        remote_node: node = self._destinations[-1]
+        port_pair: PortPair = self._quantum_channels_port_pairs[-1]
+
+        remote_node.subcomponents["RemoteQuantumSource"].ports["qout0"].forward_output(
+            remote_node.ports[port_pair.source])
+        remote_node.subcomponents["RemoteQuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
+
+        repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
 
     ############################################
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
@@ -312,10 +351,11 @@ class StarNetwork:
 
         :param node1: The index of the first node
         :param node2: The index of the second node
-        :raise AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1`
+        :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
+                                and `node2` are the same node
         :return: A dictionary containing the qubits and their fidelity
         """
-        assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1)
+        assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
         self._perform_entanglement_swapping(node1, node2)
@@ -330,7 +370,6 @@ class StarNetwork:
         :param node1: The index of the first node
         :param node2: The index of the second node
         """
-
         protocol_node1: GenerateEntanglement
         protocol_node2: GenerateEntanglement
 
@@ -347,7 +386,7 @@ class StarNetwork:
                                                    is_remote=True, name="ProtocolRemote")
 
             protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
-                                                     is_repeater= True, name=f"ProtocolRepeater")
+                                                     is_repeater=True, name=f"ProtocolRepeater")
 
             if node1 == self._destinations_n - 1:
                 protocol_node1 = protocol_repeater
@@ -383,8 +422,11 @@ class StarNetwork:
         :param node1: The index of the first node
         :param node2: The index of the second node
         """
-        if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-            self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
+        try:
+            if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
+                self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_SWAP, [0, 1])
+        except MemPositionEmptyError:
+            return
 
     def _perform_fidelity_measurement(self, node1: int, node2: int):
         """
@@ -394,11 +436,16 @@ class StarNetwork:
         :param node2: The index of the second node
         :return: A dictionary containing the qubits and their fidelity
         """
-        node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-        node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+        try:
+            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
 
-        qubit_node1, = self._network.subcomponents[node1_label].qmemory.peek(0)
-        qubit_node2, = self._network.subcomponents[node2_label].qmemory.peek(0)
-        entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+            qubit_node1, = self._network.subcomponents[node1_label].qmemory.peek(0)
+            qubit_node2, = self._network.subcomponents[node2_label].qmemory.peek(0)
+            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
 
-        return {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity}
+            result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
+        except ValueError:
+            result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
+
+        return result
