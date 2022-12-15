@@ -25,9 +25,9 @@ class Experiment:
 
     """
     _num_each_simulation: int = 100
-    _csv_path: str = "./out/data.csv"
+    _csv_path: str = "../out/data.csv"
     _lengths: ndarray = np.arange(10, 1000 + 10, 10)
-    _fig_path: str = "./out/fidelity-over-length.png"
+    _fig_path: str = "../out/fidelity-over-length.png"
 
     _verbose: bool = False
     _network: StarNetwork = None

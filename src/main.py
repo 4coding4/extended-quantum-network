@@ -9,12 +9,12 @@ if __name__ == "__main__":
 
     # Run experiment (Node1 *-* Node2)
     experiment: Experiment = Experiment(star_network)
-    experiment.csv_path = "./out/data[node-node].csv"
-    experiment.fig_path = "./out/fidelity-over-length[node-node].png"
+    experiment.csv_path = "../out/data[node-node].csv"
+    experiment.fig_path = "../out/fidelity-over-length[node-node].png"
     experiment.run(1, 3)
 
     # Run experiment (Node1 *-* RemoteNode)
     experiment: Experiment = Experiment(star_network)
-    experiment.csv_path = "./out/data[node-remote].csv"
-    experiment.fig_path = "./out/fidelity-over-length[node-remote].png"
+    experiment.csv_path = "../out/data[node-remote].csv"
+    experiment.fig_path = "../out/fidelity-over-length[node-remote].png"
     experiment.run(1, 4)
