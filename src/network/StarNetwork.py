@@ -424,7 +424,7 @@ class StarNetwork:
         """
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_SWAP, [0, 1])
+                self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
         except MemPositionEmptyError:
             return
 
