@@ -184,7 +184,9 @@ class StarNetwork:
         :raises AssertionError: If n is 0 or less
         """
         assert (n > 0)
+
         self._channels_length = n / 1000
+        self._change_lengths(self._channels_length)
     
     @models.setter
     def models(self, models_dict: dict):
@@ -240,14 +242,16 @@ class StarNetwork:
                                      fallback_to_nonphysical=True)
                 )
 
-    def _init_quantum_channels(self):
+    def _init_quantum_channels(self, length: float = _channels_length):
         """
         Initialize the quantum channels of the network.
         """
+        self._quantum_channels.clear()
+
         for (index, destination) in enumerate(self._destinations):
             if index == self._destinations_n - 2:
                 # Initialize quantum channel for the repeater
-                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=self._channels_length / 2,
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=length / 2,
                                                          models=self._models)
                 self._quantum_channels.append(channel)
 
@@ -256,7 +260,7 @@ class StarNetwork:
                 self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater))
             elif index == self._destinations_n - 1:
                 # Initialize quantum channel for the remote node
-                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=self._channels_length / 2,
+                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=length / 2,
                                                          models=self._models)
                 self._quantum_channels.append(channel)
 
@@ -266,7 +270,7 @@ class StarNetwork:
                 self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater))
             else:
                 # Initialize quantum channels for normal nodes
-                channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=self._channels_length,
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=length,
                                                          models=self._models)
                 self._quantum_channels.append(channel)
 
@@ -340,6 +344,20 @@ class StarNetwork:
         remote_node.subcomponents["RemoteQuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
 
         repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
+
+    def _change_lengths(self, new_length: float):
+        """
+        Change the lengths of the quantum channels
+
+        :param new_length:
+        :return:
+        """
+        assert (new_length >= 0)
+
+        if new_length == self._channels_length:
+            return
+
+        self._init_quantum_channels(new_length)
 
     ############################################
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #

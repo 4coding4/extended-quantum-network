@@ -121,16 +121,16 @@ class Experiment:
 
         for length in tqdm(self._lengths):
             fidelity_values = []
+            self._network.channels_length = length
 
             if self._verbose:
-                print(f"Nodes are entangled after {length} meters")
+                print(f"Nodes are entangled after {self._network.channels_length * 1000} meters")
 
             for i in range(self._num_each_simulation):
                 try:
-                    self._network.channels_length = length
                     result_dict = self._network.entangle_nodes(node1, node2)
                     fidelity_values.append(result_dict["fidelity"])
-                except ValueError:
+                except KeyError:
                     fidelity_values.append(0)
 
                     if self._verbose:
