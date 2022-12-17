@@ -377,6 +377,10 @@ class StarNetwork:
 
         self._perform_entanglement(node1, node2)
         self._perform_entanglement_swapping(node1, node2)
+<<<<<<< Updated upstream
+=======
+        # self._perform_entanglement_correction(node1, node2)
+>>>>>>> Stashed changes
         return self._perform_fidelity_measurement(node1, node2)
 
     def _perform_entanglement(self, node1: int, node2: int):
