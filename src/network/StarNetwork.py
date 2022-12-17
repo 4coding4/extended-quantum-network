@@ -6,6 +6,7 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler
 
 from src.network.PortPair import PortPair
+from src.protocols.BellMeasurement import BellMeasurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -377,10 +378,7 @@ class StarNetwork:
 
         self._perform_entanglement(node1, node2)
         self._perform_entanglement_swapping(node1, node2)
-<<<<<<< Updated upstream
-=======
         # self._perform_entanglement_correction(node1, node2)
->>>>>>> Stashed changes
         return self._perform_fidelity_measurement(node1, node2)
 
     def _perform_entanglement(self, node1: int, node2: int):
@@ -446,7 +444,10 @@ class StarNetwork:
         """
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
+                # self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
+                protocol_rep: BellMeasurement = BellMeasurement(self._network.subcomponents["Repeater"],
+                                                                name="ProtocolRepeater_Measurement")
+                protocol_rep.start()
         except MemPositionEmptyError:
             return
 

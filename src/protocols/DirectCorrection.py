@@ -4,7 +4,8 @@ from netsquid.protocols.protocol import Signals
 
 
 class DirectCorrection(NodeProtocol):
-    def run(self,meas_results):
+    def run(self, m):
+        meas_results = m
         if meas_results[0] == 1:
             self.node.qmemory.execute_instruction(INSTR_Z)
             yield self.await_program(self.node.qmemory)
