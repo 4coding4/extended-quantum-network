@@ -91,7 +91,7 @@ class Experiment:
         :param filename: The name of the file
         :raises AssertionError: If the filename does not contain the .csv extension
         """
-        assert (".csv" not in filename)
+        # assert (".csv" not in filename)
         self._csv_path = filename
 
     @fig_path.setter
@@ -102,7 +102,7 @@ class Experiment:
         :param filename: The name of the file
         :raises AssertionError: If the filename does not contain the .png extension
         """
-        assert (".png" not in filename)
+        # assert (".png" not in filename)
         self._fig_path = filename
 
     ############################################
