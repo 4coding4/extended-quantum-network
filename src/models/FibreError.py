@@ -20,7 +20,7 @@ class FibreError:
         Random number generator to use. If None then get_random_state of numpy is used. get_random_state uses Mersenne
         Twister pseudo-random number generator.
     """
-    _p_loss_init: float = 0.2
+    _p_loss_init: float = 0.09
     _p_loss_length: float = 0.25
     _rng: RandomState = None
 
