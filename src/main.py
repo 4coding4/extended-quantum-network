@@ -14,7 +14,7 @@ if __name__ == "__main__":
     experiment.run(1, 3)
 
     # Run experiment (Node1 *-* RemoteNode)
-    # experiment: Experiment = Experiment(star_network, verbose=True)
-    # experiment.csv_path = "../out/data[node-remote].csv"
-    # experiment.fig_path = "../out/fidelity-over-length[node-remote].png"
-    # experiment.run(1, 4)
+    experiment: Experiment = Experiment(star_network, verbose=True)
+    experiment.csv_path = "../out/data[node-remote].csv"
+    experiment.fig_path = "../out/fidelity-over-length[node-remote].png"
+    experiment.run(1, 4)

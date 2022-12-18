@@ -117,7 +117,7 @@ class Experiment:
         :param node2: The index of the second node
         """
         f = open(self._csv_path, "w+")
-        f.write(f"length,fidelity\r\n")
+        f.write(f"length,fidelity,not-decoherence\r\n")
 
         for length in tqdm(self._lengths):
             fidelity_values = []
@@ -139,8 +139,9 @@ class Experiment:
             if self._verbose:
                 print(f"fidelity values: {fidelity_values}")
                 print(f"Average fidelity: {np.mean(fidelity_values)}")
+                print(f"Number of not decoherence qubits: {(np.array(fidelity_values) > 0.5).sum()}")
 
-            f.write(f"{length},{np.mean(fidelity_values)}\r\n")
+            f.write(f"{length},{np.mean(fidelity_values)},{(np.array(fidelity_values) > 0.5).sum()}\r\n")
 
         f.close()
         self._plot_results()
