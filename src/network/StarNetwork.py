@@ -1,11 +1,12 @@
 from netsquid import sim_run, qubits, b00
 from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
-    INSTR_MEASURE_BELL, INSTR_SWAP
+    INSTR_MEASURE_BELL, INSTR_SWAP, INSTR_Z, INSTR_X, INSTR_INIT, INSTR_H, INSTR_S
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler
 
 from src.network.PortPair import PortPair
+from src.protocols.BellMeasurement import BellMeasurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -98,13 +99,13 @@ class StarNetwork:
     _quantum_channels: [QuantumChannel] = []
     _quantum_channels_port_pairs: [PortPair] = []
 
-
-    def __init__(self, models: dict = None):
+    def __init__(self, models: dict = None, lengths: float = _channels_length):
         """
         Constructor for the StarNetwork class.
         """
         self._models = models
-        
+        self._channels_length = lengths
+
         self._init_source()
         self._init_destinations()
         self._init_quantum_channels()
@@ -141,15 +142,16 @@ class StarNetwork:
         :type: float
         """
         return self._channels_length
-    
+
     @property
     def models(self) -> dict:
         """
         :type: dict
         """
-        return self._models 
+        return self._models
 
-    ###########
+        ###########
+
     # SETTERS #
     ###########
 
@@ -187,7 +189,7 @@ class StarNetwork:
 
         self._channels_length = n / 1000
         self._change_lengths(self._channels_length)
-    
+
     @models.setter
     def models(self, models_dict: dict):
         """
@@ -376,8 +378,8 @@ class StarNetwork:
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
-        self._perform_entanglement_swapping(node1, node2)
-        return self._perform_fidelity_measurement(node1, node2)
+        return self._perform_entanglement_swapping(node1, node2)
+        # return self._perform_fidelity_measurement(node1, node2)
 
     def _perform_entanglement(self, node1: int, node2: int):
         """
@@ -442,9 +444,49 @@ class StarNetwork:
         """
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
+                m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
+                                                                                        output_key="M")
+                state = m[0]["M"][0]
+
+                if state == 1:
+                    # |01>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
+                elif state == 2:
+                    # |11>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
+                elif state == 3:
+                    # |10>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
         except MemPositionEmptyError:
-            return
+            pass
+
+        try:
+            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+
+            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
+            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
+            e, = self._network.subcomponents["Repeater"].qmemory.peek(0)
+            r, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+
+            if node1_label == "RemoteNode" or node2_label == "RemoteNode":
+                try:
+                    self._network.subcomponents["Repeater"].qmemory.discard(0)
+                except:
+                    pass
+
+                try:
+                    self._network.subcomponents["Repeater"].qmemory.discard(1)
+                except:
+                    pass
+
+            result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
+        except ValueError:
+            result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
+
+        return result
 
     def _perform_fidelity_measurement(self, node1: int, node2: int):
         """

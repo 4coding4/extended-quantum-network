@@ -91,7 +91,7 @@ class Experiment:
         :param filename: The name of the file
         :raises AssertionError: If the filename does not contain the .csv extension
         """
-        assert (".csv" not in filename)
+        assert (".csv" in filename)
         self._csv_path = filename
 
     @fig_path.setter
@@ -102,7 +102,7 @@ class Experiment:
         :param filename: The name of the file
         :raises AssertionError: If the filename does not contain the .png extension
         """
-        assert (".png" not in filename)
+        assert (".png" in filename)
         self._fig_path = filename
 
     ############################################
@@ -138,6 +138,7 @@ class Experiment:
 
             if self._verbose:
                 print(f"Average fidelity: {np.mean(fidelity_values)}")
+                print(f"Number of not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}")
 
             f.write(f"{length},{np.mean(fidelity_values)}\r\n")
 
