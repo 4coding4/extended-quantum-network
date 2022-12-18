@@ -1,6 +1,6 @@
 from netsquid import sim_run, qubits, b00
 from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
-    INSTR_MEASURE_BELL, INSTR_SWAP
+    INSTR_MEASURE_BELL, INSTR_SWAP, INSTR_Z, INSTR_X, INSTR_INIT, INSTR_H, INSTR_S
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler
@@ -99,13 +99,12 @@ class StarNetwork:
     _quantum_channels: [QuantumChannel] = []
     _quantum_channels_port_pairs: [PortPair] = []
 
-
     def __init__(self, models: dict = None):
         """
         Constructor for the StarNetwork class.
         """
         self._models = models
-        
+
         self._init_source()
         self._init_destinations()
         self._init_quantum_channels()
@@ -142,15 +141,16 @@ class StarNetwork:
         :type: float
         """
         return self._channels_length
-    
+
     @property
     def models(self) -> dict:
         """
         :type: dict
         """
-        return self._models 
+        return self._models
 
-    ###########
+        ###########
+
     # SETTERS #
     ###########
 
@@ -188,7 +188,7 @@ class StarNetwork:
 
         self._channels_length = n / 1000
         self._change_lengths(self._channels_length)
-    
+
     @models.setter
     def models(self, models_dict: dict):
         """
@@ -444,9 +444,19 @@ class StarNetwork:
         """
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                # self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL, [0, 1])
-                protocol_rep: BellMeasurement = BellMeasurement(self._network.subcomponents["Repeater"],
-                                                                name="ProtocolRepeater_Measurement")
+                    #         m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
+                    #                                                                                 output_key="M")
+                    #         yield self.await_program(self._network.subcomponents["Repeater"].qmemory)
+                    #         # correction
+                    #         if m[0] == 1:
+                    #             self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
+                    #             yield self.await_program(self._network.subcomponents["RemoteNode"].qmemory)
+                    #         elif m[1] == 1:
+                    #             self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
+                    #             yield self.await_program(self._network.subcomponents["RemoteNode"].qmemory)
+                    # except KeyError:
+                    #     return
+                protocol_rep: BellMeasurement = BellMeasurement(self._network.subcomponents["Repeater"], name="ProtocolRepeater_Measurement")
                 protocol_rep.start()
         except MemPositionEmptyError:
             return

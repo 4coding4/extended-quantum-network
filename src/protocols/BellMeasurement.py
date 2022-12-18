@@ -15,7 +15,7 @@ class BellMeasurementProgram(QuantumProgram):
         # self.apply(INSTR_H, q1)
         # self.apply(INSTR_MEASURE, q1, output_key="M1")
         # self.apply(INSTR_MEASURE, q2, output_key="M2")
-        self.apply(INSTR_MEASURE_BELL, [0,1], output_key="M")
+        self.apply(INSTR_MEASURE_BELL, [q1, q2], output_key="M")
 
         yield self.run()
 
@@ -44,4 +44,4 @@ class BellMeasurement(NodeProtocol):
                 # qubit_initialised = False
                 # entanglement_ready = False
                 DirectConnection(self._network.subcomponents["RemoteNode"],
-                                        m=m).start()
+                                 m=m).start()

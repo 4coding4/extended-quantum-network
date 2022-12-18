@@ -137,6 +137,7 @@ class Experiment:
                         print("Either one or both Qubits were lost during transfer")
 
             if self._verbose:
+                print(f"fidelity values: {fidelity_values}")
                 print(f"Average fidelity: {np.mean(fidelity_values)}")
 
             f.write(f"{length},{np.mean(fidelity_values)}\r\n")
