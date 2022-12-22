@@ -1,6 +1,25 @@
 # Quantum Network
 
+This is an implementation of a Quantum Network in python using the NetSquid library. The topology of the network is a Star topology, this means that the center of the network is a Quantum Source that generates entangled Bell pairs. On the other hand, the points of the star are nodes with quantum memories.
+
+One of the points of the network is a Quantum Repeater. This repeater is connected to a remote node which has a Quantum Source as well as a quantum memory. The repeater will receive one qubit from the source, one qubit from the remote node, and will perform Entanglement Swapping on those qubits.
+
+A more detailed report on the project can be found [here](https://github.com/edoriggio/quantum-network/blob/main/docs/report.pdf)
+
 ## Docker
+
+### Download
+A pre-built docker image can be downloaded by running the following command:
+
+```bash
+docker pull ghcr.io/edoriggio/quantum-network:main
+```
+
+Alternatively, you can directly include the image in your Dockerfile by using the following line:
+
+```dockerfile
+FROM ghcr.io/edoriggio/quantum-network:main
+```
 
 ### Build
 To build the docker image, use the following line of code
