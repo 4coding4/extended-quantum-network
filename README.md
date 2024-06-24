@@ -33,6 +33,7 @@ Where `<username>` and `<password>` are the credentials used for accessing [NetS
 ### Using as Python Interpreter
 If you're using **PyCharm**, you can do the following:
 
+If you are using the pre-built docker image do:
 1. Click on the bottom right where the python interpreter name usually is;
 2. `Add New Interpreter > On Docker...`;
 3. Select your docker server;
@@ -40,3 +41,13 @@ If you're using **PyCharm**, you can do the following:
 4. Select `pull`;
 5. Write `quantum_network` in the textfield;
 6. Click on `Next`.
+
+If you are using the built the docker image do:
+1. Click on the bottom right where the python interpreter name usually is;
+2. `Add New Interpreter > On Docker...`;
+4. Select `Build`;
+5. Keep Dockerfile as `Dockerfile` and Context folder as `.`;
+6. Click on Optional;
+7. Write in `Build Args` the following `USERNAME=<username> PASSWORD=<password>`
+8. Click on `Next`.
+9. Click on `Next`.
