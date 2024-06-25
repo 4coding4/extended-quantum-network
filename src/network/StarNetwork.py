@@ -210,7 +210,6 @@ class StarNetwork:
         """
         Initialize the source node of the network.
         """
-        # print(self.get_two_bell_pairs_sampler().num_qubits())
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
             QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
