@@ -5,8 +5,15 @@ from netsquid.qubits import StateSampler
 
 
 class QuantumComponents:
+    """
+    Represents the quantum components.
+    """
+
     @staticmethod
     def get_processor(name, mem_positions):
+        """
+        Get QuantumProcessor component with default settings.
+        """
         return QuantumProcessor(name,
                                 num_positions=mem_positions,
                                 fallback_to_nonphysical=True
@@ -14,6 +21,9 @@ class QuantumComponents:
 
     @staticmethod
     def get_source(name, delay, num_ports):
+        """
+        Get QSource component with default settings.
+        """
         return QSource(name,
                        state_sampler=StateSampler([b00]),
                        status=SourceStatus.EXTERNAL,
