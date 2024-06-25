@@ -3,7 +3,7 @@ from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDela
     INSTR_MEASURE_BELL, INSTR_SWAP, INSTR_Z, INSTR_X, INSTR_INIT, INSTR_H, INSTR_S
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
-from netsquid.qubits import StateSampler
+from netsquid.qubits import StateSampler, QRepr, KetRepr
 
 from src.network.PortPair import PortPair
 from src.protocols.BellMeasurement import BellMeasurement
@@ -205,16 +205,32 @@ class StarNetwork:
     #############################################
     # PRIVATE HELPERS USED TO BUILD THE NETWORK #
     #############################################
+    # def get_two_bell_pairs_sampler(self):
+    # return QRepr(4).create_in_basis([b00, b00]) #NotImplementedError
+    # https://docs.netsquid.org/latest-release/api_qubits/netsquid.qubits.qrepr.html#netsquid.qubits.qrepr.QRepr
+    # return QRepr(4).create_in_basis([b00])  # NotImplementedError
+    # return StateSampler([b00]) #, StateSampler([b00])
+    # return StateSampler(QRepr(4), formalism=KetRepr(num_qubits=4))
 
     def _init_source(self):
         """
         Initialize the source node of the network.
         """
+        # print(self.get_two_bell_pairs_sampler().num_qubits())
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
+            # StateSampler([b00, b00])
+            # QSource("QuantumSource", state_sampler=self.get_two_bell_pairs_sampler(), status=SourceStatus.EXTERNAL,
+            #         models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+            #         num_ports=self._source_num_ports)
             QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
                     models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                    num_ports=self._source_num_ports)
+                    num_ports=self._source_num_ports / 2)
+        )
+        self._source.add_subcomponent(
+            QSource("QuantumSource1", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                    num_ports=self._source_num_ports / 2)
         )
 
     def _init_destinations(self):
@@ -237,9 +253,17 @@ class StarNetwork:
                                      fallback_to_nonphysical=True)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+                    # StateSampler([b00])
+                    QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]),
+                            status=SourceStatus.EXTERNAL,
                             models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                            num_ports=self._remote_source_num_ports)
+                            num_ports=self._remote_source_num_ports / 2)
+                )
+                self._destinations[destination_n - 1].add_subcomponent(
+                    QSource("RemoteQuantumSource1", state_sampler=StateSampler([b00]),
+                            status=SourceStatus.EXTERNAL,
+                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                            num_ports=self._remote_source_num_ports / 2)
                 )
             else:
                 # Initialize normal nodes
