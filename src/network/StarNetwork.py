@@ -6,8 +6,7 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler, QRepr, KetRepr
 
 from src.network.PortPair import PortPair
-from src.network.component.processor import get_processor
-from src.network.component.source import get_source
+from src.network.QuantumComponents import QuantumComponents as QC
 from src.protocols.BellMeasurement import BellMeasurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
@@ -214,10 +213,10 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            get_source("QuantumSource", self._source_delay, self._source_num_ports / 2)
+            QC.get_source("QuantumSource", self._source_delay, self._source_num_ports / 2)
         )
         self._source.add_subcomponent(
-            get_source("QuantumSource1", self._source_delay, self._source_num_ports / 2)
+            QC.get_source("QuantumSource1", self._source_delay, self._source_num_ports / 2)
         )
 
     def _init_destinations(self):
@@ -229,25 +228,25 @@ class StarNetwork:
                 # Initialization of the repeater
                 self._destinations.append(self._network.add_node(f"Repeater"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    get_processor(f"QP_Repeater", self._repeater_mem_positions)
+                    QC.get_processor(f"QP_Repeater", self._repeater_mem_positions)
                 )
             elif destination_n == self._destinations_n:
                 # Initialize the remote node
                 self._destinations.append(self._network.add_node(f"RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
+                    QC.get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    get_source("RemoteQuantumSource", self._source_delay, self._remote_source_num_ports / 2)
+                    QC.get_source("RemoteQuantumSource", self._source_delay, self._remote_source_num_ports / 2)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    get_source("RemoteQuantumSource1", self._source_delay, self._remote_source_num_ports / 2)
+                    QC.get_source("RemoteQuantumSource1", self._source_delay, self._remote_source_num_ports / 2)
                 )
             else:
                 # Initialize normal nodes
                 self._destinations.append(self._network.add_node(f"Node{destination_n}"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    get_processor(f"QP_Node{destination_n}", self._node_mem_positions)
+                    QC.get_processor(f"QP_Node{destination_n}", self._node_mem_positions)
                 )
 
     def _init_quantum_channels(self, length: float = _channels_length):
