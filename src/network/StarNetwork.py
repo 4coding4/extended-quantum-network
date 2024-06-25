@@ -88,7 +88,10 @@ class StarNetwork:
     _source_delay: float = 1e5
     _channels_length: float = 1
     _node_mem_positions: int = 1
-    _repeater_mem_positions: int = 2
+    _repeater_mem_positions: int = 4
+    _source_num_ports: int = 4
+    _remote_source_num_ports: int = 4
+    _remote_node_mem_positions: int = 2
 
     # Network object and network components
     _network: Network = Network("StarNetwork")
@@ -210,7 +213,8 @@ class StarNetwork:
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
             QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
-                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
+                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                    num_ports=self._source_num_ports)
         )
 
     def _init_destinations(self):
@@ -229,12 +233,13 @@ class StarNetwork:
                 # Initialize the remote node
                 self._destinations.append(self._network.add_node(f"RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QuantumProcessor(f"QP_RemoteNode", num_positions=self._node_mem_positions,
+                    QuantumProcessor(f"QP_RemoteNode", num_positions=self._remote_node_mem_positions,
                                      fallback_to_nonphysical=True)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
                     QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
-                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)}, num_ports=2)
+                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                            num_ports=self._remote_source_num_ports)
                 )
             else:
                 # Initialize normal nodes
