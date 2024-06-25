@@ -6,6 +6,8 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import StateSampler, QRepr, KetRepr
 
 from src.network.PortPair import PortPair
+from src.network.component.processor import get_processor
+from src.network.component.source import get_source
 from src.protocols.BellMeasurement import BellMeasurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
@@ -212,14 +214,16 @@ class StarNetwork:
         """
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
-                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                    num_ports=self._source_num_ports / 2)
+            # QSource("QuantumSource", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+            #         models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+            #         num_ports=self._source_num_ports / 2)
+            get_source("QuantumSource", self._source_delay, self._source_num_ports / 2)
         )
         self._source.add_subcomponent(
-            QSource("QuantumSource1", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
-                    models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                    num_ports=self._source_num_ports / 2)
+            # QSource("QuantumSource1", state_sampler=StateSampler([b00]), status=SourceStatus.EXTERNAL,
+            #         models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+            #         num_ports=self._source_num_ports / 2)
+            get_source("QuantumSource1", self._source_delay, self._source_num_ports / 2)
         )
 
     def _init_destinations(self):
@@ -231,34 +235,39 @@ class StarNetwork:
                 # Initialization of the repeater
                 self._destinations.append(self._network.add_node(f"Repeater"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QuantumProcessor(f"QP_Repeater", num_positions=self._repeater_mem_positions,
-                                     fallback_to_nonphysical=True)
+                    # QuantumProcessor(f"QP_Repeater", num_positions=self._repeater_mem_positions,
+                    #                  fallback_to_nonphysical=True)
+                    get_processor(f"QP_Repeater", self._repeater_mem_positions)
                 )
             elif destination_n == self._destinations_n:
                 # Initialize the remote node
                 self._destinations.append(self._network.add_node(f"RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QuantumProcessor(f"QP_RemoteNode", num_positions=self._remote_node_mem_positions,
-                                     fallback_to_nonphysical=True)
+                    # QuantumProcessor(f"QP_RemoteNode", num_positions=self._remote_node_mem_positions,
+                    #                  fallback_to_nonphysical=True)
+                    get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]),
-                            status=SourceStatus.EXTERNAL,
-                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                            num_ports=self._remote_source_num_ports / 2)
+                    # QSource("RemoteQuantumSource", state_sampler=StateSampler([b00]),
+                    #         status=SourceStatus.EXTERNAL,
+                    #         models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                    #         num_ports=self._remote_source_num_ports / 2)
+                    get_source("RemoteQuantumSource", self._source_delay, self._remote_source_num_ports / 2)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QSource("RemoteQuantumSource1", state_sampler=StateSampler([b00]),
-                            status=SourceStatus.EXTERNAL,
-                            models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
-                            num_ports=self._remote_source_num_ports / 2)
+                    # QSource("RemoteQuantumSource1", state_sampler=StateSampler([b00]),
+                    #         status=SourceStatus.EXTERNAL,
+                    #         models={"emission_delay_model": FixedDelayModel(delay=self._source_delay)},
+                    #         num_ports=self._remote_source_num_ports / 2)
+                    get_source("RemoteQuantumSource1", self._source_delay, self._remote_source_num_ports / 2)
                 )
             else:
                 # Initialize normal nodes
                 self._destinations.append(self._network.add_node(f"Node{destination_n}"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QuantumProcessor(f"QP_Node{destination_n}", num_positions=self._node_mem_positions,
-                                     fallback_to_nonphysical=True)
+                    # QuantumProcessor(f"QP_Node{destination_n}", num_positions=self._node_mem_positions,
+                    #                  fallback_to_nonphysical=True)
+                    get_processor(f"QP_Node{destination_n}", self._node_mem_positions)
                 )
 
     def _init_quantum_channels(self, length: float = _channels_length):
