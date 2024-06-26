@@ -258,7 +258,7 @@ class StarNetwork:
         for (index, destination) in enumerate(self._destinations):
             if index == self._destinations_n - 2:
                 # Initialize quantum channel for the repeater
-                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=length / 2,
+                channel: QuantumChannel = QuantumChannel(f"QC_Source->Repeater", length=length,
                                                          models=self._models)
                 self._quantum_channels.append(channel)
 
@@ -267,7 +267,7 @@ class StarNetwork:
                 self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater))
             elif index == self._destinations_n - 1:
                 # Initialize quantum channel for the remote node
-                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=length / 2,
+                channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=length,
                                                          models=self._models)
                 self._quantum_channels.append(channel)
 
