@@ -11,7 +11,8 @@ if __name__ == "__main__":
     # Run single experiment
     # ---------------------
     fidelity = star_network.entangle_nodes(1, 3)
-    # fidelity = star_network.entangle_nodes(1, 4)
+    print(fidelity)
+    fidelity = star_network.entangle_nodes(1, 4)
     print(fidelity)
 
     # Run experiment suite (Node1 *-* Node2)
