@@ -10,8 +10,8 @@ if __name__ == "__main__":
 
     # Run single experiment
     # ---------------------
-    fidelity = star_network.entangle_nodes(1, 3)
-    print(fidelity)
+    # fidelity = star_network.entangle_nodes(1, 3)
+    # print(fidelity)
     fidelity = star_network.entangle_nodes(1, 4)
     print(fidelity)
 
