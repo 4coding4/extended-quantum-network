@@ -264,7 +264,15 @@ class StarNetwork:
 
                 port_source, port_repeater = self.network.add_connection(self._source, destination, channel_to=channel,
                                                                          label=f"C_Source->Repeater")
-                self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater))
+                self._quantum_channels_port_pairs.append(PortPair(port_source, port_repeater, f"C_Source->Repeater"))
+                # second quantum channel for the repeater
+                channel1: QuantumChannel = QuantumChannel(f"QC_Source1->Repeater", length=length,
+                                                          models=self._models)
+                self._quantum_channels.append(channel1)
+
+                port_source1, port_repeater1 = self.network.add_connection(self._source, destination, channel_to=channel1,
+                                                                           label=f"C_Source1->Repeater")
+                self._quantum_channels_port_pairs.append(PortPair(port_source1, port_repeater1, f"C_Source1->Repeater"))
             elif index == self._destinations_n - 1:
                 # Initialize quantum channel for the remote node
                 channel: QuantumChannel = QuantumChannel(f"QC_RemoteNode->Repeater", length=length,
@@ -274,7 +282,17 @@ class StarNetwork:
                 repeater = self._network.subcomponents["Repeater"]
                 port_remote, port_repeater = self.network.add_connection(destination, repeater, channel_to=channel,
                                                                          label=f"C_RemoteNode->Repeater")
-                self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater))
+                self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater, f"C_RemoteNode->Repeater"))
+                # second quantum channel for the remote node
+                channel1: QuantumChannel = QuantumChannel(f"QC_RemoteNode1->Repeater", length=length,
+                                                          models=self._models)
+                self._quantum_channels.append(channel1)
+
+                # repeater = self._network.subcomponents["Repeater"]
+                port_remote1, port_repeater1 = self.network.add_connection(destination, repeater, channel_to=channel1,
+                                                                           label=f"C_RemoteNode1->Repeater")
+                self._quantum_channels_port_pairs.append(
+                    PortPair(port_remote1, port_repeater1, f"C_RemoteNode1->Repeater"))
             else:
                 # Initialize quantum channels for normal nodes
                 channel: QuantumChannel = QuantumChannel(f"QC_Source->Node{index}", length=length,
@@ -284,7 +302,7 @@ class StarNetwork:
                 port_source, port_destination = self.network.add_connection(self._source, destination,
                                                                             channel_to=channel,
                                                                             label=f"C_Source->Node{index + 1}")
-                self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination))
+                self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination, f"C_Source->Node{index + 1}"))
 
     ###################################################################
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
