@@ -1,13 +1,10 @@
 from netsquid import sim_run, qubits, b00
-from netsquid.components import QuantumChannel, QSource, SourceStatus, FixedDelayModel, QuantumProcessor, \
-    INSTR_MEASURE_BELL, INSTR_SWAP, INSTR_Z, INSTR_X, INSTR_INIT, INSTR_H, INSTR_S
+from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
-from netsquid.qubits import StateSampler, QRepr, KetRepr
 
 from src.network.PortPair import PortPair
 from src.network.QuantumComponents import QuantumComponents as QC
-from src.protocols.BellMeasurement import BellMeasurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
