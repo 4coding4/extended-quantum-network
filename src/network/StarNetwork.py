@@ -359,13 +359,21 @@ class StarNetwork:
         """
         repeater: node = self._destinations[-2]
         remote_node: node = self._destinations[-1]
-        port_pair: PortPair = self._quantum_channels_port_pairs[-1]
+        port_pair: PortPair = self._quantum_channels_port_pairs[-2]
+        port_pair1: PortPair = self._quantum_channels_port_pairs[-1]
 
         remote_node.subcomponents["RemoteQuantumSource"].ports["qout0"].forward_output(
             remote_node.ports[port_pair.source])
         remote_node.subcomponents["RemoteQuantumSource"].ports["qout1"].connect(remote_node.qmemory.ports["qin0"])
 
         repeater.ports[port_pair.destination].forward_input(repeater.qmemory.ports["qin1"])
+
+        # second quantum channel for the remote node
+        remote_node.subcomponents["RemoteQuantumSource1"].ports["qout0"].forward_output(
+            remote_node.ports[port_pair1.source])
+        remote_node.subcomponents["RemoteQuantumSource1"].ports["qout1"].connect(remote_node.qmemory.ports["qin1"])
+
+        repeater.ports[port_pair1.destination].forward_input(repeater.qmemory.ports["qin3"])
 
     def _change_lengths(self, new_length: float):
         """
