@@ -495,8 +495,8 @@ class StarNetwork:
 
             qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
             qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
-            e, = self._network.subcomponents["Repeater"].qmemory.peek(0)
-            r, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
             entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
 
             if node1_label == "RemoteNode" or node2_label == "RemoteNode":
