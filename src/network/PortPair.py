@@ -42,3 +42,15 @@ class PortPair:
         :type: str
         """
         return self._name
+
+    def get_all(self) -> tuple:
+        """
+        :type: tuple
+        """
+        return self._source, self._destination, self._name
+
+    def show(self) -> str:
+        """
+        :type: str
+        """
+        return f"{self._source} -> {self._destination}, {self._name}"
