@@ -427,8 +427,8 @@ class StarNetwork:
         # Idea is to:
         # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
         # want this in the end
-        # self._perform_entanglement(node1, node2, node3)
-        # return self._perform_entanglement_swapping(node1, node2, node3)
+        # self._perform_new_entanglement(node1, node2, node3)
+        # return self._perform_new_entanglement_swapping(node1, node2, node3)
 
     def entangle_nodes(self, node1: int, node2: int):
         """
@@ -500,7 +500,7 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def _perform_entanglement(self, node1: int, node2: int, node3: int):
+    def _perform_new_entanglement(self, node1: int, node2: int, node3: int):
         # TODO: implement the entanglement between 3 nodes
         pass
 
@@ -515,7 +515,9 @@ class StarNetwork:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
                 m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
                                                                                         output_key="M")
+                # print(m)  # ({'M': [1]}, 0.0)
                 state = m[0]["M"][0]
+                # print(state)  # 1
 
                 if state == 1:
                     # |01>
@@ -557,9 +559,78 @@ class StarNetwork:
 
         return result
 
-    def _perform_entanglement_swapping(self, node1: int, node2: int, node3: int):
+    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int):
         # TODO: implement the perform entanglement swapping between 3 nodes
-        pass
+        try:
+            if node3 == self._destinations_n - 1:
+                m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
+                                                                                        output_key="M")
+                print('_perform_new_entanglement_swapping: m= ', m)
+                state = m[0]["M"][0]
+                state1 = m[1]["M"][0]  # I assume that I will get this position 1
+                print(state, state1)
+                # swap the qubits in memory position 0 and 1,
+                # and then apply the necessary gates
+                # then do the same for the position 2 and 3
+                # TODO refactor by extracting state and position number
+                if state == 1:
+                    # |01>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, positions=0)
+                elif state == 2:
+                    # |11>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=0)
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=0)
+                elif state == 3:
+                    # |10>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=0)
+                # second position
+                if state1 == 1:
+                    # |01>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=1)
+                elif state1 == 2:
+                    # |11>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=1)
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=1)
+                elif state1 == 3:
+                    # |10>
+                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=1)
+        except MemPositionEmptyError as e:
+            print(e)
+            # pass
+
+        try:
+            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode" # always "RemoteNode"
+
+            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
+            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
+            # "RemoteNode" w 2 mem positions
+            qubit_node3, = self._network.subcomponents[node3_label].qmemory.pop(0)
+            qubit_node3_1, = self._network.subcomponents[node3_label].qmemory.pop(1)
+            # peak in all the repeater memory positions
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
+            # measure fidelity between qubit_node1 and qubit_node3 and qubit_node2 and qubit_node3_1
+            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node3], b00)
+            entanglement_fidelity1: float = qubits.fidelity([qubit_node2, qubit_node3_1], b00)
+            # try to discard the memory positions in the repeater
+            if node3_label == "RemoteNode":
+                # list of the memory positions from 0 to 3 (both included)
+                for i in range(4):
+                    try:
+                        self._network.subcomponents["Repeater"].qmemory.discard(i)
+                    except:
+                        pass
+
+            result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
+            result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
+            results = [result, result1]
+        except ValueError:
+            results = {"message": "Some Qubits were lost during transfer", "error": True}
+        return results
 
     def _perform_fidelity_measurement(self, node1: int, node2: int):
         """
