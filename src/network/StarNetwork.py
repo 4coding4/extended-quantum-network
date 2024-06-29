@@ -267,7 +267,8 @@ class StarNetwork:
                                                           models=self._models)
                 self._quantum_channels.append(channel1)
 
-                port_source1, port_repeater1 = self.network.add_connection(self._source, destination, channel_to=channel1,
+                port_source1, port_repeater1 = self.network.add_connection(self._source, destination,
+                                                                           channel_to=channel1,
                                                                            label=f"C_Source1->Repeater")
                 self._quantum_channels_port_pairs.append(PortPair(port_source1, port_repeater1, f"C_Source1->Repeater"))
             elif index == self._destinations_n - 1:
@@ -279,7 +280,8 @@ class StarNetwork:
                 repeater = self._network.subcomponents["Repeater"]
                 port_remote, port_repeater = self.network.add_connection(destination, repeater, channel_to=channel,
                                                                          label=f"C_RemoteNode->Repeater")
-                self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater, f"C_RemoteNode->Repeater"))
+                self._quantum_channels_port_pairs.append(
+                    PortPair(port_remote, port_repeater, f"C_RemoteNode->Repeater"))
                 # second quantum channel for the remote node
                 channel1: QuantumChannel = QuantumChannel(f"QC_RemoteNode1->Repeater", length=length,
                                                           models=self._models)
@@ -299,7 +301,8 @@ class StarNetwork:
                 port_source, port_destination = self.network.add_connection(self._source, destination,
                                                                             channel_to=channel,
                                                                             label=f"C_Source->Node{index + 1}")
-                self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination, f"C_Source->Node{index + 1}"))
+                self._quantum_channels_port_pairs.append(
+                    PortPair(port_source, port_destination, f"C_Source->Node{index + 1}"))
 
     ###################################################################
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
@@ -421,6 +424,8 @@ class StarNetwork:
         self._perform_entanglement(node2, node3)
         res23 = self._perform_entanglement_swapping(node2, node3)
         return res13, res23
+        # Idea is to:
+        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
         # want this in the end
         # self._perform_entanglement(node1, node2, node3)
         # return self._perform_entanglement_swapping(node1, node2, node3)
@@ -495,6 +500,10 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
+    def _perform_entanglement(self, node1: int, node2: int, node3: int):
+        # TODO: implement the entanglement between 3 nodes
+        pass
+
     def _perform_entanglement_swapping(self, node1: int, node2: int):
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
@@ -547,6 +556,10 @@ class StarNetwork:
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
 
         return result
+
+    def _perform_entanglement_swapping(self, node1: int, node2: int, node3: int):
+        # TODO: implement the perform entanglement swapping between 3 nodes
+        pass
 
     def _perform_fidelity_measurement(self, node1: int, node2: int):
         """
