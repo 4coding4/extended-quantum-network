@@ -411,13 +411,17 @@ class StarNetwork:
                 and node1 != node2 != node3)
 
         # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
+
+        # this way uses only 1 mem position0 and 1 qchannel between nodes
         self._perform_entanglement(node1, node3)
         res13 = self._perform_entanglement_swapping(node1, node3)
 
         self._perform_entanglement(node2, node3)
         res23 = self._perform_entanglement_swapping(node2, node3)
-
         return res13, res23
+        # want this in the end
+        # self._perform_entanglement(node1, node2, node3)
+        # return self._perform_entanglement_swapping(node1, node2, node3)
 
     def entangle_nodes(self, node1: int, node2: int):
         """
