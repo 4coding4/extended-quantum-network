@@ -393,6 +393,32 @@ class StarNetwork:
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
     ############################################
 
+    def protocol_a(self, node1: int = 1, node2: int = 2, node3: int = 4):
+        """
+        Perform the steps of entangling two nodes given their indices.
+
+        :param node1: The index of the first node, default is 1
+        :param node2: The index of the second node, default is 2
+        :param node3: The index of the third node (Remote Node), default is 4
+        :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
+                                and `node2` are the same node
+        :return: A dictionary containing the qubits and their fidelity
+        """
+        assert (1 <= node1 <= self._destinations_n - 1
+                and 1 <= node2 <= self._destinations_n - 1
+                and 1 <= node3 <= self._destinations_n - 1
+                and node1 < node2 < node3
+                and node1 != node2 != node3)
+
+        # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
+        self._perform_entanglement(node1, node3)
+        res13 = self._perform_entanglement_swapping(node1, node3)
+
+        self._perform_entanglement(node2, node3)
+        res23 = self._perform_entanglement_swapping(node2, node3)
+
+        return res13, res23
+
     def entangle_nodes(self, node1: int, node2: int):
         """
         Perform the steps of entangling two nodes given their indices.
