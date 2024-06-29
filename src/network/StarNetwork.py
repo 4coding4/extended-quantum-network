@@ -395,13 +395,15 @@ class StarNetwork:
 
     def protocol_a(self, node1: int = 1, node2: int = 2, node3: int = 4):
         """
-        Perform the steps of entangling two nodes given their indices.
+        Perform the steps of entangling 3 nodes given their indices
+        (similarly to entangle_nodes but with limited customization).
 
         :param node1: The index of the first node, default is 1
         :param node2: The index of the second node, default is 2
         :param node3: The index of the third node (Remote Node), default is 4
-        :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
-                                and `node2` are the same node
+        :raises AssertionError: If either `node1`, `node2`, or `node3` is not between 1 and `self._destinations_n - 1`,
+        and one of the nodes is the same as the other,
+        and `node1` is greater than `node2` and `node2` is greater than `node3`
         :return: A dictionary containing the qubits and their fidelity
         """
         assert (1 <= node1 <= self._destinations_n - 1
