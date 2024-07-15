@@ -1,11 +1,13 @@
 from src.models.Combined import Combined
+from src.models.Empty import Empty
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
 
 
 if __name__ == "__main__":
     # Initialize Network and run experiment
-    star_network: StarNetwork = StarNetwork(Combined.models)
+    # star_network: StarNetwork = StarNetwork(Combined.models)  # TODO reactivate this at the end to enable noises/errors
+    star_network: StarNetwork = StarNetwork(Empty.empty_models)
 
 
     # Run single experiment
