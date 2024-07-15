@@ -559,9 +559,9 @@ class StarNetwork:
         # Run the simulation
         sim_run()
 
-        # Disconnect the source from the nodes
-        self._disconnect_source_from_destination(node1)
-        self._disconnect_source_from_destination(node2)
+        # Disconnect the source from the nodes # TODO re-enable at the end (but need to disconnect the right channels)
+        # self._disconnect_source_from_destination(node1)
+        # self._disconnect_source_from_destination(node2)
         # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
 
         # pass
