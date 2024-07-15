@@ -659,6 +659,7 @@ class StarNetwork:
                     Apply the necessary gates to the qubit in the memory position based on the state.
                     """
                     mem = self._network.subcomponents["RemoteNode"].qmemory
+                    # TODO Refact even more w this 2 techniques https://stackoverflow.com/questions/11479816/what-is-the-python-equivalent-for-a-case-switch-statement
                     if curr_state == 1:
                         # |01>
                         mem.execute_instruction(INSTR_X, position=position)
