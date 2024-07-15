@@ -560,7 +560,7 @@ class StarNetwork:
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int):
-        # TODO: implement the perform entanglement swapping between 3 nodes
+        # TODO: implement the perform entanglement swapping between 3 nodes (should be all right, check at the end if the second state is returned in the state1 as expected)
         try:
             if node3 == self._destinations_n - 1:
                 m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
