@@ -322,14 +322,36 @@ class StarNetwork:
         destination: node = self._destinations[n - 1]
         port_pair: PortPair = self._quantum_channels_port_pairs[n - 1]
         source_ports: dict = source.subcomponents["QuantumSource"].ports
+        source_ports1: dict = source.subcomponents["QuantumSource1"].ports
 
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
+            if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
+                raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+
+        # port_n = None
+        if len(source_ports["qout0"].forwarded_ports) == 0:
+            port_n = 0
+            selected_source_ports = source_ports
+            component_name = "QuantumSource"
+        elif len(source_ports["qout1"].forwarded_ports) == 0:
+            port_n = 1
+            selected_source_ports = source_ports
+            component_name = "QuantumSource"
+        elif len(source_ports1["qout0"].forwarded_ports) == 0:
+            port_n = 0
+            selected_source_ports = source_ports1
+            component_name = "QuantumSource1"
+        elif len(source_ports1["qout1"].forwarded_ports) == 0:
+            port_n = 1
+            selected_source_ports = source_ports1
+            component_name = "QuantumSource1"
+        else:
             raise Exception("Two nodes have already been connected to the source's QuantumSource component")
 
-        port_n = 0 if len(source_ports["qout0"].forwarded_ports) == 0 else 1
-
-        source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
     def _disconnect_source_from_destination(self, n: int):
@@ -540,7 +562,7 @@ class StarNetwork:
         # Disconnect the source from the nodes
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
-        self._disconnect_source_from_destination(node3)
+        # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
 
         # pass
 
