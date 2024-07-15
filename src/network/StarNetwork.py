@@ -648,31 +648,34 @@ class StarNetwork:
                 state = m[0]["M"][0]
                 state1 = m[1]["M"][0]  # I assume that I will get this position 1
                 print("state", state, "state1", state1)
+
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
                 # then do the same for the position 2 and 3
-                # TODO refactor by extracting state and position number
-                if state == 1:
-                    # |01>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, positions=0)
-                elif state == 2:
-                    # |11>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=0)
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=0)
-                elif state == 3:
-                    # |10>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=0)
-                # second position
-                if state1 == 1:
-                    # |01>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=1)
-                elif state1 == 2:
-                    # |11>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=1)
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X, position=1)
-                elif state1 == 3:
-                    # |10>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z, position=1)
+
+                # create helper function to apply the gates
+                def apply_gates(curr_state, position):
+                    """
+                    Apply the necessary gates to the qubit in the memory position based on the state.
+                    """
+                    if curr_state == 1:
+                        # |01>
+                        self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X,
+                                                                                              position=position)
+                    elif curr_state == 2:
+                        # |11>
+                        self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z,
+                                                                                              position=position)
+                        self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X,
+                                                                                              position=position)
+                    elif curr_state == 3:
+                        # |10>
+                        self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z,
+                                                                                              position=position)
+
+                # apply gates for first and second state/position
+                apply_gates(state, 0)
+                apply_gates(state1, 1)
         except MemPositionEmptyError as e:
             print(e)
             # pass
