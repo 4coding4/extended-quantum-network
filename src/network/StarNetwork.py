@@ -348,10 +348,12 @@ class StarNetwork:
             component_name = "QuantumSource1"
         else:
             raise Exception("Two nodes have already been connected to the source's QuantumSource component")
-
+        # old
         # source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # new
+        source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
     def _disconnect_source_from_destination(self, n: int):
