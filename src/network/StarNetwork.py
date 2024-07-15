@@ -630,7 +630,7 @@ class StarNetwork:
                 print('_perform_new_entanglement_swapping: m= ', m)
                 state = m[0]["M"][0]
                 state1 = m[1]["M"][0]  # I assume that I will get this position 1
-                print(state, state1)
+                print("state", state, "state1", state1)
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
                 # then do the same for the position 2 and 3
