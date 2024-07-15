@@ -329,7 +329,7 @@ class StarNetwork:
             if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
                 raise Exception("Two nodes have already been connected to the source's QuantumSource component")
 
-        # port_n = None
+        # TODO REFACTOR THIS
         if len(source_ports["qout0"].forwarded_ports) == 0:
             port_n = 0
             selected_source_ports = source_ports
@@ -455,11 +455,18 @@ class StarNetwork:
         # create observer in repeater to check if the q bits are there
         # peak in all the repeater memory positions
         skip_noise = True
-        m0, = self._network.subcomponents["Repeater"].qmemory.peek(0, skip_noise)
-        m1, = self._network.subcomponents["Repeater"].qmemory.peek(1, skip_noise)
-        m2, = self._network.subcomponents["Repeater"].qmemory.peek(2, skip_noise)
-        m3, = self._network.subcomponents["Repeater"].qmemory.peek(3, skip_noise)
-        print("m0", m0, "m1", m1, "m2", m2, "m3", m3)
+        r_m0, = self._network.subcomponents["Repeater"].qmemory.peek(0, skip_noise)
+        r_m1, = self._network.subcomponents["Repeater"].qmemory.peek(1, skip_noise)
+        r_m2, = self._network.subcomponents["Repeater"].qmemory.peek(2, skip_noise)
+        r_m3, = self._network.subcomponents["Repeater"].qmemory.peek(3, skip_noise)
+        print("r_m0", r_m0, "r_m1", r_m1, "r_m2", r_m2, "r_m3", r_m3)
+        # peak in all the nodes memory positions
+        n1_m0, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0, skip_noise)
+        n2_m0, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0, skip_noise)
+        rn3_m0, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(0, skip_noise)
+        rn3_m1, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(1, skip_noise)
+        print("n1_m0", n1_m0, "n2_m0", n2_m0)
+        print("rn3_m0", rn3_m0, "rn3_m1", rn3_m1)
         return self._perform_new_entanglement_swapping(node1, node2, node3)
 
     def entangle_nodes(self, node1: int, node2: int):
