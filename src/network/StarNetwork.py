@@ -450,6 +450,14 @@ class StarNetwork:
         # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
         # want this in the end
         self._perform_new_entanglement(node1, node2, node3)
+        # create observer in repeater to check if the q bits are there
+        # peak in all the repeater memory positions
+        skip_noise = True
+        m0, = self._network.subcomponents["Repeater"].qmemory.peek(0, skip_noise)
+        m1, = self._network.subcomponents["Repeater"].qmemory.peek(1, skip_noise)
+        m2, = self._network.subcomponents["Repeater"].qmemory.peek(2, skip_noise)
+        m3, = self._network.subcomponents["Repeater"].qmemory.peek(3, skip_noise)
+        print("m0", m0, "m1", m1, "m2", m2, "m3", m3)
         return self._perform_new_entanglement_swapping(node1, node2, node3)
 
     def entangle_nodes(self, node1: int, node2: int):
