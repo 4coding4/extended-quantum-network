@@ -23,7 +23,7 @@ def main():
     # print(fidelity)
     fidelity = star_network.protocol_a()  # 1, 2, 4
     print(fidelity)
-    reset_restart = True
+    reset_restart = False  # True
     reset_restart = check_reset_restart(reset_restart)
     # Run experiment suite (Node1 *-* Node2)
     # --------------------------------------
