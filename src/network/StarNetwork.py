@@ -444,41 +444,41 @@ class StarNetwork:
         # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
 
         # this way uses only 1 mem position0 and 1 qchannel between nodes
-        self._perform_entanglement(node1, node3)
-
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
-        res13 = self._perform_entanglement_swapping(node1, node3)
-
-        self._perform_entanglement(node2, node3)
-
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-
-        res23 = self._perform_entanglement_swapping(node2, node3)
-
-        return res13, res23
-        # Idea is to:
-        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
-        # want this in the end
-        # self._perform_new_entanglement(node1, node2, node3)
+        # self._perform_entanglement(node1, node3)
         #
         # if debug:
         #     line = "-" * 50
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
+        #         initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
+        # res13 = self._perform_entanglement_swapping(node1, node3)
         #
-        # results = self._perform_new_entanglement_swapping(node1, node2, node3)
+        # self._perform_entanglement(node2, node3)
         #
         # if debug:
+        #     line = "-" * 50
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
+        #         initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
         #
-        # return results
+        # res23 = self._perform_entanglement_swapping(node2, node3)
+        #
+        # return res13, res23
+        # Idea is to:
+        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
+        # want this in the end
+        self._perform_new_entanglement(node1, node2, node3)
+
+        if debug:
+            line = "-" * 50
+            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
+
+        results = self._perform_new_entanglement_swapping(node1, node2, node3)
+
+        if debug:
+            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
+
+        return results
 
     def entangle_nodes(self, node1: int, node2: int):
         """
