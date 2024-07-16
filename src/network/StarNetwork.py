@@ -420,7 +420,7 @@ class StarNetwork:
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
     ############################################
 
-    def protocol_a(self, node1: int = 1, node2: int = 2, node3: int = 4):
+    def protocol_a(self, node1: int = 1, node2: int = 2, node3: int = 4, debug: bool = False):
         """
         Perform the steps of entangling 3 nodes given their indices
         (similarly to entangle_nodes but with limited customization).
@@ -428,6 +428,7 @@ class StarNetwork:
         :param node1: The index of the first node, default is 1
         :param node2: The index of the second node, default is 2
         :param node3: The index of the third node (Remote Node), default is 4
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
         :raises AssertionError: If either `node1`, `node2`, or `node3` is not between 1 and `self._destinations_n - 1`,
         and one of the nodes is the same as the other,
         and `node1` is greater than `node2` and `node2` is greater than `node3`
@@ -452,21 +453,46 @@ class StarNetwork:
         # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
         # want this in the end
         self._perform_new_entanglement(node1, node2, node3)
-        # create observer in repeater to check if the q bits are there
-        # peak in all the repeater memory positions
-        skip_noise = True
-        r_m0, = self._network.subcomponents["Repeater"].qmemory.peek(0, skip_noise)
-        r_m1, = self._network.subcomponents["Repeater"].qmemory.peek(1, skip_noise)
-        r_m2, = self._network.subcomponents["Repeater"].qmemory.peek(2, skip_noise)
-        r_m3, = self._network.subcomponents["Repeater"].qmemory.peek(3, skip_noise)
-        print("r_m0", r_m0, "r_m1", r_m1, "r_m2", r_m2, "r_m3", r_m3)
+
+        def show_all_memory_positions():
+            """
+            Observer in repeater to check if the q bits are there by peaking in all the memory positions
+            """
+
+            def memory_access(name, position):
+                skip_noise = True
+                el, = self._network.subcomponents[name].qmemory.peek(position, skip_noise)
+                return el
+
+            def get_all_repeater_memory():
+                name = "Repeater"
+                positions = [0, 1, 2, 3]
+                return {f"{name}_m{pos}": memory_access(name, pos) for pos in positions}
+
+            print(get_all_repeater_memory())
+
+            def get_all_nodes_memory():
+                nodes = [f"Node{node1}", f"Node{node2}"]
+                positions = [0, 0]
+                return {f"{node_name}_m{pos}": memory_access(node_name, pos) for node_name, pos in zip(nodes, positions)}
+
+            print(get_all_nodes_memory())
+
+            def get_remote_node_memory():
+                name = "RemoteNode"
+                positions = [0, 1]
+                return {f"{name}_m{pos}": memory_access(name, pos) for pos in positions}
+
+            print(get_remote_node_memory())
         # peak in all the nodes memory positions
-        n1_m0, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0, skip_noise)
-        n2_m0, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0, skip_noise)
-        rn3_m0, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(0, skip_noise)
-        rn3_m1, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(1, skip_noise)
-        print("n1_m0", n1_m0, "n2_m0", n2_m0)
-        print("rn3_m0", rn3_m0, "rn3_m1", rn3_m1)
+        # n1_m0, = self._network.subcomponents[f"Node{node1}"].qmemory.peek(0, skip_noise)
+        # n2_m0, = self._network.subcomponents[f"Node{node2}"].qmemory.peek(0, skip_noise)
+        # rn3_m0, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(0, skip_noise)
+        # rn3_m1, = self._network.subcomponents[f"RemoteNode"].qmemory.peek(1, skip_noise)
+        # print("n1_m0", n1_m0, "n2_m0", n2_m0)
+        # print("rn3_m0", rn3_m0, "rn3_m1", rn3_m1)
+        if debug:
+            show_all_memory_positions()
         return self._perform_new_entanglement_swapping(node1, node2, node3)
 
     def entangle_nodes(self, node1: int, node2: int):
@@ -687,7 +713,7 @@ class StarNetwork:
         try:
             node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
             node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
-            node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode" # always "RemoteNode"
+            node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode"  # always "RemoteNode"
 
             qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
             qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)

@@ -21,7 +21,7 @@ def main():
     # print(fidelity)
     # fidelity = star_network.entangle_nodes(1, 4)
     # print(fidelity)
-    fidelity = star_network.protocol_a()  # 1, 2, 4
+    fidelity = star_network.protocol_a(debug=True)  # 1, 2, 4
     print(fidelity)
     reset_restart = False  # True
     reset_restart = check_reset_restart(reset_restart)
