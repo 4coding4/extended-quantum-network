@@ -1,4 +1,4 @@
-from netsquid import sim_run, qubits, b00
+from netsquid import sim_run, qubits, b00, sim_time
 from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
@@ -575,13 +575,12 @@ class StarNetwork:
 
         # Run the simulation
         sim_run()
+        print("sim_time in nanoseconds", sim_time())
 
         # Disconnect the source from the nodes # TODO re-enable at the end (but need to disconnect the right channels)
         # self._disconnect_source_from_destination(node1)
         # self._disconnect_source_from_destination(node2)
         # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
-
-        # pass
 
     def _perform_entanglement_swapping(self, node1: int, node2: int):
         """
