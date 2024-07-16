@@ -9,8 +9,8 @@ def main():
     """
     Main function to run the simulation.
     """
-    global reset
-    reset = False
+    global reset_restart
+    reset_restart = False
     # Initialize Network and run experiment
     # star_network: StarNetwork = StarNetwork(Combined.models)  # TODO reactivate this at the end to enable noises/errors
     star_network: StarNetwork = StarNetwork(Empty.empty_models)
@@ -23,8 +23,8 @@ def main():
     # print(fidelity)
     fidelity = star_network.protocol_a()  # 1, 2, 4
     print(fidelity)
-    reset = True
-    reset = check_reset_restart(reset)
+    reset_restart = True
+    reset_restart = check_reset_restart(reset_restart)
     # Run experiment suite (Node1 *-* Node2)
     # --------------------------------------
     # experiment: Experiment = Experiment(star_network, verbose=False)
