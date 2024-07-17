@@ -16,7 +16,7 @@ class GenerateEntanglement(NodeProtocol):
 
 
     def __init__(self, on_node: node, name: str, is_source: bool = False, is_repeater: bool = False,
-                 is_remote: bool = False):
+                 is_remote: bool = False, qsource_name: node = None):
         """
         Constructor for the GenerateEntanglement protocol class.
 
@@ -31,6 +31,7 @@ class GenerateEntanglement(NodeProtocol):
         self._is_source = is_source
         self._is_repeater = is_repeater
         self._is_remote = is_remote
+        self._qsource_name = qsource_name  # default is None
 
         if not self._is_source:
             self._qmem_input_ports.append(self.node.qmemory.ports["qin0"])
@@ -62,9 +63,17 @@ class GenerateEntanglement(NodeProtocol):
         if self._is_source or self._is_remote:
             for name, subcomp in self.node.subcomponents.items():
                 if isinstance(subcomp, QSource):
-                    self._qsource_name = name
-                    break
-            else:
-                return False
+                    if self._qsource_name is name:
+                        print(f"Source {self._qsource_name}")
+                        return True
+                    elif self._qsource_name is None:
+                        # connect the first source found
+                        self._qsource_name = name
+                        return True
 
-        return True
+            if self._qsource_name is None:
+                return False
+            else:
+                return True
+        else:
+            return True
