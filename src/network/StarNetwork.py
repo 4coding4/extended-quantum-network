@@ -444,7 +444,7 @@ class StarNetwork:
         # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
 
         # this way uses only 1 mem position0 and 1 qchannel between nodes
-        self._perform_entanglement(node1, node3)
+        self._perform_entanglement(node1, node3, 1)
 
         if debug:
             line = "-" * 50
@@ -496,7 +496,7 @@ class StarNetwork:
         return self._perform_entanglement_swapping(node1, node2)
         # return self._perform_fidelity_measurement(node1, node2)
 
-    def _perform_entanglement(self, node1: int, node2: int):
+    def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
         Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
         function then returns the two qubits and the fidelity of their entanglement compared to the entangled state
@@ -512,13 +512,22 @@ class StarNetwork:
         self._connect_source_to_destination(node1)
         self._connect_source_to_destination(node2)
 
+        if channel_n == 0:
+            source_name = "QuantumSource"
+            remote_source_name = "RemoteQuantumSource"
+        else:
+            source_name = "QuantumSource" + str(channel_n)
+            remote_source_name = "RemoteQuantumSource" + str(channel_n)
+
         # Initialize and start the protocols
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
-                                                                     is_source=True, name="ProtocolSource")
+                                                                     is_source=True, name="ProtocolSource",
+                                                                     qsource_name=source_name)
 
         if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
             protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
-                                                   is_remote=True, name="ProtocolRemote")
+                                                   is_remote=True, name="ProtocolRemote",
+                                                   qsource_name=remote_source_name)
 
             protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
                                                      is_repeater=True, name=f"ProtocolRepeater")
