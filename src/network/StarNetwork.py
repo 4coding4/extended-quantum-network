@@ -1,8 +1,9 @@
-from netsquid import sim_run, qubits, b00
+from netsquid import sim_run, qubits, b00, sim_time
 from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
 
+from src.network.MemorySnapshot import MemorySnapshot
 from src.network.PortPair import PortPair
 from src.network.QuantumComponents import QuantumComponents as QC
 from src.protocols.GenerateEntanglement import GenerateEntanglement
@@ -267,7 +268,8 @@ class StarNetwork:
                                                           models=self._models)
                 self._quantum_channels.append(channel1)
 
-                port_source1, port_repeater1 = self.network.add_connection(self._source, destination, channel_to=channel1,
+                port_source1, port_repeater1 = self.network.add_connection(self._source, destination,
+                                                                           channel_to=channel1,
                                                                            label=f"C_Source1->Repeater")
                 self._quantum_channels_port_pairs.append(PortPair(port_source1, port_repeater1, f"C_Source1->Repeater"))
             elif index == self._destinations_n - 1:
@@ -279,7 +281,8 @@ class StarNetwork:
                 repeater = self._network.subcomponents["Repeater"]
                 port_remote, port_repeater = self.network.add_connection(destination, repeater, channel_to=channel,
                                                                          label=f"C_RemoteNode->Repeater")
-                self._quantum_channels_port_pairs.append(PortPair(port_remote, port_repeater, f"C_RemoteNode->Repeater"))
+                self._quantum_channels_port_pairs.append(
+                    PortPair(port_remote, port_repeater, f"C_RemoteNode->Repeater"))
                 # second quantum channel for the remote node
                 channel1: QuantumChannel = QuantumChannel(f"QC_RemoteNode1->Repeater", length=length,
                                                           models=self._models)
@@ -299,13 +302,14 @@ class StarNetwork:
                 port_source, port_destination = self.network.add_connection(self._source, destination,
                                                                             channel_to=channel,
                                                                             label=f"C_Source->Node{index + 1}")
-                self._quantum_channels_port_pairs.append(PortPair(port_source, port_destination, f"C_Source->Node{index + 1}"))
+                self._quantum_channels_port_pairs.append(
+                    PortPair(port_source, port_destination, f"C_Source->Node{index + 1}"))
 
     ###################################################################
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
-    def _connect_source_to_destination(self, n: int):
+    def _connect_source_to_destination(self, n: int, channel_n=0):
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -319,15 +323,62 @@ class StarNetwork:
         destination: node = self._destinations[n - 1]
         port_pair: PortPair = self._quantum_channels_port_pairs[n - 1]
         source_ports: dict = source.subcomponents["QuantumSource"].ports
+        source_ports1: dict = source.subcomponents["QuantumSource1"].ports
 
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
+            if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
+                raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+
+        # TODO REFACTOR THIS
+        if len(source_ports["qout0"].forwarded_ports) == 0:
+            port_n = 0
+            selected_source_ports = source_ports
+            component_name = "QuantumSource"
+        elif len(source_ports["qout1"].forwarded_ports) == 0:
+            port_n = 1
+            selected_source_ports = source_ports
+            component_name = "QuantumSource"
+        elif len(source_ports1["qout0"].forwarded_ports) == 0:
+            port_n = 0
+            selected_source_ports = source_ports1
+            component_name = "QuantumSource1"
+        elif len(source_ports1["qout1"].forwarded_ports) == 0:
+            port_n = 1
+            selected_source_ports = source_ports1
+            component_name = "QuantumSource1"
+        else:
             raise Exception("Two nodes have already been connected to the source's QuantumSource component")
 
-        port_n = 0 if len(source_ports["qout0"].forwarded_ports) == 0 else 1
+        # if channel_n == 0:
+        #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        # else:
+        #     source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        #     if n == self._destinations_n - 2:  # repeater
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        #     else:
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
 
+        # old (keep it since we still need for simple cases/routing)
         source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+
+        source.subcomponents["QuantumSource1"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        if n == self._destinations_n - 1:  # remote node
+            if channel_n == 0:
+                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+            else:
+                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
+        elif n == self._destinations_n - 2:  # repeater
+            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+        else:
+            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+
+        # new
+        # source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])  # enabled
+        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])  # enabled
 
     def _disconnect_source_from_destination(self, n: int):
         """
@@ -393,6 +444,64 @@ class StarNetwork:
     # GENERATE ENTANGLEMENT BETWEEN NODE PAIRS #
     ############################################
 
+    def protocol_a(self, node1: int = 1, node2: int = 2, node3: int = 4, debug: bool = False):
+        """
+        Perform the steps of entangling 3 nodes given their indices
+        (similarly to entangle_nodes but with limited customization).
+
+        :param node1: The index of the first node, default is 1
+        :param node2: The index of the second node, default is 2
+        :param node3: The index of the third node (Remote Node), default is 4
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
+        :raises AssertionError: If either `node1`, `node2`, or `node3` is not between 1 and `self._destinations_n - 1`,
+        and one of the nodes is the same as the other,
+        and `node1` is greater than `node2` and `node2` is greater than `node3`
+        :return: A dictionary containing the qubits and their fidelity
+        """
+        assert (1 <= node1 <= self._destinations_n - 1
+                and 1 <= node2 <= self._destinations_n - 1
+                and 1 <= node3 <= self._destinations_n - 1
+                and node1 < node2 < node3
+                and node1 != node2 != node3)
+
+        # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
+
+        # this way uses only 1 mem position0 and 1 qchannel between nodes
+        self._perform_entanglement(node1, node3, 1)
+
+        if debug:
+            line = "-" * 50
+            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
+
+        self._perform_entanglement(node2, node3)
+
+        if debug:
+            line = "-" * 50
+            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
+        res13 = self._perform_entanglement_swapping(node1, node3)
+        res23 = self._perform_entanglement_swapping(node2, node3)
+
+        return res13, res23
+        # Idea is to:
+        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
+        # want this in the end
+        # self._perform_new_entanglement(node1, node2, node3)
+        #
+        # if debug:
+        #     line = "-" * 50
+        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+        #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
+        #
+        # results = self._perform_new_entanglement_swapping(node1, node2, node3)
+        #
+        # if debug:
+        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+        #         initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
+        #
+        # return results
+
     def entangle_nodes(self, node1: int, node2: int):
         """
         Perform the steps of entangling two nodes given their indices.
@@ -409,7 +518,7 @@ class StarNetwork:
         return self._perform_entanglement_swapping(node1, node2)
         # return self._perform_fidelity_measurement(node1, node2)
 
-    def _perform_entanglement(self, node1: int, node2: int):
+    def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
         Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
         function then returns the two qubits and the fidelity of their entanglement compared to the entangled state
@@ -422,16 +531,25 @@ class StarNetwork:
         protocol_node2: GenerateEntanglement
 
         # Connect the source to the nodes
-        self._connect_source_to_destination(node1)
-        self._connect_source_to_destination(node2)
+        self._connect_source_to_destination(node1, channel_n)
+        self._connect_source_to_destination(node2, channel_n)
+
+        if channel_n == 0:
+            source_name = "QuantumSource"
+            remote_source_name = "RemoteQuantumSource"
+        else:
+            source_name = "QuantumSource" + str(channel_n)
+            remote_source_name = "RemoteQuantumSource" + str(channel_n)
 
         # Initialize and start the protocols
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
-                                                                     is_source=True, name="ProtocolSource")
+                                                                     is_source=True, name="ProtocolSource",
+                                                                     qsource_name=source_name)
 
         if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
             protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
-                                                   is_remote=True, name="ProtocolRemote")
+                                                   is_remote=True, name="ProtocolRemote",
+                                                   qsource_name=remote_source_name)
 
             protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
                                                      is_repeater=True, name=f"ProtocolRepeater")
@@ -463,6 +581,49 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
+    def _perform_new_entanglement(self, node1: int, node2: int, node3: int):
+        # TODO: implement the entanglement between 3 nodes
+        protocol_node1: GenerateEntanglement
+        protocol_node2: GenerateEntanglement
+        protocol_node3: GenerateEntanglement
+
+        # Connect the source to the nodes
+        self._connect_source_to_destination(node1)
+        self._connect_source_to_destination(node2)
+        self._connect_source_to_destination(node3)
+
+        # Initialize and start the protocols
+        protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
+                                                                     is_source=True, name="ProtocolSource")
+
+        protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
+                                               is_remote=True, name="ProtocolRemote")
+
+        protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
+                                                 is_repeater=True, name=f"ProtocolRepeater")
+
+        protocol_node1 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
+                                              name=f"ProtocolNode{node1}")
+        protocol_node2 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
+                                              name=f"ProtocolNode{node2}")
+        # protocol_node3 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node3}"],
+        #                                       name=f"ProtocolNode{node3}")  # always RemoteNode
+        protocol_source.start()
+        protocol_node1.start()
+        protocol_node2.start()
+        protocol_repeater.start()
+        # protocol_node3.start()
+        protocol_remote.start()
+
+        # Run the simulation
+        sim_run()
+        print("sim_time in nanoseconds", sim_time())
+
+        # Disconnect the source from the nodes # TODO re-enable at the end (but need to disconnect the right channels)
+        # self._disconnect_source_from_destination(node1)
+        # self._disconnect_source_from_destination(node2)
+        # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
+
     def _perform_entanglement_swapping(self, node1: int, node2: int):
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
@@ -474,7 +635,9 @@ class StarNetwork:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
                 m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
                                                                                         output_key="M")
+                # print(m)  # ({'M': [1]}, 0.0)
                 state = m[0]["M"][0]
+                # print(state)  # 1
 
                 if state == 1:
                     # |01>
@@ -515,6 +678,88 @@ class StarNetwork:
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
 
         return result
+
+    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int):
+        # TODO: implement the perform entanglement swapping between 3 nodes (should be all right, check at the end if the second state is returned in the state1 as expected)
+        try:
+            if node3 == self._destinations_n - 1:
+                m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
+                                                                                        output_key="M")
+                print('_perform_new_entanglement_swapping: m= ', m)
+                state = m[0]["M"][0]
+                state1 = m[1]["M"][0]  # I assume that I will get this position 1
+                print("state", state, "state1", state1)
+
+                # swap the qubits in memory position 0 and 1,
+                # and then apply the necessary gates
+                # then do the same for the position 2 and 3
+
+                # create helper function to apply the gates
+                def apply_gates(curr_state, position):
+                    """
+                    Apply the necessary gates to the qubit in the memory position based on the state.
+                    """
+                    instructions = {
+                        1: [INSTR_X],  # |01>
+                        2: [INSTR_Z, INSTR_X],  # |11>
+                        3: [INSTR_Z]  # |10>
+                    }
+                    get_instructions = instructions[curr_state]
+                    mem = self._network.subcomponents["RemoteNode"].qmemory
+                    for instr in get_instructions:
+                        mem.execute_instruction(instr, position=position)
+                    # if curr_state == 1:
+                    #     # |01>
+                    #     mem.execute_instruction(INSTR_X, position=position)
+                    # elif curr_state == 2:
+                    #     # |11>
+                    #     mem.execute_instruction(INSTR_Z, position=position)
+                    #     mem.execute_instruction(INSTR_X, position=position)
+                    # elif curr_state == 3:
+                    #     # |10>
+                    #     mem.execute_instruction(INSTR_Z, position=position)
+
+                # apply gates for first and second state/position
+                apply_gates(state, 0)
+                apply_gates(state1, 1)
+        except MemPositionEmptyError as e:
+            print(e)
+            # pass
+
+        try:
+            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode"  # always "RemoteNode"
+
+            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
+            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
+            # "RemoteNode" w 2 mem positions
+            qubit_node3, = self._network.subcomponents[node3_label].qmemory.pop(0)
+            qubit_node3_1, = self._network.subcomponents[node3_label].qmemory.pop(1)
+            # peak in all the repeater memory positions
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
+            _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
+            # measure fidelity between qubit_node1 and qubit_node3 and qubit_node2 and qubit_node3_1
+            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node3], b00)
+            entanglement_fidelity1: float = qubits.fidelity([qubit_node2, qubit_node3_1], b00)
+            # try to discard the memory positions in the repeater
+            if node3_label == "RemoteNode":
+                # list of the memory positions from 0 to 3 (both included)
+                for i in range(4):
+                    try:
+                        self._network.subcomponents["Repeater"].qmemory.discard(i)
+                    except:
+                        pass
+
+            result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
+            result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
+            results = [result, result1]
+        except ValueError as e:
+            print(e)
+            results = {"message": "Some Qubits were lost during transfer", "error": True}
+        return results
 
     def _perform_fidelity_measurement(self, node1: int, node2: int):
         """
