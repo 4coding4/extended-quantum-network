@@ -725,7 +725,8 @@ class StarNetwork:
             result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
             result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
             results = [result, result1]
-        except ValueError:
+        except ValueError as e:
+            print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
         return results
 
