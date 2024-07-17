@@ -309,7 +309,7 @@ class StarNetwork:
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
-    def _connect_source_to_destination(self, n: int):
+    def _connect_source_to_destination(self, n: int, channel_n=0):
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -349,13 +349,36 @@ class StarNetwork:
             component_name = "QuantumSource1"
         else:
             raise Exception("Two nodes have already been connected to the source's QuantumSource component")
-        # old
-        # source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        # new
-        source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+
+        # if channel_n == 0:
+        #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        # else:
+        #     source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        #     if n == self._destinations_n - 2:  # repeater
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        #     else:
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+
+        # old (keep it since we still need for simple cases/routing)
+        source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+
+        source.subcomponents["QuantumSource1"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        if n == self._destinations_n - 1:  # remote node
+            if channel_n == 0:
+                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+            else:
+                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
+        elif n == self._destinations_n - 2:  # repeater
+            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+        else:
+            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+
+        # new
+        # source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])  # enabled
+        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])  # enabled
 
     def _disconnect_source_from_destination(self, n: int):
         """
@@ -450,7 +473,6 @@ class StarNetwork:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
-        res13 = self._perform_entanglement_swapping(node1, node3)
 
         self._perform_entanglement(node2, node3)
 
@@ -458,7 +480,7 @@ class StarNetwork:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-
+        res13 = self._perform_entanglement_swapping(node1, node3)
         res23 = self._perform_entanglement_swapping(node2, node3)
 
         return res13, res23
@@ -509,8 +531,8 @@ class StarNetwork:
         protocol_node2: GenerateEntanglement
 
         # Connect the source to the nodes
-        self._connect_source_to_destination(node1)
-        self._connect_source_to_destination(node2)
+        self._connect_source_to_destination(node1, channel_n)
+        self._connect_source_to_destination(node2, channel_n)
 
         if channel_n == 0:
             source_name = "QuantumSource"
