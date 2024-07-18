@@ -20,10 +20,11 @@ class GenerateEntanglement(NodeProtocol):
         Constructor for the GenerateEntanglement protocol class.
 
         :param on_node: Node to run this protocol on
+        :param name: Name of the protocol
         :param is_source: Whether this protocol should act as a source or a receiver. Both are needed
         :param is_repeater: Whether this protocol should act as a repeater
         :param is_remote: Whether this protocol should act as a remote_source
-        :param name: Name of the protocol
+        :param qsource_name: Name of the qsource node to use for this protocol. If None, the first source node is used.
         """
         super().__init__(node=on_node, name=name)
 
