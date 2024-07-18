@@ -56,11 +56,11 @@ class GenerateEntanglement(NodeProtocol):
             self.send_signal(Signals.SUCCESS, 1)
 
     @property
-    def is_connected(self) -> bool:
+    def is_connected(self) -> bool:  # TODO refactor this complex method, too many if-else and return statements
         if self._is_source or self._is_remote:
             for name, subcomp in self.node.subcomponents.items():
                 if isinstance(subcomp, QSource):
-                    if self._qsource_name is name:
+                    if self._qsource_name is name:  # TODO Check this first in its own loop so we can skip the rest
                         print(f"Source {self._qsource_name}")
                         return True
                     elif self._qsource_name is None:
@@ -72,5 +72,6 @@ class GenerateEntanglement(NodeProtocol):
                 return False
             else:
                 return True
+        # needed for repeater nodes
         else:
             return True
