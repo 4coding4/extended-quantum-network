@@ -4,7 +4,7 @@ class MemorySnapshot:
     :param network: The network to take the snapshot of.
     :param node1: The first node of the network.
     :param node2: The second node of the network.
-    (the third node is the remote node, is implicit)
+    (the third node is the remote node, is implicit) # TODO refactor to make it explicit
     """
 
     def __init__(self, network, node1, node2):
@@ -50,7 +50,7 @@ class MemorySnapshot:
         Returns the names and positions of the repeater's memories.
         :return: Tuple of lists of names and positions of the repeater's memories.
         """
-        names = ["Repeater"] * 4
+        names = ["Repeater"] * 4  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 1, 2, 3]
         return names, positions
 
@@ -59,7 +59,7 @@ class MemorySnapshot:
         Returns the names and positions of the nodes' memories.
         :return: Tuple of lists of names and positions of the nodes' memories.
         """
-        names = [f"Node{self.node1}", f"Node{self.node2}"]
+        names = [f"Node{self.node1}", f"Node{self.node2}"]  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 0]
         return names, positions
 
@@ -68,7 +68,7 @@ class MemorySnapshot:
         Returns the names and positions of the remote node's memories.
         :return: Tuple of lists of names and positions of the remote node's memories.
         """
-        names = ["RemoteNode"] * 2
+        names = ["RemoteNode"] * 2  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 1]
         return names, positions
 
@@ -79,8 +79,12 @@ class MemorySnapshot:
         if initial_msg != "":
             print(initial_msg)
 
+        # run the repeater, nodes and remote node, to get the tuples of names and positions of the memories
         names_positions = [self.repeater(), self.nodes(), self.remote_node()]
+        # access the memories at the given positions (of the subcomponents) and
+        # store the results in a list of dictionaries
         all_mem = [self.multi_access(names_positions) for names_positions in names_positions]
+        # print the results in a formatted way for each memory position 1 pro line
         print("\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()]))
 
         if end_msg != "":
