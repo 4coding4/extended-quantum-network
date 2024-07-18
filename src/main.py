@@ -125,53 +125,53 @@ def handle_args() -> tuple[str, str, list[int], bool, int]:
         sys.exit()
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
-    models_name: str = "empty"
-    method_name: str = "protocol_a"
-    nodes: list[int] = [1, 2, 4]
-    debug: bool = False
-    experiment_num: int = 0
+    models_name_input: str = "empty"
+    method_name_input: str = "protocol_a"
+    nodes_input: list[int] = [1, 2, 4]
+    debug_input: bool = False
+    experiment_num_input: int = 0
     for i in range(1, len(sys.argv)):
         if i == 1:
-            models_name = sys.argv[i]
+            models_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
-            if models_name not in ["combined", "empty"]:
+            if models_name_input not in ["combined", "empty"]:
                 error_exit("Invalid models_name, please provide 'combined' or 'empty'")
         elif i == 2:
-            method_name = sys.argv[i]
+            method_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
-            if method_name not in ["protocol_a", "entangle_nodes"]:
+            if method_name_input not in ["protocol_a", "entangle_nodes"]:
                 error_exit("Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'")
         elif i == 3:
             try:
                 nodes_str: list[str] = sys.argv[i].split(",")
                 # convert the strings to integers
-                nodes = [int(node) for node in nodes_str]
+                nodes_input = [int(node) for node in nodes_str]
             except ValueError:
                 error_exit("Invalid nodes, please provide a list of integers separated by ','")
 
             # check that nodes is a list of non-duplicate integers (between 1 and 4) and the length is either 0, 2 or 3
-            if len(nodes) not in [0, 2, 3]:
+            if len(nodes_input) not in [0, 2, 3]:
                 error_exit("Invalid number of nodes, please provide a list of length 0, 2 or 3")
-            if len(nodes) != len(set(nodes)):
+            if len(nodes_input) != len(set(nodes_input)):
                 error_exit("Invalid nodes, please provide a list of unique integers")
-            if any(node < 1 or node > 4 for node in nodes):
+            if any(node < 1 or node > 4 for node in nodes_input):
                 error_exit("Invalid nodes, please provide a list of integers between 1 and 4")
         elif i == 4:
             debug_str = sys.argv[i]
             # convert the string to a boolean
             if debug_str == "True":
-                debug = True
+                debug_input = True
             elif debug_str == "False":
-                debug = False
+                debug_input = False
             else:
                 error_exit("Invalid debug, please provide 'True' or 'False'")
         elif i == 5:
             try:
-                experiment_num = int(sys.argv[i])
+                experiment_num_input = int(sys.argv[i])
             except ValueError:
                 error_exit("Invalid experiment_num, please provide an integer")
 
-    return models_name, method_name, nodes, debug, experiment_num
+    return models_name_input, method_name_input, nodes_input, debug_input, experiment_num_input
 
 
 if __name__ == "__main__":
