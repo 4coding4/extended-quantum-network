@@ -507,12 +507,13 @@ class StarNetwork:
         #
         # return results
 
-    def entangle_nodes(self, node1: int, node2: int):
+    def entangle_nodes(self, node1: int = 1, node2: int = 4, debug: bool = False):
         """
         Perform the steps of entangling two nodes given their indices.
 
-        :param node1: The index of the first node
-        :param node2: The index of the second node
+        :param node1: The index of the first node (default is 1)
+        :param node2: The index of the second node (default is 4, the Remote Node)
+        :param debug: unused boolean (default is False)
         :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
                                 and `node2` are the same node
         :return: A dictionary containing the qubits and their fidelity
