@@ -176,18 +176,18 @@ def handle_args() -> tuple[str, str, list[int], bool, int]:
 
 if __name__ == "__main__":
     # handle the command line arguments
-    models_name, method_name, nodes, debug, experiment_num = handle_args()
+    models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main = handle_args()
 
     # print all the parsed arguments
     print("Parsed arguments:")
-    print(f"models_name: {models_name}")
-    print(f"method_name: {method_name}")
-    print(f"nodes: {nodes}")
-    print(f"debug: {debug}")
-    print(f"experiment_num: {experiment_num}")
+    print(f"models_name: {models_name_main}")
+    print(f"method_name: {method_name_main}")
+    print(f"nodes: {nodes_main}")
+    print(f"debug: {debug_main}")
+    print(f"experiment_num: {experiment_num_main}")
 
     # run the main function
-    main(models_name, method_name, nodes, debug, experiment_num)
+    main(models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main)
 
     # test entangle_nodes
     # main(models_name="empty", method_name="entangle_nodes", nodes=[1, 3])
