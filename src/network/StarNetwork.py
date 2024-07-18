@@ -309,7 +309,7 @@ class StarNetwork:
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
-    def _connect_source_to_destination(self, n: int, channel_n=0):
+    def _connect_source_to_destination(self, n: int, channel_n=0):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -625,7 +625,7 @@ class StarNetwork:
         # self._disconnect_source_from_destination(node2)
         # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
 
-    def _perform_entanglement_swapping(self, node1: int, node2: int):
+    def _perform_entanglement_swapping(self, node1: int, node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
