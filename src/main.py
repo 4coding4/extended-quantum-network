@@ -41,4 +41,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # TODO accept command line arguments to choose between (combined and empty) models and the number to run the experiment on (optional)
     main()
