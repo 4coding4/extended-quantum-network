@@ -50,7 +50,7 @@ class MemorySnapshot:
         Returns the names and positions of the repeater's memories.
         :return: Tuple of lists of names and positions of the repeater's memories.
         """
-        names = ["Repeater"] * 4
+        names = ["Repeater"] * 4  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 1, 2, 3]
         return names, positions
 
@@ -59,7 +59,7 @@ class MemorySnapshot:
         Returns the names and positions of the nodes' memories.
         :return: Tuple of lists of names and positions of the nodes' memories.
         """
-        names = [f"Node{self.node1}", f"Node{self.node2}"]
+        names = [f"Node{self.node1}", f"Node{self.node2}"]  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 0]
         return names, positions
 
@@ -68,7 +68,7 @@ class MemorySnapshot:
         Returns the names and positions of the remote node's memories.
         :return: Tuple of lists of names and positions of the remote node's memories.
         """
-        names = ["RemoteNode"] * 2
+        names = ["RemoteNode"] * 2  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
         positions = [0, 1]
         return names, positions
 

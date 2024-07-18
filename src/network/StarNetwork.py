@@ -465,7 +465,7 @@ class StarNetwork:
                 and node1 != node2 != node3)
 
         # redo: _perform_entanglement and _perform_entanglement_swapping (and all his calls)
-
+        # TODO auto assign the channel_n
         # this way uses only 1 mem position0 and 1 qchannel between nodes
         self._perform_entanglement(node1, node3, 1)
 
@@ -480,10 +480,11 @@ class StarNetwork:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-        res13 = self._perform_entanglement_swapping(node1, node3)
-        res23 = self._perform_entanglement_swapping(node2, node3)
+        res13 = self._perform_entanglement_swapping(node1, node3)  # TODO Replace w th e combined method
+        res23 = self._perform_entanglement_swapping(node2, node3)  # TODO Replace w th e combined method
 
         return res13, res23
+        # TODO: delete the following code, then the above tested and working
         # Idea is to:
         # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
         # want this in the end

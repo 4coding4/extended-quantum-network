@@ -14,7 +14,6 @@ class GenerateEntanglement(NodeProtocol):
     _qsource_name: node = None
     _qmem_input_ports: [Port] = []
 
-
     def __init__(self, on_node: node, name: str, is_source: bool = False, is_repeater: bool = False,
                  is_remote: bool = False, qsource_name: node = None):
         """
@@ -41,7 +40,6 @@ class GenerateEntanglement(NodeProtocol):
             self._qmem_input_ports.append(self.node.qmemory.ports["qin1"])
             self.node.qmemory.mem_positions[1].in_use = True
 
-
     def run(self) -> None:
         """
         Send entangled qubits of the source to the two destination nodes.
@@ -56,7 +54,6 @@ class GenerateEntanglement(NodeProtocol):
         if self._is_remote:
             yield self.await_port_input(self._qmem_input_ports[1])
             self.send_signal(Signals.SUCCESS, 1)
-
 
     @property
     def is_connected(self) -> bool:
