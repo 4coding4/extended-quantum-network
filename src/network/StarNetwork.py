@@ -786,10 +786,6 @@ class StarNetwork:
                 result1 = {"qubits": pair2, "fidelity": fidelity2, "error": False}
                 return result, result1
 
-            # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node3],b00)  # TODO: merge this w the results at the button
-            # entanglement_fidelity1: float = qubits.fidelity([qubit_node2, qubit_node3_1], b00)
-            # result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
-            # result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
             result, result1 = return_results(qubit_node1, qubit_node2, qubit_node3, qubit_node3_1)
             # try to discard the memory positions in the repeater
             if node3_label == "RemoteNode":
