@@ -703,9 +703,10 @@ class StarNetwork:
         :param node3: The index of the third node
         :return: A dictionary containing the qubits and their fidelity
         """
+        repeater_memory = self._network.subcomponents["Repeater"].qmemory
+        remotenode_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if any(single_node == self._destinations_n - 1 for single_node in [node1, node2, node3]):
-                repeater_memory = self._network.subcomponents["Repeater"].qmemory
                 m_mem_positions = [0, 1]
                 m1_mem_positions = [2, 3]
                 m = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m_mem_positions, output_key="M"))
@@ -738,9 +739,8 @@ class StarNetwork:
                     # get the instructions based on the state of the qubit in the memory position
                     get_instructions = instructions[curr_state]
                     # apply the instructions to the qubit in the memory position (in the RemoteNode)
-                    rn_mem = self._network.subcomponents["RemoteNode"].qmemory
                     for instr in get_instructions:
-                        rn_mem.execute_instruction(instr, [position])
+                        remotenode_memory.execute_instruction(instr, [position])
                         #, output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
                         print(f"Applying instruction {instr} to the qubit "
                               f"in memory position {position} in the RemoteNode")
@@ -753,20 +753,30 @@ class StarNetwork:
 
         try:
             # TODO refactor this following repeating code patterns
-            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
-            node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode"  # always "RemoteNode"
 
-            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
-            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
-            # "RemoteNode" w 2 mem positions
-            qubit_node3, = self._network.subcomponents[node3_label].qmemory.pop(0)
-            qubit_node3_1, = self._network.subcomponents[node3_label].qmemory.pop(1)
-            # peak in all the repeater memory positions
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
+            # node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            # node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            # node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode"  # always "RemoteNode"
+            # labels = [node1_label, node2_label, node3_label, node3_label]
+            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
+                      for node_n in [node1, node2, node3, node3]]  # the last 2 are always "RemoteNode"
+            mem_positions = [0, 0, 0, 1]  # 1 because "RemoteNode" has 2 mem positions
+            # qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
+            # qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
+            # # "RemoteNode" w 2 mem positions
+            # qubit_node3, = self._network.subcomponents[node3_label].qmemory.pop(0)
+            # qubit_node3_1, = self._network.subcomponents[node3_label].qmemory.pop(1)
+            qubit_node1, qubit_node2, qubit_node3, qubit_node3_1 = \
+                [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
+                 for label, mem_pos in zip(labels, mem_positions)]
+            # peak in all the repeater memory positions, from 0 to 3 (both included)
+            for i in range(4):
+                _, = repeater_memory.peek(i)
+
+            # _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
+            # _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            # _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
+            # _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
 
             def return_results(qubit1: Qubit, qubit2: Qubit, qubit3: Qubit, qubit4: Qubit) \
                     -> List[Dict[str, Union[List[Qubit], float, bool]]]:
@@ -802,11 +812,11 @@ class StarNetwork:
 
             results = return_results(qubit_node1, qubit_node2, qubit_node3, qubit_node3_1)
             # try to discard the memory positions in the repeater
-            if node3_label == "RemoteNode":
+            if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
                 # list of the memory positions from 0 to 3 (both included)
                 for i in range(4):
                     try:
-                        self._network.subcomponents["Repeater"].qmemory.discard(i)
+                        repeater_memory.discard(i)
                     except:
                         pass
         except ValueError as e:
