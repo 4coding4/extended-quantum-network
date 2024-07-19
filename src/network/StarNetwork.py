@@ -499,40 +499,6 @@ class StarNetwork:
                     initial_msg=f"{line}\nAfter entanglement in nodes {first_node_number}-3{extra_msg}:",
                     end_msg=f"{line}\n" + expected_output + f"\n{line}")
 
-        # self._perform_entanglement(node1, node3, 1)
-
-        # if debug:
-        #     line = "-" * 50
-        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nAfter entanglement swapping in nodes 1-3:", end_msg=line)
-        # should be 4 None
-
-        # self._perform_entanglement(node2, node3)
-
-        # if debug:
-        #     line = "-" * 50
-        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-        # should be all Qubits and 0 None
-
-        # TODO perform the memory snapshot between the entanglement and the (entanglement) swapping
-
-        # perform swapping in aggregate since the entanglement is already done and all the qbits are in memory
-        # res13 = self._perform_entanglement_swapping(node1, node3)  # TODO Replace w the combined method
-        # res23 = self._perform_entanglement_swapping(node2, node3)  # TODO Replace w the combined method
-
-        # return res13, res23
-        # TODO: delete the following code, then the above tested and working
-        # Idea is to:
-        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
-        # want this in the end
-        # self._perform_new_entanglement(node1, node2, node3)
-        #
-        # if debug:
-        #     line = "-" * 50
-        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
-        #
         results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
         if debug:
