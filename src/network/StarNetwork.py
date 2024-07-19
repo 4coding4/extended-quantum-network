@@ -487,7 +487,6 @@ class StarNetwork:
 
             if debug:
                 first_node_number = i + 1
-                line = "-" * 50
                 if i == 0:
                     expected_output = "If it is working correctly, the output should have 4 Qubits and 4 None"
                     extra_msg = ""
@@ -496,17 +495,16 @@ class StarNetwork:
                     extra_msg = " and Before entanglement swapping"
 
                 MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                    initial_msg=f"{line}\nAfter entanglement in nodes {first_node_number}-3{extra_msg}:",
-                    end_msg=f"{line}\n" + expected_output + f"\n{line}")
+                    initial_msg=f"After entanglement in nodes {first_node_number}-3{extra_msg}:",
+                    end_msg=expected_output)
 
         results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
         if debug:
-            line = "-" * 50
             expected_output = "If it is working correctly, the output should have all None"
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nAfter entanglement swapping:",
-                end_msg=f"{line}\n" + expected_output + f"\n{line}")
+                initial_msg="After entanglement swapping:",
+                end_msg=expected_output)
 
         return results
 
