@@ -473,6 +473,7 @@ class StarNetwork:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
+            # should be 4 None
 
         self._perform_entanglement(node2, node3)
 
@@ -480,14 +481,15 @@ class StarNetwork:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
+            # should be all Qubits and 0 None
 
         # TODO perform the memory snapshot between the entanglement and the (entanglement) swapping
 
         # perform swapping in aggregate since the entanglement is already done and all the qbits are in memory
-        res13 = self._perform_entanglement_swapping(node1, node3)  # TODO Replace w the combined method
-        res23 = self._perform_entanglement_swapping(node2, node3)  # TODO Replace w the combined method
+        # res13 = self._perform_entanglement_swapping(node1, node3)  # TODO Replace w the combined method
+        # res23 = self._perform_entanglement_swapping(node2, node3)  # TODO Replace w the combined method
 
-        return res13, res23
+        # return res13, res23
         # TODO: delete the following code, then the above tested and working
         # Idea is to:
         # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
@@ -499,13 +501,15 @@ class StarNetwork:
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
         #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
         #
-        # results = self._perform_new_entanglement_swapping(node1, node2, node3)
-        #
-        # if debug:
-        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
-        #
-        # return results
+        results = self._perform_new_entanglement_swapping(node1, node2, node3)
+
+        if debug:
+            line = "-" * 50
+            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
+            # should be all None
+
+        return results
 
     def entangle_nodes(self, node1: int = 1, node2: int = 4, debug: bool = False):
         """
@@ -689,12 +693,15 @@ class StarNetwork:
         # TODO: implement the perform entanglement swapping between 3 nodes (should be all right, check at the end if the second state is returned in the state1 as expected)
         try:
             if node3 == self._destinations_n - 1:
-                m = (self._network.subcomponents["Repeater"].qmemory.
-                     execute_instruction(INSTR_MEASURE_BELL, output_key="M"))
-                print('_perform_new_entanglement_swapping: m= ', m)
+                repeater_memory = self._network.subcomponents["Repeater"].qmemory
+                m_mem_positions = [0, 1]
+                m1_mem_positions = [2, 3]
+                m = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m_mem_positions, output_key="M"))
+                m1 = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m1_mem_positions, output_key="M"))
+                print('_perform_new_entanglement_swapping: m= ', m, 'm1= ', m1)
                 state = m[0]["M"][0]
-                state1 = m[1]["M"][0]  # I assume that I will get this position 1  # TODO check if this is correct
-                print("state", state, "state1", state1)
+                state1 = m1[0]["M"][0]
+                print('Bell measurement in repeater: state', state, "state1", state1)
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
@@ -705,12 +712,13 @@ class StarNetwork:
                     """
                     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
                     based on the state (in the repeater).
-                    :param curr_state: The state of the qubit in the Repeater memory position (1, 2, or 3)
+                    :param curr_state: The state of the qubit in the Repeater memory position (0, 1, 2, or 3)
                     :param position: The memory position in the RemoteNode (0 or 1)
                     """
                     # dictionary with the instructions to apply based on the state of the qubit
                     # (represented w numbers, input of the function curr_state or as bell states in the comments)
                     instructions = {
+                        0: [],  # |00> (no gates to apply) # TODO ask if this is correct
                         1: [INSTR_X],  # |01>
                         2: [INSTR_Z, INSTR_X],  # |11>
                         3: [INSTR_Z]  # |10>
@@ -718,9 +726,12 @@ class StarNetwork:
                     # get the instructions based on the state of the qubit in the memory position
                     get_instructions = instructions[curr_state]
                     # apply the instructions to the qubit in the memory position (in the RemoteNode)
-                    mem = self._network.subcomponents["RemoteNode"].qmemory
+                    rn_mem = self._network.subcomponents["RemoteNode"].qmemory
                     for instr in get_instructions:
-                        mem.execute_instruction(instr, position=position)
+                        rn_mem.execute_instruction(instr, [position], output_key="M")
+                        # , inplace=True, repetitions=1, position=position)  # position=position
+                        print(f"Applying instruction {instr} to the qubit "
+                              f"in memory position {position} in the RemoteNode")
 
                 # apply gates for first and second state/position
                 apply_gates(state, 0)
