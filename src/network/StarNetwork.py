@@ -760,7 +760,8 @@ class StarNetwork:
             _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
 
-            def return_results(qubit1, qubit2, qubit3, qubit4) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+            def return_results(qubit1: Qubit, qubit2: Qubit, qubit3: Qubit, qubit4: Qubit) \
+                    -> List[Dict[str, Union[List[Qubit], float, bool]]]:
                 """
                 Return the results of the entanglement swapping.
 
@@ -774,7 +775,8 @@ class StarNetwork:
                 channel_0_pair = [qubit2, qubit3]
 
                 # measure fidelity between (qubit_node1, qubit_node3)&(qubit_node2, qubit_node3_1) & return the results
-                def calc_fidelity(pair1, pair2, reference_state: QRepr = b00) -> Tuple[float, float]:
+                def calc_fidelity(pair1: List[Qubit], pair2: List[Qubit], reference_state: QRepr = b00) \
+                        -> Tuple[float, float]:
                     """
                     Calculate the fidelity between two pairs of qubits.
 
@@ -799,10 +801,6 @@ class StarNetwork:
                         self._network.subcomponents["Repeater"].qmemory.discard(i)
                     except:
                         pass
-
-            # result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
-            # result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
-            # results = [result, result1]
         except ValueError as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
