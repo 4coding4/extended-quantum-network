@@ -1,16 +1,21 @@
+from netsquid.nodes import Network
+
+
 class MemorySnapshot:
     """
     A class to take a snapshot of the memories of the subcomponents of the network.
     :param network: The network to take the snapshot of.
     :param node1: The first node of the network.
     :param node2: The second node of the network.
-    (the third node is the remote node, is implicit) # TODO refactor to make it explicit
+    :param node4: The 4. node of the network equal to the remote node of the network.
     """
 
-    def __init__(self, network, node1, node2):
+    def __init__(self, network: Network, node1: int, node2: int, node4: int):
         self._network = network
         self.node1 = node1
         self.node2 = node2
+        assert node4 == 4  # The remote node must be the 4th node of the network.
+        self.node4 = node4
 
     def memory_access(self, name, position):
         """
