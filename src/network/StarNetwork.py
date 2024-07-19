@@ -2,6 +2,7 @@ from netsquid import sim_run, qubits, b00, sim_time
 from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
 from netsquid.components.qmemory import MemPositionEmptyError
 from netsquid.nodes import Network, node
+from netsquid.qubits import QRepr
 
 from src.network.MemorySnapshot import MemorySnapshot
 from src.network.PortPair import PortPair
@@ -728,8 +729,8 @@ class StarNetwork:
                     # apply the instructions to the qubit in the memory position (in the RemoteNode)
                     rn_mem = self._network.subcomponents["RemoteNode"].qmemory
                     for instr in get_instructions:
-                        rn_mem.execute_instruction(instr, [position], output_key="M")
-                        # , inplace=True, repetitions=1, position=position)  # position=position
+                        rn_mem.execute_instruction(instr, [position])
+                        #, output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
                         print(f"Applying instruction {instr} to the qubit "
                               f"in memory position {position} in the RemoteNode")
 
@@ -755,9 +756,41 @@ class StarNetwork:
             _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
-            # measure fidelity between qubit_node1 and qubit_node3 and qubit_node2 and qubit_node3_1
-            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node3], b00)  # TODO: merge this w the results at the button
-            entanglement_fidelity1: float = qubits.fidelity([qubit_node2, qubit_node3_1], b00)
+
+            # measure fidelity between (qubit_node1, qubit_node3)&(qubit_node2, qubit_node3_1) and return the results
+            def calc_fidelity(pair1, pair2, reference_state: QRepr = b00):
+                """
+                Calculate the fidelity between two pairs of qubits.
+
+                :param pair1: The first pair of qubits
+                :param pair2: The second pair of qubits
+                :param reference_state: The reference state to compare the fidelity to
+                :return: The fidelity between the two pairs of qubits
+                """
+                return qubits.fidelity(pair1, reference_state), qubits.fidelity(pair2, reference_state)
+
+            def return_results(qubit1, qubit2, qubit3, qubit4):
+                """
+                Return the results of the entanglement swapping.
+
+                :param qubit1: The first qubit
+                :param qubit2: The second qubit
+                :param qubit3: The third qubit
+                :param qubit4: The fourth qubit
+                :return: A dictionary containing the qubits and their fidelity
+                """
+                pair1 = [qubit1, qubit3]
+                pair2 = [qubit2, qubit4]
+                fidelity1, fidelity2 = calc_fidelity(pair1, pair2)
+                result = {"qubits": pair1, "fidelity": fidelity1, "error": False}
+                result1 = {"qubits": pair2, "fidelity": fidelity2, "error": False}
+                return result, result1
+
+            # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node3],b00)  # TODO: merge this w the results at the button
+            # entanglement_fidelity1: float = qubits.fidelity([qubit_node2, qubit_node3_1], b00)
+            # result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
+            # result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
+            result, result1 = return_results(qubit_node1, qubit_node2, qubit_node3, qubit_node3_1)
             # try to discard the memory positions in the repeater
             if node3_label == "RemoteNode":
                 # list of the memory positions from 0 to 3 (both included)
@@ -767,8 +800,8 @@ class StarNetwork:
                     except:
                         pass
 
-            result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
-            result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
+            # result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
+            # result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
             results = [result, result1]
         except ValueError as e:
             print(e)
