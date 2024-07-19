@@ -468,8 +468,10 @@ class StarNetwork:
                 and node1 != node2 != node3)
 
         tot_num_channels = self._repeater_mem_positions // 2  # 2 memories per channel for the repeater
+        assert tot_num_channels == 2
+
         channels_n = []
-        for i in range(0, tot_num_channels):
+        for i in range(0, 2):
             channels_n.append(i)
         # reverse the list to start from the last channel
         channels_n.reverse()
@@ -483,20 +485,19 @@ class StarNetwork:
             # this way uses only 1 mem position0 and 1 qchannel between nodes
             self._perform_entanglement(first_node, node3, channel_n)
 
-
             if debug:
                 first_node_number = i + 1
                 line = "-" * 50
                 if i == 0:
+                    expected_output = "If it is working correctly, the output should have 4 Qubits and 4 None"
                     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                        initial_msg=f"{line}\nAfter entanglement swapping in nodes 1-3:", end_msg=line)
-                    # should be 4 None
+                        initial_msg=f"{line}\nAfter entanglement in nodes {first_node_number}-3:",
+                        end_msg=f"{line}\n" + expected_output + f"\n{line}")
                 elif i == 1:
+                    expected_output = "If it is working correctly, the output should have all Qubits and 0 None"
                     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                        initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-                    # should be all Qubits and 0 None
-
-
+                        initial_msg=f"{line}\nAfter entanglement in nodes {first_node_number}-3:",
+                        end_msg=f"{line}\n" + expected_output + f"\n{line}")
 
         # self._perform_entanglement(node1, node3, 1)
 
@@ -504,7 +505,7 @@ class StarNetwork:
         #     line = "-" * 50
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
         #         initial_msg=f"{line}\nAfter entanglement swapping in nodes 1-3:", end_msg=line)
-            # should be 4 None
+        # should be 4 None
 
         # self._perform_entanglement(node2, node3)
 
@@ -512,7 +513,7 @@ class StarNetwork:
         #     line = "-" * 50
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
         #         initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-            # should be all Qubits and 0 None
+        # should be all Qubits and 0 None
 
         # TODO perform the memory snapshot between the entanglement and the (entanglement) swapping
 
@@ -536,9 +537,10 @@ class StarNetwork:
 
         if debug:
             line = "-" * 50
+            expected_output = "If it is working correctly, the output should have all None"
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
-            # should be all None
+                initial_msg=f"{line}\nAfter entanglement swapping:",
+                end_msg=f"{line}\n" + expected_output + f"\n{line}")
 
         return results
 
