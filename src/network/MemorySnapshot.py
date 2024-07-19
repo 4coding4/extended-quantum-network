@@ -72,12 +72,14 @@ class MemorySnapshot:
         positions = [0, 1]
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg="", end_msg=""):
+    def show_all_memory_positions(self, initial_msg="", end_msg="", line_width=80):
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
         """
+        line = "-" * line_width
+
         if initial_msg != "":
-            print(initial_msg)
+            print(f"{line}\n" + initial_msg)
 
         # run the repeater, nodes and remote node, to get the tuples of names and positions of the memories
         names_positions = [self.repeater(), self.nodes(), self.remote_node()]
@@ -88,4 +90,4 @@ class MemorySnapshot:
         print("\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()]))
 
         if end_msg != "":
-            print(end_msg)
+            print(end_msg + f"\n{line}")
