@@ -693,10 +693,18 @@ class StarNetwork:
 
         return result
 
-    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int):
-        # TODO: implement the perform entanglement swapping between 3 nodes (should be all right, check at the end if the second state is returned in the state1 as expected)
+    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int) \
+            -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+        """
+        Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
+
+        :param node1: The index of the first node
+        :param node2: The index of the second node
+        :param node3: The index of the third node
+        :return: A dictionary containing the qubits and their fidelity
+        """
         try:
-            if node3 == self._destinations_n - 1:
+            if any(single_node == self._destinations_n - 1 for single_node in [node1, node2, node3]):
                 repeater_memory = self._network.subcomponents["Repeater"].qmemory
                 m_mem_positions = [0, 1]
                 m1_mem_positions = [2, 3]
