@@ -504,7 +504,7 @@ class StarNetwork:
         #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
         #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
         #
-        results = self._perform_new_entanglement_swapping(node1, node2, node3)
+        results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
         if debug:
             line = "-" * 50
@@ -693,7 +693,7 @@ class StarNetwork:
 
         return result
 
-    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int) \
+    def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
             -> List[Dict[str, Union[List[Qubit], float, bool]]]:
         """
         Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
@@ -711,10 +711,11 @@ class StarNetwork:
                 m1_mem_positions = [2, 3]
                 m = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m_mem_positions, output_key="M"))
                 m1 = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m1_mem_positions, output_key="M"))
-                print('_perform_new_entanglement_swapping: m= ', m, 'm1= ', m1)
                 state = m[0]["M"][0]
                 state1 = m1[0]["M"][0]
-                print('Bell measurement in repeater: state', state, "state1", state1)
+                if debug:
+                    print('_perform_new_entanglement_swapping: m= ', m, 'm1= ', m1)
+                    print('Bell measurement in repeater: state', state, "state1", state1)
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
@@ -742,8 +743,9 @@ class StarNetwork:
                     for instr in get_instructions:
                         remotenode_memory.execute_instruction(instr, [position])
                         #, output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
-                        print(f"Applying instruction {instr} to the qubit "
-                              f"in memory position {position} in the RemoteNode")
+                        if debug:
+                            print(f"Applying instruction {instr} to the qubit "
+                                  f"in memory position {position} in the RemoteNode")
 
                 # apply gates for first and second state/position
                 apply_gates(state, 0)
