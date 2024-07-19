@@ -1,8 +1,9 @@
 from netsquid import sim_run, qubits, b00, sim_time
 from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
-from netsquid.components.qmemory import MemPositionEmptyError
+from netsquid.components.qmemory import MemPositionEmptyError, Qubit
 from netsquid.nodes import Network, node
 from netsquid.qubits import QRepr
+from typing import Tuple, List, Dict, Union
 
 from src.network.MemorySnapshot import MemorySnapshot
 from src.network.PortPair import PortPair
@@ -310,7 +311,8 @@ class StarNetwork:
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
-    def _connect_source_to_destination(self, n: int, channel_n=0):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+    def _connect_source_to_destination(self, n: int,
+                                       channel_n=0):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -635,7 +637,8 @@ class StarNetwork:
         # self._disconnect_source_from_destination(node2)
         # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
 
-    def _perform_entanglement_swapping(self, node1: int, node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+    def _perform_entanglement_swapping(self, node1: int,
+                                       node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
@@ -757,19 +760,7 @@ class StarNetwork:
             _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
 
-            # measure fidelity between (qubit_node1, qubit_node3)&(qubit_node2, qubit_node3_1) and return the results
-            def calc_fidelity(pair1, pair2, reference_state: QRepr = b00):
-                """
-                Calculate the fidelity between two pairs of qubits.
-
-                :param pair1: The first pair of qubits
-                :param pair2: The second pair of qubits
-                :param reference_state: The reference state to compare the fidelity to
-                :return: The fidelity between the two pairs of qubits
-                """
-                return qubits.fidelity(pair1, reference_state), qubits.fidelity(pair2, reference_state)
-
-            def return_results(qubit1, qubit2, qubit3, qubit4):
+            def return_results(qubit1, qubit2, qubit3, qubit4) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
                 """
                 Return the results of the entanglement swapping.
 
@@ -779,14 +770,27 @@ class StarNetwork:
                 :param qubit4: The fourth qubit
                 :return: A dictionary containing the qubits and their fidelity
                 """
-                pair1 = [qubit1, qubit4]
-                pair2 = [qubit2, qubit3]
-                fidelity1, fidelity2 = calc_fidelity(pair1, pair2)
-                result = {"qubits": pair1, "fidelity": fidelity1, "error": False}
-                result1 = {"qubits": pair2, "fidelity": fidelity2, "error": False}
-                return result, result1
+                channel_1_pair = [qubit1, qubit4]
+                channel_0_pair = [qubit2, qubit3]
 
-            result, result1 = return_results(qubit_node1, qubit_node2, qubit_node3, qubit_node3_1)
+                # measure fidelity between (qubit_node1, qubit_node3)&(qubit_node2, qubit_node3_1) & return the results
+                def calc_fidelity(pair1, pair2, reference_state: QRepr = b00) -> Tuple[float, float]:
+                    """
+                    Calculate the fidelity between two pairs of qubits.
+
+                    :param pair1: The first pair of qubits
+                    :param pair2: The second pair of qubits
+                    :param reference_state: The reference state to compare the fidelity to
+                    :return: The fidelity of the two pairs of qubits
+                    """
+                    return qubits.fidelity(pair1, reference_state), qubits.fidelity(pair2, reference_state)
+
+                fidelity1, fidelity2 = calc_fidelity(channel_1_pair, channel_0_pair)
+                result = {"qubits": channel_1_pair, "fidelity": fidelity1, "error": False}
+                result1 = {"qubits": channel_0_pair, "fidelity": fidelity2, "error": False}
+                return [result, result1]
+
+            results = return_results(qubit_node1, qubit_node2, qubit_node3, qubit_node3_1)
             # try to discard the memory positions in the repeater
             if node3_label == "RemoteNode":
                 # list of the memory positions from 0 to 3 (both included)
@@ -798,7 +802,7 @@ class StarNetwork:
 
             # result = {"qubits": (qubit_node1, qubit_node3), "fidelity": entanglement_fidelity, "error": False}
             # result1 = {"qubits": (qubit_node2, qubit_node3_1), "fidelity": entanglement_fidelity1, "error": False}
-            results = [result, result1]
+            # results = [result, result1]
         except ValueError as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
