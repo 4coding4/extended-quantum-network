@@ -722,7 +722,7 @@ class StarNetwork:
                 # then do the same for the position 2 and 3
 
                 # create helper function to apply the gates, this replaces a chain of if-elif-else statements
-                def apply_gates(curr_state, position):
+                def apply_gates(curr_state: int, position: int) -> None:
                     """
                     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
                     based on the state (in the repeater).
