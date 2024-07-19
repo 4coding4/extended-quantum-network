@@ -128,7 +128,7 @@ def handle_args() -> tuple:
     models_name_input: str = "empty"
     method_name_input: str = "protocol_a"
     nodes_input: list[int] = [1, 2, 4]
-    debug_input: bool = False
+    debug_input: bool = True
     experiment_num_input: int = 0
     for i in range(1, len(sys.argv)):
         if i == 1:
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     main(models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main)
 
     # test entangle_nodes
-    # main(models_name="empty", method_name="entangle_nodes", nodes=[1, 3])
+    # main(models_name="empty", method_name="entangle_nodes", nodes=[1, 3]) # crash ?
     # default nodes 1, 4
     # main(models_name="empty", method_name="entangle_nodes")
     # test protocol_a
