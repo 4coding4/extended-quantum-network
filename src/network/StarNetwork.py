@@ -779,8 +779,8 @@ class StarNetwork:
                 :param qubit4: The fourth qubit
                 :return: A dictionary containing the qubits and their fidelity
                 """
-                pair1 = [qubit1, qubit3]
-                pair2 = [qubit2, qubit4]
+                pair1 = [qubit1, qubit4]
+                pair2 = [qubit2, qubit3]
                 fidelity1, fidelity2 = calc_fidelity(pair1, pair2)
                 result = {"qubits": pair1, "fidelity": fidelity1, "error": False}
                 result1 = {"qubits": pair2, "fidelity": fidelity2, "error": False}
