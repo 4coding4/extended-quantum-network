@@ -752,31 +752,16 @@ class StarNetwork:
             print(e)
 
         try:
-            # TODO refactor this following repeating code patterns
-
-            # node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            # node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
-            # node3_label = f"Node{node3}" if node3 != self._destinations_n - 1 else "RemoteNode"  # always "RemoteNode"
-            # labels = [node1_label, node2_label, node3_label, node3_label]
             labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
                       for node_n in [node1, node2, node3, node3]]  # the last 2 are always "RemoteNode"
             mem_positions = [0, 0, 0, 1]  # 1 because "RemoteNode" has 2 mem positions
-            # qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
-            # qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
-            # # "RemoteNode" w 2 mem positions
-            # qubit_node3, = self._network.subcomponents[node3_label].qmemory.pop(0)
-            # qubit_node3_1, = self._network.subcomponents[node3_label].qmemory.pop(1)
+            # pop the qubits from the memory positions in the nodes specified by the labels (none repeater) & positions
             qubit_node1, qubit_node2, qubit_node3, qubit_node3_1 = \
                 [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
                  for label, mem_pos in zip(labels, mem_positions)]
             # peak in all the repeater memory positions, from 0 to 3 (both included)
             for i in range(4):
                 _, = repeater_memory.peek(i)
-
-            # _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
-            # _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
-            # _, = self._network.subcomponents["Repeater"].qmemory.peek(2)
-            # _, = self._network.subcomponents["Repeater"].qmemory.peek(3)
 
             def return_results(qubit1: Qubit, qubit2: Qubit, qubit3: Qubit, qubit4: Qubit) \
                     -> List[Dict[str, Union[List[Qubit], float, bool]]]:
@@ -792,7 +777,7 @@ class StarNetwork:
                 channel_1_pair = [qubit1, qubit4]
                 channel_0_pair = [qubit2, qubit3]
 
-                # measure fidelity between (qubit_node1, qubit_node3)&(qubit_node2, qubit_node3_1) & return the results
+                # measure fidelity between 2 pairs of qubits & return the results
                 def calc_fidelity(pair1: List[Qubit], pair2: List[Qubit], reference_state: QRepr = b00) \
                         -> Tuple[float, float]:
                     """
