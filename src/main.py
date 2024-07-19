@@ -128,7 +128,7 @@ def handle_args() -> tuple:
     models_name_input: str = "empty"
     method_name_input: str = "protocol_a"
     nodes_input: list[int] = [1, 2, 4]
-    debug_input: bool = False
+    debug_input: bool = True
     experiment_num_input: int = 0
     for i in range(1, len(sys.argv)):
         if i == 1:
