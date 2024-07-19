@@ -465,16 +465,31 @@ class StarNetwork:
                 and node1 != node2 != node3)
 
         # TODO auto assign the channel_n
-        # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
-        # this way uses only 1 mem position0 and 1 qchannel between nodes
-        self._perform_entanglement(node1, node3, 1)
+        tot_num_channels = self._repeater_mem_positions // 2  # 2 memories per channel for the repeater
+        channels_n = []
+        for i in range(0, tot_num_channels):
+            channels_n.append(i)
+        # reverse the list to start from the last channel
+        channels_n.reverse()
+        for i, channel_n in enumerate(channels_n):
+            if i == 0:
+                first_node = node1
+            elif i == 1:
+                first_node = node2
+
+            # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
+            # this way uses only 1 mem position0 and 1 qchannel between nodes
+            self._perform_entanglement(first_node, node3, channel_n)
+
+
+        # self._perform_entanglement(node1, node3, 1)
 
         if debug:
             line = "-" * 50
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
                 initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
 
-        self._perform_entanglement(node2, node3)
+        # self._perform_entanglement(node2, node3)
 
         if debug:
             line = "-" * 50
