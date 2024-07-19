@@ -41,7 +41,7 @@ class MemorySnapshot:
         el, = self._network.subcomponents[name].qmemory.peek(position, skip_noise)
         return el
 
-    def multi_access(self, names_positions: List[Tuple[str, int]]):
+    def multi_access(self, names_positions: Tuple[List[str], List[int]]):
         """
         Access multiple memories at the given positions of the subcomponents.
         :param names_positions: List of tuples (name, position) for each memory to access.
