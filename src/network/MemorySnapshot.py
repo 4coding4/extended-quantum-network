@@ -1,4 +1,5 @@
 from netsquid.nodes import Network
+from typing import List, Tuple
 
 
 class MemorySnapshot:
@@ -15,9 +16,8 @@ class MemorySnapshot:
         self.node1 = node1
         self.node2 = node2
         assert node4 == 4  # The remote node must be the 4th node of the network.
-        self.node4 = node4
 
-    def memory_access(self, name, position):
+    def memory_access(self, name: str, position: int):
         """
         Access the memory at the given position of the subcomponent.
 
@@ -41,7 +41,7 @@ class MemorySnapshot:
         el, = self._network.subcomponents[name].qmemory.peek(position, skip_noise)
         return el
 
-    def multi_access(self, names_positions):
+    def multi_access(self, names_positions: List[Tuple[str, int]]):
         """
         Access multiple memories at the given positions of the subcomponents.
         :param names_positions: List of tuples (name, position) for each memory to access.
@@ -77,7 +77,7 @@ class MemorySnapshot:
         positions = [0, 1]
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg="", end_msg="", line_width=80):
+    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: str = 80):
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
         """
