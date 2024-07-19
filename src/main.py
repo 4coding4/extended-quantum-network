@@ -190,7 +190,7 @@ if __name__ == "__main__":
     main(models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main)
 
     # test entangle_nodes
-    # main(models_name="empty", method_name="entangle_nodes", nodes=[1, 3])
+    # main(models_name="empty", method_name="entangle_nodes", nodes=[1, 3]) # crash ?
     # default nodes 1, 4
     # main(models_name="empty", method_name="entangle_nodes")
     # test protocol_a
