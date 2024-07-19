@@ -50,7 +50,7 @@ def select_method(star_network: StarNetwork, method_name_str: str) -> callable:
     return method, allowed_nodes_num
 
 
-def main(models_name: str, method_name: str, nodes: list[int] = [], debug: bool = False, experiment_num: int = 0):
+def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
     """
     Main function to run the simulation.
     """
@@ -116,11 +116,11 @@ def show_help() -> None:
     print("- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite")
 
 
-def handle_args() -> tuple[str, str, list[int], bool, int]:
+def handle_args() -> tuple:
     """
     Handle the command line arguments.
     """
-    if sys.argv[1] == "help":
+    if len(sys.argv) == 2 and sys.argv[1] == "help":
         show_help()
         sys.exit()
     # make the following variables the default values
