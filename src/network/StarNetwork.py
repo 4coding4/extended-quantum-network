@@ -467,50 +467,46 @@ class StarNetwork:
                 and node1 < node2 < node3
                 and node1 != node2 != node3)
 
-        # TODO auto assign the channel_n
-        # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
-        # this way uses only 1 mem position0 and 1 qchannel between nodes
-        self._perform_entanglement(node1, node3, 1)
+        tot_num_channels = self._repeater_mem_positions // 2  # 2 memories per channel for the repeater
+        assert tot_num_channels == 2
 
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
-            # should be 4 None
+        channels_n = []
+        for i in range(0, 2):
+            channels_n.append(i)
+        # reverse the list to start from the last channel
+        channels_n.reverse()
+        for i, channel_n in enumerate(channels_n):
+            if i == 0:
+                first_node = node1
+            elif i == 1:
+                first_node = node2
 
-        self._perform_entanglement(node2, node3)
+            # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
+            # this way uses only 1 mem position0 and 1 qchannel between nodes
+            self._perform_entanglement(first_node, node3, channel_n)
 
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
-            # should be all Qubits and 0 None
+            if debug:
+                first_node_number = i + 1
+                line = "-" * 50
+                if i == 0:
+                    expected_output = "If it is working correctly, the output should have 4 Qubits and 4 None"
+                    extra_msg = ""
+                elif i == 1:
+                    expected_output = "If it is working correctly, the output should have all Qubits and 0 None"
+                    extra_msg = " and Before entanglement swapping"
 
-        # TODO perform the memory snapshot between the entanglement and the (entanglement) swapping
+                MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                    initial_msg=f"{line}\nAfter entanglement in nodes {first_node_number}-3{extra_msg}:",
+                    end_msg=f"{line}\n" + expected_output + f"\n{line}")
 
-        # perform swapping in aggregate since the entanglement is already done and all the qbits are in memory
-        # res13 = self._perform_entanglement_swapping(node1, node3)  # TODO Replace w the combined method
-        # res23 = self._perform_entanglement_swapping(node2, node3)  # TODO Replace w the combined method
-
-        # return res13, res23
-        # TODO: delete the following code, then the above tested and working
-        # Idea is to:
-        # entangle 1 and 4, then 2 and 4 using 2 parallel channels/connections following this order
-        # want this in the end
-        # self._perform_new_entanglement(node1, node2, node3)
-        #
-        # if debug:
-        #     line = "-" * 50
-        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-        #         initial_msg=f"{line}\nBefore entanglement swapping:", end_msg=line)
-        #
         results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
         if debug:
             line = "-" * 50
+            expected_output = "If it is working correctly, the output should have all None"
             MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nAfter entanglement swapping:", end_msg=line)
-            # should be all None
+                initial_msg=f"{line}\nAfter entanglement swapping:",
+                end_msg=f"{line}\n" + expected_output + f"\n{line}")
 
         return results
 
