@@ -58,16 +58,13 @@ class GenerateEntanglement(NodeProtocol):
 
     @property
     def is_connected(self) -> bool:
-        print(self._qsource_name)
         if self._is_source or self._is_remote:
             # handle first when the _qsource_name is set/passed as parameter, check if the source is connected
             if self._qsource_name is not None:
                 for name, subcomp in self.node.subcomponents.items():
                     if isinstance(subcomp, QSource):
-                        print("name", name)
                         if self._qsource_name == name:
                             # no need to set _qsource_name again, it is already set
-                            print("connected")
                             return True
                 return False
             # handle when the _qsource_name is not set, check if the first source is connected
