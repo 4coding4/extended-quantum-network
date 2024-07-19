@@ -1,18 +1,24 @@
+from netsquid.components.component import Qubit
+from netsquid.nodes import Network
+from typing import List, Tuple
+
+
 class MemorySnapshot:
     """
     A class to take a snapshot of the memories of the subcomponents of the network.
     :param network: The network to take the snapshot of.
     :param node1: The first node of the network.
     :param node2: The second node of the network.
-    (the third node is the remote node, is implicit) # TODO refactor to make it explicit
+    :param node4: The 4. node of the network equal to the remote node of the network.
     """
 
-    def __init__(self, network, node1, node2):
+    def __init__(self, network: Network, node1: int, node2: int, node4: int):
         self._network = network
         self.node1 = node1
         self.node2 = node2
+        assert node4 == 4  # The remote node must be the 4th node of the network.
 
-    def memory_access(self, name, position):
+    def memory_access(self, name: str, position: int) -> Qubit:
         """
         Access the memory at the given position of the subcomponent.
 
@@ -36,7 +42,7 @@ class MemorySnapshot:
         el, = self._network.subcomponents[name].qmemory.peek(position, skip_noise)
         return el
 
-    def multi_access(self, names_positions):
+    def multi_access(self, names_positions: Tuple[List[str], List[int]]) -> dict:
         """
         Access multiple memories at the given positions of the subcomponents.
         :param names_positions: List of tuples (name, position) for each memory to access.
@@ -45,7 +51,7 @@ class MemorySnapshot:
         names, positions = names_positions
         return {f"{name}_m{pos}": self.memory_access(name, pos) for name, pos in zip(names, positions)}
 
-    def repeater(self):
+    def repeater(self) -> Tuple[List[str], List[int]]:
         """
         Returns the names and positions of the repeater's memories.
         :return: Tuple of lists of names and positions of the repeater's memories.
@@ -54,7 +60,7 @@ class MemorySnapshot:
         positions = [0, 1, 2, 3]
         return names, positions
 
-    def nodes(self):
+    def nodes(self) -> Tuple[List[str], List[int]]:
         """
         Returns the names and positions of the nodes' memories.
         :return: Tuple of lists of names and positions of the nodes' memories.
@@ -63,7 +69,7 @@ class MemorySnapshot:
         positions = [0, 0]
         return names, positions
 
-    def remote_node(self):
+    def remote_node(self) -> Tuple[List[str], List[int]]:
         """
         Returns the names and positions of the remote node's memories.
         :return: Tuple of lists of names and positions of the remote node's memories.
@@ -72,7 +78,7 @@ class MemorySnapshot:
         positions = [0, 1]
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg="", end_msg="", line_width=80):
+    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: str = 80) -> None:
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
         """
