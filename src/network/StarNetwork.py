@@ -467,7 +467,6 @@ class StarNetwork:
                 and node1 < node2 < node3
                 and node1 != node2 != node3)
 
-        # TODO auto assign the channel_n
         tot_num_channels = self._repeater_mem_positions // 2  # 2 memories per channel for the repeater
         channels_n = []
         for i in range(0, tot_num_channels):
@@ -485,20 +484,34 @@ class StarNetwork:
             self._perform_entanglement(first_node, node3, channel_n)
 
 
+            if debug:
+                first_node_number = i + 1
+                line = "-" * 50
+                if i == 0:
+                    MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                        initial_msg=f"{line}\nAfter entanglement swapping in nodes 1-3:", end_msg=line)
+                    # should be 4 None
+                elif i == 1:
+                    MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+                        initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
+                    # should be all Qubits and 0 None
+
+
+
         # self._perform_entanglement(node1, node3, 1)
 
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 1-3:", end_msg=line)
+        # if debug:
+        #     line = "-" * 50
+        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+        #         initial_msg=f"{line}\nAfter entanglement swapping in nodes 1-3:", end_msg=line)
             # should be 4 None
 
         # self._perform_entanglement(node2, node3)
 
-        if debug:
-            line = "-" * 50
-            MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
-                initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
+        # if debug:
+        #     line = "-" * 50
+        #     MemorySnapshot(self._network, node1, node2).show_all_memory_positions(
+        #         initial_msg=f"{line}\nBefore entanglement swapping in nodes 2-3:", end_msg=line)
             # should be all Qubits and 0 None
 
         # TODO perform the memory snapshot between the entanglement and the (entanglement) swapping
