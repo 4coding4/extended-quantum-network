@@ -63,12 +63,8 @@ class GenerateEntanglement(NodeProtocol):
 
             # handle first when the _qsource_name is set/passed as parameter, check if the source is connected
             if self._qsource_name is not None:
-                return self._qsource_name in qsources_names  # check if the source is connected
-                # for name in qsources_names:
-                #     if self._qsource_name == name:
-                #         # no need to set _qsource_name again, it is already set
-                #         return True
-                # return False
+                # check if the source is connected, true=connected, false=not connected
+                return self._qsource_name in qsources_names
             # handle when the _qsource_name is not set, check if the first source is connected
             else:
                 for name in qsources_names:
