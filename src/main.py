@@ -1,21 +1,11 @@
 import sys
 
+from src.helper.main_helper import error_exit, run_method_with_nodes
 from src.models.Combined import Combined
 from src.models.Empty import Empty
 from src.network.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
-
-
-def error_exit(msg: str) -> None:
-    """
-    Exit the program with an error message and exit code 1.
-    :param msg: str
-    """
-    # Quote from the documentation
-    # sys.exit("some error message") is a quick way to exit a program when an error occurs.
-    # https://docs.python.org/3.11/library/sys.html#sys.exit
-    sys.exit(msg)
 
 
 def select_models(models_name_str: str) -> dict:
@@ -63,44 +53,24 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     # Check if the number of nodes is allowed for the selected method
     if nodes_len not in allowed_nodes_num:
         error_exit(f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
+    if experiment_num < 0:
+        error_exit("Invalid experiment_num, please provide a non-negative integer")
     # Run single experiment
     # ---------------------
     if experiment_num == 0:
-        # run with the default nodes
-        if nodes_len == 0:
-            # 1, 2, 4 for protocol_a
-            # 1, 4 for entangle_nodes
-            fidelity = method(debug=debug)
-            print(fidelity)
-        # run with the provided nodes
-        elif nodes_len == 2:
-            # run entangle_nodes
-            fidelity = method(nodes[0], nodes[1], debug=debug)
-            print(fidelity)
-        elif nodes_len == 3:
-            # run protocol_a
-            fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
-            print(fidelity)
-
-        # reset restart simulation
-        reset_restart = False  # True
-        reset_restart = check_reset_restart(reset_restart)
+        _ = run_method_with_nodes(method, nodes, debug)
     else:
-        # TODO idk if this is needed/required, if required pass to experiment the method and the nodes (partial rewrite needed)
-        pass
-        # Run experiment suite (Node1 *-* Node2)
-        # --------------------------------------
-        # experiment: Experiment = Experiment(star_network, verbose=False)
-        # experiment.csv_path = "../out/data[node-node].csv"
-        # experiment.fig_path = "../out/fidelity-over-length[node-node].png"
-        # experiment.run(1, 3)
-
-        # Run experiment suite (Node1 *-* RemoteNode)
-        # -------------------------------------------
-        # experiment: Experiment = Experiment(star_network, verbose=False)
-        # experiment.csv_path = f"../out/data[node-remote].csv"
-        # experiment.fig_path = f"../out/fidelity-over-length[node-remote].png"
-        # experiment.run(1, 4)
+        underscore = "_"
+        run_name = (method_name + underscore + models_name + underscore + str(nodes)
+                    + underscore + str(debug) + underscore + str(experiment_num))
+        experiment: Experiment = Experiment(star_network, verbose=debug)
+        experiment.csv_path = f"../out/data[{run_name}].csv"
+        experiment.fig_path = f"../out/fidelity-over-length[{run_name}].png"
+        experiment.num_each_simulation = experiment_num  # set the number of measurements for each run of the simulation
+        experiment.run(method, nodes, debug)
+    # reset restart simulation
+    reset_restart = False  # True
+    reset_restart = check_reset_restart(reset_restart)
 
 
 def show_help() -> None:
@@ -125,11 +95,11 @@ def handle_args() -> tuple:
         sys.exit()
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
-    models_name_input: str = "empty"
-    method_name_input: str = "protocol_a"
-    nodes_input: list[int] = [1, 2, 4]
-    debug_input: bool = True
-    experiment_num_input: int = 0
+    models_name_input: str = "empty"  # "combined"
+    method_name_input: str = "protocol_a"  # "entangle_nodes"
+    nodes_input: list[int] = [1, 2, 4]  # [1,4]
+    debug_input: bool = True  # False
+    experiment_num_input: int = 0  # 100
     for i in range(1, len(sys.argv)):
         if i == 1:
             models_name_input = sys.argv[i]
