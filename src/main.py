@@ -60,7 +60,6 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     if experiment_num == 0:
         _ = run_method_with_nodes(method, nodes, debug)
     else:
-        # TODO idk if this is needed/required, if required pass to experiment the method and the nodes (partial rewrite needed)
         underscore = "_"
         run_name = (method_name + underscore + models_name + underscore + str(nodes)
                     + underscore + str(debug) + underscore + str(experiment_num))
@@ -99,8 +98,8 @@ def handle_args() -> tuple:
     models_name_input: str = "empty"  # "combined"
     method_name_input: str = "protocol_a"  # "entangle_nodes"
     nodes_input: list[int] = [1, 2, 4]  # [1,4]
-    debug_input: bool = True
-    experiment_num_input: int = 100
+    debug_input: bool = True  # False
+    experiment_num_input: int = 0  # 100
     for i in range(1, len(sys.argv)):
         if i == 1:
             models_name_input = sys.argv[i]
