@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from numpy import ndarray
 from tqdm import tqdm
 
+from src.helper.main_helper import run_method_with_nodes
 from src.network.StarNetwork import StarNetwork
 
 
@@ -31,7 +32,6 @@ class Experiment:
 
     _verbose: bool = False
     _network: StarNetwork = None
-
 
     def __init__(self, network: StarNetwork, verbose=False):
         """
@@ -109,12 +109,14 @@ class Experiment:
     # FUNCTIONS USED TO PERFORM THE EXPERIMENT #
     ############################################
 
-    def run(self, node1: int, node2: int):
+    def run(self, method: callable, nodes: list, debug: bool = False):
         """
         Run the simulation between the two given nodes. When the simulation is over, a
+        csv file is created with the results and a figure is generated.
 
-        :param node1: The index of the first node
-        :param node2: The index of the second node
+        :param method: The method to run on the network
+        :param nodes: The nodes to run the method on
+        :param debug: If the simulation should print more info
         """
         f = open(self._csv_path, "w+")
         f.write(f"length,fidelity\r\n")
@@ -126,10 +128,15 @@ class Experiment:
             if self._verbose:
                 print(f"Nodes are entangled after {self._network.channels_length * 1000} meters")
 
-            for i in range(self._num_each_simulation):
+            for _ in range(self._num_each_simulation):
                 try:
-                    result_dict = self._network.entangle_nodes(node1, node2)
-                    fidelity_values.append(result_dict["fidelity"])
+                    result = run_method_with_nodes(method, nodes, debug)
+                    if isinstance(result, dict):
+                        fidelity_values.append(result["fidelity"])
+                    else:
+                        # is array
+                        for idx in range(len(result)):
+                            fidelity_values.append(result[idx]["fidelity"])
                 except KeyError:
                     fidelity_values.append(0)
 
