@@ -145,7 +145,7 @@ class Experiment:
 
             if self._verbose:
                 print(f"Average fidelity: {np.mean(fidelity_values)}")
-                print(f"Number of not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}")
+                print(f"Not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}/{len(fidelity_values)}")
 
             f.write(f"{length},{np.mean(fidelity_values)}\r\n")
 
