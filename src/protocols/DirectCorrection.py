@@ -1,8 +1,8 @@
 from netsquid.components import INSTR_Z, INSTR_X
 from netsquid.protocols import NodeProtocol
-from netsquid.protocols.protocol import Signals
 
 
+# TODO check if this file is even used
 class DirectCorrection(NodeProtocol):
     def run(self, m):
         meas_results = m

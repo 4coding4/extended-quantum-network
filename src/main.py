@@ -1,11 +1,11 @@
 import sys
 
-from src.helper.converter.converter import converter_exit, converter_string_list_int, converter_string_boolean, \
+from src.helper.main.converter.converter import converter_exit, converter_string_list_int, converter_string_boolean, \
     converter_string_int
 from src.helper.main.main import run_method_with_nodes, checker, show_help, select_models, select_method
-from src.network.ResetRestart import check_reset_restart
+from src.helper.main.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
-from src.protocols.Experiment import Experiment
+from src.helper.main.Experiment import Experiment
 
 
 def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
