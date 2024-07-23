@@ -1,44 +1,13 @@
 import sys
 
 from src.helper.main_helper import error_exit, run_method_with_nodes, converter_exit, \
-    converter_string_list_int, converter_string_int, converter_string_boolean, checker
+    converter_string_list_int, converter_string_int, converter_string_boolean, checker, show_help, select_models, \
+    select_method
 from src.models.Combined import Combined
 from src.models.Empty import Empty
 from src.network.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
-
-
-def select_models(models_name_str: str) -> dict:
-    """
-    Select the models to be used in the network, based on the provided name.
-    :param models_name_str: str
-    :return: dict of models to be used in the network
-    """
-    models: dict
-    if models_name_str == "combined":
-        models = Combined.models
-    elif models_name_str == "empty":
-        models = Empty.empty_models
-    return models
-
-
-def select_method(star_network: StarNetwork, method_name_str: str) -> callable:
-    """
-    Select the method to be used in the network, based on the provided name.
-    :param star_network: StarNetwork
-    :param method_name_str: str
-    :return: method to be used in the network and the allowed number of nodes for this method
-    """
-    method = None
-    allowed_nodes_num = [0]
-    if method_name_str == "protocol_a":
-        method = star_network.protocol_a
-        allowed_nodes_num.append(3)
-    elif method_name_str == "entangle_nodes":
-        method = star_network.entangle_nodes
-        allowed_nodes_num.append(2)
-    return method, allowed_nodes_num
 
 
 def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
@@ -52,10 +21,14 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     # Select the method to be used in the network
     method, allowed_nodes_num = select_method(star_network, method_name)
     # Check if the number of nodes is allowed for the selected method
-    if nodes_len not in allowed_nodes_num:
-        error_exit(f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
-    if experiment_num < 0:
-        error_exit("Invalid experiment_num, please provide a non-negative integer")
+    # if nodes_len not in allowed_nodes_num:
+    #     error_exit(f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
+    checker(nodes_len not in allowed_nodes_num,
+            f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
+    # if experiment_num < 0:
+    #     error_exit("Invalid experiment_num, please provide a non-negative integer")
+    checker(experiment_num < 0,
+            "Invalid experiment_num, please provide a non-negative integer")
     # Run single experiment
     # ---------------------
     if experiment_num == 0:
@@ -72,19 +45,6 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     # reset restart simulation
     reset_restart = False  # True
     reset_restart = check_reset_restart(reset_restart)
-
-
-def show_help() -> None:
-    """
-    Show the help message with the command line arguments.
-    """
-    print("Command line arguments:")
-    print("- models_name: str, default='empty', choices=['combined', 'empty']")
-    print("- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']")
-    print("- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],"
-          "use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')")
-    print("- debug: bool, default=False, if True, print debug information")
-    print("- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite")
 
 
 def handle_args() -> tuple:

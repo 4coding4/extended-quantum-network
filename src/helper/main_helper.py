@@ -1,5 +1,9 @@
 import sys
 
+from src.models.Combined import Combined
+from src.models.Empty import Empty
+from src.network.StarNetwork import StarNetwork
+
 
 def error_exit(msg: str) -> None:
     """
@@ -95,3 +99,48 @@ def checker(condition: bool, msg: str):
     """
     if condition:
         error_exit(msg)
+
+
+def show_help() -> None:
+    """
+    Show the help message with the command line arguments.
+    """
+    print("Command line arguments:")
+    print("- models_name: str, default='empty', choices=['combined', 'empty']")
+    print("- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']")
+    print("- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],"
+          "use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')")
+    print("- debug: bool, default=False, if True, print debug information")
+    print("- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite")
+
+
+def select_models(models_name_str: str) -> dict:
+    """
+    Select the models to be used in the network, based on the provided name.
+    :param models_name_str: str
+    :return: dict of models to be used in the network
+    """
+    models: dict
+    if models_name_str == "combined":
+        models = Combined.models
+    elif models_name_str == "empty":
+        models = Empty.empty_models
+    return models
+
+
+def select_method(star_network: StarNetwork, method_name_str: str) -> callable:
+    """
+    Select the method to be used in the network, based on the provided name.
+    :param star_network: StarNetwork
+    :param method_name_str: str
+    :return: method to be used in the network and the allowed number of nodes for this method
+    """
+    method = None
+    allowed_nodes_num = [0]
+    if method_name_str == "protocol_a":
+        method = star_network.protocol_a
+        allowed_nodes_num.append(3)
+    elif method_name_str == "entangle_nodes":
+        method = star_network.entangle_nodes
+        allowed_nodes_num.append(2)
+    return method, allowed_nodes_num
