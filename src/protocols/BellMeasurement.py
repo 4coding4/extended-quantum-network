@@ -4,6 +4,7 @@ from netsquid.nodes import DirectConnection
 from netsquid.protocols import NodeProtocol
 
 
+# TODO check if this file is even used
 class BellMeasurementProgram(QuantumProgram):
     default_num_qubits = 2
 
