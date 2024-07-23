@@ -1,9 +1,7 @@
-from netsquid.components import INSTR_CNOT, INSTR_H, INSTR_MEASURE, INSTR_MEASURE_BELL, Message
+from netsquid.components import INSTR_MEASURE_BELL
 from netsquid.components.qprocessor import QuantumProgram
 from netsquid.nodes import DirectConnection
 from netsquid.protocols import NodeProtocol
-from netsquid.protocols.protocol import Signals
-from src.protocols import DirectCorrection
 
 
 class BellMeasurementProgram(QuantumProgram):

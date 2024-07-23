@@ -1,6 +1,5 @@
 from netsquid.components import INSTR_Z, INSTR_X
 from netsquid.protocols import NodeProtocol
-from netsquid.protocols.protocol import Signals
 
 
 class DirectCorrection(NodeProtocol):

@@ -1,4 +1,4 @@
-from netsquid.components import QSource, Port, INSTR_SWAP
+from netsquid.components import QSource, Port
 from netsquid.nodes import node
 from netsquid.protocols import NodeProtocol
 from netsquid.protocols.protocol import Signals
