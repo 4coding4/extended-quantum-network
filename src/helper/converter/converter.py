@@ -1,4 +1,4 @@
-from src.helper.main_helper import error_exit
+from src.helper.main.main import error_exit
 
 
 def converter_exit(method: callable, input: any, msg: str) -> any:
@@ -52,4 +52,3 @@ def converter_string_list_int(input: str) -> tuple:
         return [int(node) for node in input.split(",")], False
     except ValueError:
         return None, True
-    
