@@ -256,6 +256,7 @@ class StarNetwork:
         """
         self._quantum_channels.clear()
         quantum_channel_factory = QuantumChannelFactory(length, self._models)
+        repeater = self._network.subcomponents["Repeater"]
 
         for (index, destination) in enumerate(self._destinations):
             if index == self._destinations_n - 2:
@@ -283,7 +284,6 @@ class StarNetwork:
                 channel: QuantumChannel = quantum_channel_factory.get_channel("Q" + name)
                 self._quantum_channels.append(channel)
 
-                repeater = self._network.subcomponents["Repeater"]
                 port_remote, port_repeater = self.network.add_connection(destination, repeater,
                                                                          channel_to=channel,
                                                                          label=name)
@@ -293,7 +293,6 @@ class StarNetwork:
                 channel1: QuantumChannel = quantum_channel_factory.get_channel("Q" + name1)
                 self._quantum_channels.append(channel1)
 
-                # repeater = self._network.subcomponents["Repeater"]
                 port_remote1, port_repeater1 = self.network.add_connection(destination, repeater, channel_to=channel1,
                                                                            label=name1)
                 self._quantum_channels_port_pairs.append(PortPair(port_remote1, port_repeater1, name1))
