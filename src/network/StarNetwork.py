@@ -5,7 +5,7 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import QRepr
 from typing import Tuple, List, Dict, Union
 
-from src.network.MemorySnapshot import MemorySnapshot
+from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
 from src.helper.network.QuantumComponents import QuantumComponents as QC
 from src.protocols.GenerateEntanglement import GenerateEntanglement
