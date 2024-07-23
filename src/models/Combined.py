@@ -1,6 +1,6 @@
-from src.models.DynamicFibreDelay import DynamicFibreDelay
-from src.models.FibreError import FibreError
-from src.models.T1T2Error import T1T2Error
+from src.models.single.DynamicFibreDelay import DynamicFibreDelay
+from src.models.single.FibreError import FibreError
+from src.models.single.T1T2Error import T1T2Error
 
 
 class Combined:
