@@ -39,6 +39,6 @@ class QuantumSourceFactory:
         return QSource(name,
                        state_sampler=StateSampler([b00]),
                        status=SourceStatus.EXTERNAL,
-                       models={"emission_delay_model": FixedDelayModel(delay=delay)},
+                       models={"emission_delay_model": FixedDelayModel(delay=self.delay)},
                        num_ports=self.num_ports
                        )
