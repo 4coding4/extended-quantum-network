@@ -1,10 +1,8 @@
 import sys
 
-from src.helper.main_helper import error_exit, run_method_with_nodes, converter_exit, \
-    converter_string_list_int, converter_string_int, converter_string_boolean, checker, show_help, select_models, \
-    select_method
-from src.models.Combined import Combined
-from src.models.Empty import Empty
+from src.helper.main_helper import (run_method_with_nodes, converter_exit, converter_string_list_int,
+                                    converter_string_int, converter_string_boolean, checker,
+                                    show_help, select_models, select_method)
 from src.network.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
@@ -14,21 +12,11 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     """
     Main function to run the simulation.
     """
-    nodes_len = len(nodes)
     # Initialize Network and run experiment
     models: dict = select_models(models_name)
     star_network: StarNetwork = StarNetwork(models)
     # Select the method to be used in the network
-    method, allowed_nodes_num = select_method(star_network, method_name)
-    # Check if the number of nodes is allowed for the selected method
-    # if nodes_len not in allowed_nodes_num:
-    #     error_exit(f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
-    checker(nodes_len not in allowed_nodes_num,
-            f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
-    # if experiment_num < 0:
-    #     error_exit("Invalid experiment_num, please provide a non-negative integer")
-    checker(experiment_num < 0,
-            "Invalid experiment_num, please provide a non-negative integer")
+    method = select_method(star_network, method_name, len(nodes))
     # Run single experiment
     # ---------------------
     if experiment_num == 0:
@@ -89,6 +77,8 @@ def handle_args() -> tuple:
         elif i == 5:
             experiment_num_input = converter_exit(converter_string_int, sys.argv[i],
                                                   "Invalid experiment_num, please provide an integer")
+            checker(experiment_num_input < 0,
+                    "Invalid experiment_num, please provide a non-negative integer")
 
     return models_name_input, method_name_input, nodes_input, debug_input, experiment_num_input
 
