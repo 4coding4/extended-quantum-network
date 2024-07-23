@@ -583,6 +583,7 @@ class StarNetwork:
 
         # Run the simulation
         sim_run()
+        print(f"Entanglement simulation run in {sim_time()} nanoseconds")
 
         # Disconnect the source from the nodes
         self._disconnect_source_from_destination(node1)
@@ -624,7 +625,7 @@ class StarNetwork:
 
         # Run the simulation
         sim_run()
-        print("sim_time in nanoseconds", sim_time())
+        print(f"New Entanglement simulation run in {sim_time()} nanoseconds")
 
         # Disconnect the source from the nodes # TODO re-enable at the end (but need to disconnect the right channels)
         # self._disconnect_source_from_destination(node1)
