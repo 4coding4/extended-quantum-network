@@ -1,9 +1,9 @@
 from netsquid.components import QuantumProcessor
 
 
-class QuantumComponents:
+class QuantumProcessorFactory:
     """
-    Represents the quantum components.
+    Represents the quantum Processors.
     """
 
     @staticmethod
