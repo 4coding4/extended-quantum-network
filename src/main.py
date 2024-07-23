@@ -149,12 +149,13 @@ if __name__ == "__main__":
     models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main = handle_args()
 
     # print all the parsed arguments
-    print("Parsed arguments:")
-    print(f"models_name: {models_name_main}")
-    print(f"method_name: {method_name_main}")
-    print(f"nodes: {nodes_main}")
-    print(f"debug: {debug_main}")
-    print(f"experiment_num: {experiment_num_main}")
+    if debug_main:
+        print("Parsed arguments:")
+        print(f"models_name: {models_name_main}")
+        print(f"method_name: {method_name_main}")
+        print(f"nodes: {nodes_main}")
+        print(f"debug: {debug_main}")
+        print(f"experiment_num: {experiment_num_main}")
 
     # run the main function
     main(models_name_main, method_name_main, nodes_main, debug_main, experiment_num_main)
