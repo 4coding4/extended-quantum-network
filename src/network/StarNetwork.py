@@ -522,7 +522,6 @@ class StarNetwork:
 
         self._perform_entanglement(node1, node2)
         return self._perform_entanglement_swapping(node1, node2)
-        # return self._perform_fidelity_measurement(node1, node2)
 
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
@@ -761,25 +760,3 @@ class StarNetwork:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
         return results
-
-    def _perform_fidelity_measurement(self, node1: int, node2: int):
-        """
-        Given two nodes, measure the fidelity of their entangled qubits.
-
-        :param node1: The index of the first node
-        :param node2: The index of the second node
-        :return: A dictionary containing the qubits and their fidelity
-        """
-        try:
-            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
-
-            qubit_node1, = self._network.subcomponents[node1_label].qmemory.peek(0)
-            qubit_node2, = self._network.subcomponents[node2_label].qmemory.peek(0)
-            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
-
-            result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
-        except ValueError:
-            result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
-
-        return result
