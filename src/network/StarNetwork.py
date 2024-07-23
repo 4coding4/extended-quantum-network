@@ -481,7 +481,6 @@ class StarNetwork:
             elif i == 1:
                 first_node = node2
 
-            # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
             # this way uses only 1 mem position0 and 1 qchannel between nodes
             self._perform_entanglement(first_node, node3, channel_n)
 
@@ -589,49 +588,6 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def _perform_new_entanglement(self, node1: int, node2: int, node3: int):
-        # TODO: implement the entanglement between 3 nodes
-        protocol_node1: GenerateEntanglement
-        protocol_node2: GenerateEntanglement
-        protocol_node3: GenerateEntanglement
-
-        # Connect the source to the nodes
-        self._connect_source_to_destination(node1)
-        self._connect_source_to_destination(node2)
-        self._connect_source_to_destination(node3)
-
-        # Initialize and start the protocols
-        protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
-                                                                     is_source=True, name="ProtocolSource")
-
-        protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
-                                               is_remote=True, name="ProtocolRemote")
-
-        protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
-                                                 is_repeater=True, name=f"ProtocolRepeater")
-
-        protocol_node1 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
-                                              name=f"ProtocolNode{node1}")
-        protocol_node2 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
-                                              name=f"ProtocolNode{node2}")
-        # protocol_node3 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node3}"],
-        #                                       name=f"ProtocolNode{node3}")  # always RemoteNode
-        protocol_source.start()
-        protocol_node1.start()
-        protocol_node2.start()
-        protocol_repeater.start()
-        # protocol_node3.start()
-        protocol_remote.start()
-
-        # Run the simulation
-        sim_run()
-        print(f"New Entanglement simulation run in {sim_time()} nanoseconds")
-
-        # Disconnect the source from the nodes # TODO re-enable at the end (but need to disconnect the right channels)
-        # self._disconnect_source_from_destination(node1)
-        # self._disconnect_source_from_destination(node2)
-        # self._disconnect_source_from_destination(node3) # crash Exception: The source node is not connected to Node 4
-
     def _perform_entanglement_swapping(self, node1: int,
                                        node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
@@ -689,7 +645,7 @@ class StarNetwork:
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
-            -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+            -> List[Dict[str, Union[List[Qubit], float, bool]]]:  # TODO cognitive complexity is too high (sonarlint max is 15, this 20), reduce by extrapolating the logic to a helper function
         """
         Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
 
