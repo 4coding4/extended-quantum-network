@@ -34,7 +34,7 @@ class QuantumChannelFactory:
         QuantumChannel
             Quantum channel with the given name.
         """
-        return QuantumChannel(name,
+        return QuantumChannel("Q" + name,
                               length=self.length,
                               models=self.models
                               )
