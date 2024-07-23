@@ -7,9 +7,9 @@ from typing import Tuple, List, Dict, Union
 
 from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
-from src.helper.network.Factory.QuantumChannelFactory import QuantumChannelFactory
-from src.helper.network.Factory.QuantumProcessorFactory import QuantumProcessorFactory as QC
-from src.helper.network.Factory.QuantumSourceFactory import QuantumSourceFactory
+from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
+from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
+from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -228,19 +228,20 @@ class StarNetwork:
         Initialize the destination nodes of the network.
         """
         quantum_source_factory = QuantumSourceFactory(self._source_delay, self._remote_source_num_ports / 2)
+        quantum_processor_factory = QuantumProcessorFactory()
 
         for destination_n in range(1, self._destinations_n + 1):
             if destination_n == self._destinations_n - 1:
                 # Initialization of the repeater
                 self._destinations.append(self._network.add_node(f"Repeater"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QC.get_processor(f"QP_Repeater", self._repeater_mem_positions)
+                    quantum_processor_factory.get_processor(f"QP_Repeater", self._repeater_mem_positions)
                 )
             elif destination_n == self._destinations_n:
                 # Initialize the remote node
                 self._destinations.append(self._network.add_node(f"RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QC.get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
+                    quantum_processor_factory.get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
                     quantum_source_factory.get_source("RemoteQuantumSource")
@@ -252,7 +253,7 @@ class StarNetwork:
                 # Initialize normal nodes
                 self._destinations.append(self._network.add_node(f"Node{destination_n}"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QC.get_processor(f"QP_Node{destination_n}", self._node_mem_positions)
+                    quantum_processor_factory.get_processor(f"QP_Node{destination_n}", self._node_mem_positions)
                 )
 
     def _init_quantum_channels(self, length: float = _channels_length):
