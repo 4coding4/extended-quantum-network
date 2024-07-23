@@ -9,6 +9,7 @@ from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
 from src.helper.network.QuantumChannelFactory import QuantumChannelFactory
 from src.helper.network.QuantumComponents import QuantumComponents as QC
+from src.helper.network.QuantumSourceFactory import QuantumSourceFactory
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -212,18 +213,22 @@ class StarNetwork:
         """
         Initialize the source node of the network.
         """
+        quantum_source_factory = QuantumSourceFactory(self._source_delay, self._source_num_ports / 2)
+
         self._source = self._network.add_node("Source")
         self._source.add_subcomponent(
-            QC.get_source("QuantumSource", self._source_delay, self._source_num_ports / 2)
+            quantum_source_factory.get_source("QuantumSource")
         )
         self._source.add_subcomponent(
-            QC.get_source("QuantumSource1", self._source_delay, self._source_num_ports / 2)
+            quantum_source_factory.get_source("QuantumSource1")
         )
 
     def _init_destinations(self):
         """
         Initialize the destination nodes of the network.
         """
+        quantum_source_factory = QuantumSourceFactory(self._source_delay, self._remote_source_num_ports / 2)
+
         for destination_n in range(1, self._destinations_n + 1):
             if destination_n == self._destinations_n - 1:
                 # Initialization of the repeater
@@ -238,10 +243,10 @@ class StarNetwork:
                     QC.get_processor(f"QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QC.get_source("RemoteQuantumSource", self._source_delay, self._remote_source_num_ports / 2)
+                    quantum_source_factory.get_source("RemoteQuantumSource")
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
-                    QC.get_source("RemoteQuantumSource1", self._source_delay, self._remote_source_num_ports / 2)
+                    quantum_source_factory.get_source("RemoteQuantumSource1")
                 )
             else:
                 # Initialize normal nodes
