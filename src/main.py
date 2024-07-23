@@ -1,8 +1,8 @@
 import sys
 
-from src.helper.main_helper import (run_method_with_nodes, converter_exit, converter_string_list_int,
-                                    converter_string_int, converter_string_boolean, checker,
-                                    show_help, select_models, select_method)
+from src.helper.converter.converter import converter_exit, converter_string_list_int, converter_string_boolean, \
+    converter_string_int
+from src.helper.main_helper import run_method_with_nodes, checker, show_help, select_models, select_method
 from src.network.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
