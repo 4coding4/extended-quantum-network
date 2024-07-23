@@ -481,7 +481,6 @@ class StarNetwork:
             elif i == 1:
                 first_node = node2
 
-            # TODO make the entanglement run in parallel using the 2 channels/connections following this order using threads
             # this way uses only 1 mem position0 and 1 qchannel between nodes
             self._perform_entanglement(first_node, node3, channel_n)
 
