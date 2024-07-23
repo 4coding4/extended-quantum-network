@@ -7,7 +7,7 @@ class QuantumProcessorFactory:
     """
 
     @staticmethod
-    def get_processor(name, mem_positions):
+    def get(name, mem_positions):
         """
         Get QuantumProcessor component with default settings.
         """

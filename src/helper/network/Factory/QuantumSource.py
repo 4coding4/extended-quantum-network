@@ -22,7 +22,7 @@ class QuantumSourceFactory:
         self.delay = delay
         self.num_ports = num_ports
 
-    def get_source(self, name):
+    def get(self, name):
         """
         Get a quantum source with the given name.
 
