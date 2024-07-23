@@ -7,7 +7,7 @@ from typing import Tuple, List, Dict, Union
 
 from src.network.MemorySnapshot import MemorySnapshot
 from src.network.PortPair import PortPair
-from src.network.QuantumComponents import QuantumComponents as QC
+from src.helper.network.star_network.QuantumComponents import QuantumComponents as QC
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
