@@ -39,7 +39,7 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
     else:
         error_exit("Invalid number of nodes, please provide 0 or 2 or 3 nodes")
     # always print it, since it is the result of the simulation
-    print(fidelity)
+    print("Results: ", fidelity)
     return fidelity
 
 
