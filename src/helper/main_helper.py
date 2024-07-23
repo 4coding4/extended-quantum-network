@@ -128,9 +128,6 @@ def select_models(models_name_str: str) -> dict:
     return models
 
 
-
-
-
 def select_method(star_network: StarNetwork, method_name_str: str, nodes_len) -> callable:
     """
     Select the method to be used in the network, based on the provided name.
