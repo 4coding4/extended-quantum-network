@@ -1,60 +1,22 @@
 import sys
 
-from src.helper.main_helper import error_exit, run_method_with_nodes
-from src.models.Combined import Combined
-from src.models.Empty import Empty
+from src.helper.converter.converter import converter_exit, converter_string_list_int, converter_string_boolean, \
+    converter_string_int
+from src.helper.main.main import run_method_with_nodes, checker, show_help, select_models, select_method
 from src.network.ResetRestart import check_reset_restart
 from src.network.StarNetwork import StarNetwork
 from src.protocols.Experiment import Experiment
-
-
-def select_models(models_name_str: str) -> dict:
-    """
-    Select the models to be used in the network, based on the provided name.
-    :param models_name_str: str
-    :return: dict of models to be used in the network
-    """
-    models: dict
-    if models_name_str == "combined":
-        models = Combined.models
-    elif models_name_str == "empty":
-        models = Empty.empty_models
-    return models
-
-
-def select_method(star_network: StarNetwork, method_name_str: str) -> callable:
-    """
-    Select the method to be used in the network, based on the provided name.
-    :param star_network: StarNetwork
-    :param method_name_str: str
-    :return: method to be used in the network and the allowed number of nodes for this method
-    """
-    method = None
-    allowed_nodes_num = [0]
-    if method_name_str == "protocol_a":
-        method = star_network.protocol_a
-        allowed_nodes_num.append(3)
-    elif method_name_str == "entangle_nodes":
-        method = star_network.entangle_nodes
-        allowed_nodes_num.append(2)
-    return method, allowed_nodes_num
 
 
 def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
     """
     Main function to run the simulation.
     """
-    nodes_len = len(nodes)
     # Initialize Network and run experiment
     models: dict = select_models(models_name)
     star_network: StarNetwork = StarNetwork(models)
     # Select the method to be used in the network
-    method, allowed_nodes_num = select_method(star_network, method_name)
-    # Check if the number of nodes is allowed for the selected method
-    if nodes_len not in allowed_nodes_num:
-        error_exit(f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
-    if experiment_num < 0:
-        error_exit("Invalid experiment_num, please provide a non-negative integer")
+    method = select_method(star_network, method_name, len(nodes))
     # Run single experiment
     # ---------------------
     if experiment_num == 0:
@@ -71,19 +33,6 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     # reset restart simulation
     reset_restart = False  # True
     reset_restart = check_reset_restart(reset_restart)
-
-
-def show_help() -> None:
-    """
-    Show the help message with the command line arguments.
-    """
-    print("Command line arguments:")
-    print("- models_name: str, default='empty', choices=['combined', 'empty']")
-    print("- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']")
-    print("- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],"
-          "use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')")
-    print("- debug: bool, default=False, if True, print debug information")
-    print("- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite")
 
 
 def handle_args() -> tuple:
@@ -104,42 +53,32 @@ def handle_args() -> tuple:
         if i == 1:
             models_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
-            if models_name_input not in ["combined", "empty"]:
-                error_exit("Invalid models_name, please provide 'combined' or 'empty'")
+            checker(models_name_input not in ["combined", "empty"],
+                    "Invalid models_name, please provide 'combined' or 'empty'")
         elif i == 2:
             method_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
-            if method_name_input not in ["protocol_a", "entangle_nodes"]:
-                error_exit("Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'")
+            checker(method_name_input not in ["protocol_a", "entangle_nodes"],
+                    "Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'")
         elif i == 3:
-            try:
-                nodes_str: list[str] = sys.argv[i].split(",")
-                # convert the strings to integers
-                nodes_input = [int(node) for node in nodes_str]
-            except ValueError:
-                error_exit("Invalid nodes, please provide a list of integers separated by ','")
+            nodes_input = converter_exit(converter_string_list_int, sys.argv[i],
+                                         "Invalid nodes, please provide a list of integers separated by ','")
 
             # check that nodes is a list of non-duplicate integers (between 1 and 4) and the length is either 0, 2 or 3
-            if len(nodes_input) not in [0, 2, 3]:
-                error_exit("Invalid number of nodes, please provide a list of length 0, 2 or 3")
-            if len(nodes_input) != len(set(nodes_input)):
-                error_exit("Invalid nodes, please provide a list of unique integers")
-            if any(node < 1 or node > 4 for node in nodes_input):
-                error_exit("Invalid nodes, please provide a list of integers between 1 and 4")
+            checker(len(nodes_input) not in [0, 2, 3],
+                    "Invalid number of nodes, please provide a list of length 0, 2 or 3")
+            checker(len(nodes_input) != len(set(nodes_input)),
+                    "Invalid nodes, please provide a list of unique integers")
+            checker(any(node < 1 or node > 4 for node in nodes_input),
+                    "Invalid nodes, please provide a list of integers between 1 and 4")
         elif i == 4:
-            debug_str = sys.argv[i]
-            # convert the string to a boolean
-            if debug_str == "True":
-                debug_input = True
-            elif debug_str == "False":
-                debug_input = False
-            else:
-                error_exit("Invalid debug, please provide 'True' or 'False'")
+            debug_input = converter_exit(converter_string_boolean, sys.argv[i],
+                                         "Invalid debug, please provide 'True' or 'False")
         elif i == 5:
-            try:
-                experiment_num_input = int(sys.argv[i])
-            except ValueError:
-                error_exit("Invalid experiment_num, please provide an integer")
+            experiment_num_input = converter_exit(converter_string_int, sys.argv[i],
+                                                  "Invalid experiment_num, please provide an integer")
+            checker(experiment_num_input < 0,
+                    "Invalid experiment_num, please provide a non-negative integer")
 
     return models_name_input, method_name_input, nodes_input, debug_input, experiment_num_input
 

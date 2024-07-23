@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from numpy import ndarray
 from tqdm import tqdm
 
-from src.helper.main_helper import run_method_with_nodes
+from src.helper.main.main import run_method_with_nodes
 from src.network.StarNetwork import StarNetwork
 
 
