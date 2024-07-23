@@ -7,9 +7,9 @@ from typing import Tuple, List, Dict, Union
 
 from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
-from src.helper.network.QuantumChannelFactory import QuantumChannelFactory
-from src.helper.network.QuantumProcessorFactory import QuantumProcessorFactory as QC
-from src.helper.network.QuantumSourceFactory import QuantumSourceFactory
+from src.helper.network.Factory.QuantumChannelFactory import QuantumChannelFactory
+from src.helper.network.Factory.QuantumProcessorFactory import QuantumProcessorFactory as QC
+from src.helper.network.Factory.QuantumSourceFactory import QuantumSourceFactory
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
