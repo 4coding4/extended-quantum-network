@@ -20,7 +20,7 @@ class QuantumChannelFactory:
         self.length = length
         self.models = models
 
-    def get_channel(self, name):
+    def get(self, name):
         """
         Get a quantum channel with the given name.
 

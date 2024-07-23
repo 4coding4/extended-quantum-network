@@ -1,13 +1,13 @@
 from netsquid.components import QuantumProcessor
 
 
-class QuantumComponents:
+class QuantumProcessorFactory:
     """
-    Represents the quantum components.
+    Represents the quantum Processors.
     """
 
     @staticmethod
-    def get_processor(name, mem_positions):
+    def get(name, mem_positions):
         """
         Get QuantumProcessor component with default settings.
         """
