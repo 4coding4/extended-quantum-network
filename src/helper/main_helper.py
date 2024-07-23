@@ -31,20 +31,25 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
         fidelity = method(debug=debug)
     # run with the provided nodes
     elif nodes_len == 2:
-        # run entangle_nodes
+        # run entangle_nodes/protocol_a
         fidelity = method(nodes[0], nodes[1], debug=debug)
     elif nodes_len == 3:
         # run protocol_a
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         error_exit("Invalid number of nodes, please provide 0 or 2 or 3 nodes")
+    # always print it, since it is the result of the simulation
     print(fidelity)
     return fidelity
 
 
-def converter_exit(method: callable, input, msg: str):
+def converter_exit(method: callable, input: any, msg: str) -> any:
     """
     Try to convert the input to the desired type, if it fails, exit the program with an error message.
+    :param method: callable
+    :param input: any
+    :param msg: str
+    :return: any
     """
     output, error = method(input)
     if error:
@@ -91,7 +96,7 @@ def converter_string_list_int(input: str) -> tuple:
         return None, True
 
 
-def checker(condition: bool, msg: str):
+def checker(condition: bool, msg: str) -> None:
     """
     Check if the condition is True, exit the program with an error message.
     :param condition: bool
