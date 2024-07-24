@@ -44,7 +44,7 @@ class EntangleNodes(NodeProtocol):
             self._qmem_input_port = self.node.qmemory.ports[f"qin{self._input_mem_position}"]
             self.node.qmemory.mem_positions[self._input_mem_position].in_use = True
 
-    def run(self) -> None:
+    def run(self):
         """
         Send entangled qubits of the source and destination nodes.
         """

@@ -41,7 +41,7 @@ class GenerateEntanglement(NodeProtocol):
             self._qmem_input_ports.append(self.node.qmemory.ports["qin1"])
             self.node.qmemory.mem_positions[1].in_use = True
 
-    def run(self) -> None:
+    def run(self):
         """
         Send entangled qubits of the source to the two destination nodes.
         """
