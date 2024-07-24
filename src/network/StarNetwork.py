@@ -5,6 +5,7 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import QRepr
 from typing import Tuple, List, Dict, Union
 
+from src.helper.main.main import error_exit
 from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
@@ -338,7 +339,7 @@ class StarNetwork:
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
             if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
-                raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+                error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
         # TODO REFACTOR THIS
         if len(source_ports["qout0"].forwarded_ports) == 0:
@@ -358,7 +359,7 @@ class StarNetwork:
             selected_source_ports = source_ports1
             component_name = "QuantumSource1"
         else:
-            raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+            error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
         # if channel_n == 0:
         #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
@@ -412,7 +413,7 @@ class StarNetwork:
                                or q1["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout1"].disconnect()
         else:
-            raise Exception(f"The source node is not connected to Node {n}")
+            error_exit(f"The source node is not connected to Node {n}")
 
     def _connect_remote_node(self):
         """
