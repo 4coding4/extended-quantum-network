@@ -31,7 +31,7 @@ class Experiment:
     _fig_path: str = "../out/fidelity-over-length.png"
 
     _verbose: bool = False
-    _network: StarNetwork = None
+    _network: StarNetwork
 
     def __init__(self, network: StarNetwork, verbose=False):
         """

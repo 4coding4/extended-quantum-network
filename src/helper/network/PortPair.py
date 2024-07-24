@@ -2,9 +2,9 @@ class PortPair:
     """
     Represents a pair of source and destination ports of a quantum channel.
     """
-    _source: str = None
-    _destination: str = None
-    _name: str = None
+    _source: str
+    _destination: str
+    _name: str
 
     def __init__(self, source: str, destination: str, name: str = None):
         """

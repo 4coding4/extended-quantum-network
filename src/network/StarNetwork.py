@@ -86,7 +86,7 @@ class StarNetwork:
     repeater_mem_positions (default: 2):
         The memory positions of the repeater's quantum memory
     """
-    _models: dict = None
+    _models: dict
     _destinations_n: int = 5
     _source_delay: float = 1e5
     _channels_length: float = 1
