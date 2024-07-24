@@ -233,15 +233,15 @@ class StarNetwork:
         for destination_n in range(1, self._destinations_n + 1):
             if destination_n == self._destinations_n - 1:
                 # Initialization of the repeater
-                self._destinations.append(self._network.add_node(f"Repeater"))
+                self._destinations.append(self._network.add_node("Repeater"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    quantum_processor_factory.get(f"QP_Repeater", self._repeater_mem_positions)
+                    quantum_processor_factory.get("QP_Repeater", self._repeater_mem_positions)
                 )
             elif destination_n == self._destinations_n:
                 # Initialize the remote node
-                self._destinations.append(self._network.add_node(f"RemoteNode"))
+                self._destinations.append(self._network.add_node("RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    quantum_processor_factory.get(f"QP_RemoteNode", self._remote_node_mem_positions)
+                    quantum_processor_factory.get("QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
                     quantum_source_factory.get("RemoteQuantumSource")
@@ -564,7 +564,7 @@ class StarNetwork:
                                                    qsource_name=remote_source_name)
 
             protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
-                                                     is_repeater=True, name=f"ProtocolRepeater")
+                                                     is_repeater=True, name="ProtocolRepeater")
 
             if node1 == self._destinations_n - 1:
                 protocol_node1 = protocol_repeater

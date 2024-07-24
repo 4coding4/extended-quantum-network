@@ -163,7 +163,7 @@ if __name__ == '__main__':
     num_each_sim = 100
     csv_file = "data.csv"
     f=open(csv_file, "w+")
-    f.write(f"length,fidelity\r\n")
+    f.write("length,fidelity\r\n")
     for length in lengths:
         print(f"Nodes are entangled after {length} meters")
         fidelity_values = []

@@ -119,7 +119,7 @@ class Experiment:
         :param debug: If the simulation should print more info
         """
         f = open(self._csv_path, "w+")
-        f.write(f"length,fidelity\r\n")
+        f.write("length,fidelity\r\n")
 
         for length in tqdm(self._lengths):
             fidelity_values = []
