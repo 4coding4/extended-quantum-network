@@ -109,7 +109,7 @@ class Experiment:
     # FUNCTIONS USED TO PERFORM THE EXPERIMENT #
     ############################################
 
-    def run(self, method: callable, nodes: list, debug: bool = False):
+    def run(self, method: callable, nodes: list, debug: bool = False):  # TODO cognitive complexity is too high (sonarlint max is 15, this 22), reduce by extrapolating the logic to a helper function
         """
         Run the simulation between the two given nodes. When the simulation is over, a
         csv file is created with the results and a figure is generated.
