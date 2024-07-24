@@ -1,19 +1,7 @@
-import sys
-
+from src.helper.error.error import error_exit
 from src.models.Combined import Combined
 from src.models.Empty import Empty
 from src.network.StarNetwork import StarNetwork
-
-
-def error_exit(msg: str) -> None:
-    """
-    Exit the program with an error message and exit code 1.
-    :param msg: str
-    """
-    # Quote from the documentation
-    # sys.exit("some error message") is a quick way to exit a program when an error occurs.
-    # https://docs.python.org/3.11/library/sys.html#sys.exit
-    sys.exit(msg)
 
 
 def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
