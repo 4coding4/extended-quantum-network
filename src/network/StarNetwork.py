@@ -683,13 +683,13 @@ class StarNetwork:
                     """
                     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
                     based on the state (in the repeater).
-                    :param curr_state: The state of the qubit in the Repeater memory position (0, 1, 2, or 3)
+                    :param curr_state: The state of the qubit in the Repeater memory position, w M format(0, 1, 2, or 3)
                     :param position: The memory position in the RemoteNode (0 or 1)
                     """
                     # dictionary with the instructions to apply based on the state of the qubit
                     # (represented w numbers, input of the function curr_state or as bell states in the comments)
                     instructions = {
-                        0: [],  # |00> (no gates to apply) # TODO ask if this is correct
+                        0: [],  # |00> (no gates to apply)
                         1: [INSTR_X],  # |01>
                         2: [INSTR_Z, INSTR_X],  # |11>
                         3: [INSTR_Z]  # |10>
