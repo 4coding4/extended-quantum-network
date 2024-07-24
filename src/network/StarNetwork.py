@@ -636,12 +636,12 @@ class StarNetwork:
             if node1_label == "RemoteNode" or node2_label == "RemoteNode":
                 try:
                     self._network.subcomponents["Repeater"].qmemory.discard(0)
-                except:
+                except MemPositionEmptyError:
                     pass
 
                 try:
                     self._network.subcomponents["Repeater"].qmemory.discard(1)
-                except:
+                except MemPositionEmptyError:
                     pass
 
             result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
@@ -761,7 +761,7 @@ class StarNetwork:
                 for i in range(4):
                     try:
                         repeater_memory.discard(i)
-                    except:
+                    except MemPositionEmptyError:
                         pass
         except ValueError as e:
             print(e)

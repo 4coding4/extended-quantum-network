@@ -187,7 +187,7 @@ if __name__ == '__main__':
                 if verbose:
                     print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
                 fidelity_values.append(qubits.fidelity([q1, q2], b00))
-            except:
+            except ValueError:
                 # If one or more of the qubits are dead, display the memories
                 if verbose:
                     print("Current situation of the qubits: (Alice, Bob)")
