@@ -5,6 +5,7 @@ from netsquid.nodes import Network, node
 from netsquid.qubits import QRepr
 from typing import Tuple, List, Dict, Union
 
+from src.helper.error.error import error_exit
 from src.helper.network.MemorySnapshot import MemorySnapshot
 from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
@@ -86,7 +87,7 @@ class StarNetwork:
     repeater_mem_positions (default: 2):
         The memory positions of the repeater's quantum memory
     """
-    _models: dict = None
+    _models: dict
     _destinations_n: int = 5
     _source_delay: float = 1e5
     _channels_length: float = 1
@@ -233,15 +234,15 @@ class StarNetwork:
         for destination_n in range(1, self._destinations_n + 1):
             if destination_n == self._destinations_n - 1:
                 # Initialization of the repeater
-                self._destinations.append(self._network.add_node(f"Repeater"))
+                self._destinations.append(self._network.add_node("Repeater"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    quantum_processor_factory.get(f"QP_Repeater", self._repeater_mem_positions)
+                    quantum_processor_factory.get("QP_Repeater", self._repeater_mem_positions)
                 )
             elif destination_n == self._destinations_n:
                 # Initialize the remote node
-                self._destinations.append(self._network.add_node(f"RemoteNode"))
+                self._destinations.append(self._network.add_node("RemoteNode"))
                 self._destinations[destination_n - 1].add_subcomponent(
-                    quantum_processor_factory.get(f"QP_RemoteNode", self._remote_node_mem_positions)
+                    quantum_processor_factory.get("QP_RemoteNode", self._remote_node_mem_positions)
                 )
                 self._destinations[destination_n - 1].add_subcomponent(
                     quantum_source_factory.get("RemoteQuantumSource")
@@ -338,7 +339,7 @@ class StarNetwork:
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
             if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
-                raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+                error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
         # TODO REFACTOR THIS
         if len(source_ports["qout0"].forwarded_ports) == 0:
@@ -358,7 +359,7 @@ class StarNetwork:
             selected_source_ports = source_ports1
             component_name = "QuantumSource1"
         else:
-            raise Exception("Two nodes have already been connected to the source's QuantumSource component")
+            error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
         # if channel_n == 0:
         #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
@@ -412,7 +413,7 @@ class StarNetwork:
                                or q1["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout1"].disconnect()
         else:
-            raise Exception(f"The source node is not connected to Node {n}")
+            error_exit(f"The source node is not connected to Node {n}")
 
     def _connect_remote_node(self):
         """
@@ -564,7 +565,7 @@ class StarNetwork:
                                                    qsource_name=remote_source_name)
 
             protocol_repeater = GenerateEntanglement(on_node=self._network.subcomponents["Repeater"],
-                                                     is_repeater=True, name=f"ProtocolRepeater")
+                                                     is_repeater=True, name="ProtocolRepeater")
 
             if node1 == self._destinations_n - 1:
                 protocol_node1 = protocol_repeater
@@ -636,12 +637,12 @@ class StarNetwork:
             if node1_label == "RemoteNode" or node2_label == "RemoteNode":
                 try:
                     self._network.subcomponents["Repeater"].qmemory.discard(0)
-                except:
+                except MemPositionEmptyError:
                     pass
 
                 try:
                     self._network.subcomponents["Repeater"].qmemory.discard(1)
-                except:
+                except MemPositionEmptyError:
                     pass
 
             result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
@@ -761,7 +762,7 @@ class StarNetwork:
                 for i in range(4):
                     try:
                         repeater_memory.discard(i)
-                    except:
+                    except MemPositionEmptyError:
                         pass
         except ValueError as e:
             print(e)

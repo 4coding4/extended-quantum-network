@@ -31,7 +31,7 @@ class Experiment:
     _fig_path: str = "../out/fidelity-over-length.png"
 
     _verbose: bool = False
-    _network: StarNetwork = None
+    _network: StarNetwork
 
     def __init__(self, network: StarNetwork, verbose=False):
         """
@@ -119,7 +119,7 @@ class Experiment:
         :param debug: If the simulation should print more info
         """
         f = open(self._csv_path, "w+")
-        f.write(f"length,fidelity\r\n")
+        f.write("length,fidelity\r\n")
 
         for length in tqdm(self._lengths):
             fidelity_values = []

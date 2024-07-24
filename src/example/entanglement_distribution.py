@@ -44,7 +44,7 @@ class EntangleNodes(NodeProtocol):
             self._qmem_input_port = self.node.qmemory.ports[f"qin{self._input_mem_position}"]
             self.node.qmemory.mem_positions[self._input_mem_position].in_use = True
 
-    def run(self) -> None:
+    def run(self):
         """
         Send entangled qubits of the source and destination nodes.
         """
@@ -163,7 +163,7 @@ if __name__ == '__main__':
     num_each_sim = 100
     csv_file = "data.csv"
     f=open(csv_file, "w+")
-    f.write(f"length,fidelity\r\n")
+    f.write("length,fidelity\r\n")
     for length in lengths:
         print(f"Nodes are entangled after {length} meters")
         fidelity_values = []
@@ -187,7 +187,7 @@ if __name__ == '__main__':
                 if verbose:
                     print(f"Fidelity of generated entanglement: {qubits.fidelity([q1, q2], b00)}")
                 fidelity_values.append(qubits.fidelity([q1, q2], b00))
-            except:
+            except ValueError:
                 # If one or more of the qubits are dead, display the memories
                 if verbose:
                     print("Current situation of the qubits: (Alice, Bob)")
