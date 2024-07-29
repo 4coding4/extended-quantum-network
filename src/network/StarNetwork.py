@@ -716,41 +716,6 @@ class StarNetwork:
             for i in range(4):
                 _, = repeater_memory.peek(i)
 
-            # def return_results(qubit1: Qubit, qubit2: Qubit, qubit3: Qubit, qubit4: Qubit) \
-            #         -> List[Dict[str, Union[List[Qubit], float, bool]]]:
-            #     """
-            #     Return the results of the entanglement swapping.
-            #
-            #     :param qubit1: The first qubit
-            #     :param qubit2: The second qubit
-            #     :param qubit3: The third qubit
-            #     :param qubit4: The fourth qubit
-            #     :return: A dictionary containing the qubits and their fidelity
-            #     """
-            #     channel_1_pair = [qubit1, qubit4]
-            #     channel_0_pair = [qubit2, qubit3]
-            #
-            #     # measure fidelity between 2 pairs of qubits & return the results
-            #     def calc_fidelity(pair1: List[Qubit], pair2: List[Qubit], reference_state: QRepr = b00) \
-            #             -> Tuple[float, float]:
-            #         """
-            #         Calculate the fidelity between two pairs of qubits.
-            #
-            #         :param pair1: The first pair of qubits
-            #         :param pair2: The second pair of qubits
-            #         :param reference_state: The reference state to compare the fidelity to
-            #         :return: The fidelity of the two pairs of qubits
-            #         """
-            #         return qubits.fidelity(pair1, reference_state), qubits.fidelity(pair2, reference_state)
-            #
-            #     fidelity1, fidelity2 = calc_fidelity(channel_1_pair, channel_0_pair)
-            #     channel_1_pair = [qubit1, qubit4]
-            #     channel_0_pair = [qubit2, qubit3]
-            #     result = get_result(channel_1_pair)
-            #     result1 = get_result(channel_0_pair)
-            #
-            #     return [result, result1]
-
             channel_1_pair = [qubit_node1, qubit_node3_1]
             channel_0_pair = [qubit_node2, qubit_node3]
             results = get_results(channel_1_pair, channel_0_pair)
