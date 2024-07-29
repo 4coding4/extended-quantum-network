@@ -11,6 +11,7 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
+from src.helper.network.entanglement_swapping import apply_gates
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -679,7 +680,7 @@ class StarNetwork:
         :return: A dictionary containing the qubits and their fidelity
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
-        remotenode_memory = self._network.subcomponents["RemoteNode"].qmemory
+        remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if any(single_node == self._destinations_n - 1 for single_node in [node1, node2, node3]):
                 m_mem_positions = [0, 1]
@@ -700,35 +701,9 @@ class StarNetwork:
                 # and then apply the necessary gates
                 # then do the same for the position 2 and 3
 
-                # create helper function to apply the gates, this replaces a chain of if-elif-else statements
-                def apply_gates(curr_state: int, position: int) -> None:
-                    """
-                    Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
-                    based on the state (in the repeater).
-                    :param curr_state: The state of the qubit in the Repeater memory position, w M format(0, 1, 2, or 3)
-                    :param position: The memory position in the RemoteNode (0 or 1)
-                    """
-                    # dictionary with the instructions to apply based on the state of the qubit
-                    # (represented w numbers, input of the function curr_state or as bell states in the comments)
-                    instructions = {
-                        0: [],  # |00> (no gates to apply)
-                        1: [INSTR_X],  # |01>
-                        2: [INSTR_Z, INSTR_X],  # |11>
-                        3: [INSTR_Z]  # |10>
-                    }
-                    # get the instructions based on the state of the qubit in the memory position
-                    get_instructions = instructions[curr_state]
-                    # apply the instructions to the qubit in the memory position (in the RemoteNode)
-                    for instr in get_instructions:
-                        remotenode_memory.execute_instruction(instr, [position])
-                        #, output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
-                        if debug:
-                            print(f"Applying instruction {instr} to the qubit "
-                                  f"in memory position {position} in the RemoteNode")
-
                 # apply gates for first and second state/position
-                apply_gates(state, 0)
-                apply_gates(state1, 1)
+                apply_gates(state, 0, remote_node_memory, debug)
+                apply_gates(state1, 1, remote_node_memory, debug)
         except MemPositionEmptyError as e:
             print(e)
 
