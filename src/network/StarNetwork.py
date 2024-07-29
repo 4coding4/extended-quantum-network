@@ -11,7 +11,7 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
-from src.helper.network.entanglement_swapping import apply_gates
+from src.helper.network.entanglement_swapping import apply_gates, print_bell_measurement
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -690,12 +690,9 @@ class StarNetwork:
                 state = m[0]["M"][0]
                 state1 = m1[0]["M"][0]
                 if debug:
-                    print('_perform_new_entanglement_swapping: m= ', m, 'm1= ', m1)
-                    print('Bell measurement in repeater:')
-                    print('M/Indices format for the states: state', state,
-                          "state1", state1)
-                    print('B/Bell states/Ket vectors format for the states: state', ketstates.BellIndex(state),
-                          "state1", ketstates.BellIndex(state1))
+                    print('_perform_new_entanglement_swapping:')
+                    print_bell_measurement(m, state)
+                    print_bell_measurement(m1, state1)
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates

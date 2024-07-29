@@ -1,4 +1,5 @@
 from netsquid.components import INSTR_X, INSTR_Z
+from netsquid.qubits import ketstates
 
 
 def apply_gates(curr_state: int, position: int, remote_node_memory, debug: bool) -> None:
@@ -27,3 +28,16 @@ def apply_gates(curr_state: int, position: int, remote_node_memory, debug: bool)
         if debug:
             print(f"Applying instruction {instr} to the qubit "
                   f"in memory position {position} in the RemoteNode")
+
+
+def print_bell_measurement(m, state) :
+    """
+    Print the measurement of the Bell state and the state of the qubit in the Repeater
+    :param m: The measurement of the Bell state
+    :param state: The state of the qubit in the Repeater
+    """
+    print('Bell measurement in repeater:')
+    print('m= ', m, ', state:')
+    print('M/Indices format for the states: ', state)
+    print('B/Bell states/Ket vectors format for the states: ', ketstates.BellIndex(state))
+
