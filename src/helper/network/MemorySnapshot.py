@@ -88,14 +88,19 @@ class MemorySnapshot:
         positions = list(range(self.remote_node_mem_positions))
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: int = 80) -> None:
+    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: int = 80) -> str:
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
+        :param initial_msg: The initial message to print.
+        :param end_msg: The end message to print.
+        :param line_width: The width of the line to print.
+        :return: A string with the initial message, the memory positions and the end message.
         """
         line = "-" * line_width
 
+        start_str = f"{line}\n" + initial_msg
         if initial_msg != "":
-            print(f"{line}\n" + initial_msg)
+            print(start_str)
 
         # run the repeater, nodes and remote node, to get the tuples of names and positions of the memories
         names_positions = [self.repeater(), self.nodes(), self.remote_node()]
@@ -103,7 +108,11 @@ class MemorySnapshot:
         # store the results in a list of dictionaries
         all_mem = [self.multi_access(names_positions) for names_positions in names_positions]
         # print the results in a formatted way for each memory position 1 pro line
-        print("\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()]))
+        mid_str = "\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()])
+        print(mid_str)
 
+        end_str = "If it is working correctly, the output should have " + end_msg + f"\n{line}"
         if end_msg != "":
-            print("If it is working correctly, the output should have " + end_msg + f"\n{line}")
+            print(end_str)
+
+        return start_str + mid_str + end_msg
