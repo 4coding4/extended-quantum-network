@@ -106,4 +106,4 @@ class MemorySnapshot:
         print("\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()]))
 
         if end_msg != "":
-            print(end_msg + f"\n{line}")
+            print("If it is working correctly, the output should have " + end_msg + f"\n{line}")
