@@ -27,7 +27,7 @@ class MemorySnapshot:
 
     def memory_access(self, name: str, position: int) -> Qubit:
         """
-        Access the memory at the given position of the subcomponent.
+        Access the memory at the given position of the subcomponent, without causing/calculating/updating decoherence.
 
         :param name: Name of the quantum memory
         :param position: Position in the memory
@@ -63,8 +63,7 @@ class MemorySnapshot:
         Returns the names and positions of the repeater's memories.
         :return: Tuple of lists of names and positions of the repeater's memories.
         """
-        names = ["Repeater"] * self.repeater_mem_positions  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        # positions = [0, 1, 2, 3] # 0 to repeater_mem_positions-1
+        names = ["Repeater"] * self.repeater_mem_positions
         positions = list(range(self.repeater_mem_positions))
         return names, positions
 
@@ -73,8 +72,7 @@ class MemorySnapshot:
         Returns the names and positions of the nodes' memories.
         :return: Tuple of lists of names and positions of the nodes' memories.
         """
-        names = [f"Node{self.node1}", f"Node{self.node2}"]  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        # positions = [0, 0] # 0 to node_mem_positions-1 *2 for two nodes
+        names = [f"Node{self.node1}", f"Node{self.node2}"]
         positions = list(range(self.node_mem_positions)) * 2
         return names, positions
 
@@ -83,8 +81,7 @@ class MemorySnapshot:
         Returns the names and positions of the remote node's memories.
         :return: Tuple of lists of names and positions of the remote node's memories.
         """
-        names = ["RemoteNode"] * self.remote_node_mem_positions  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        # positions = [0, 1] # 0 to remote_node_mem_positions-1
+        names = ["RemoteNode"] * self.remote_node_mem_positions
         positions = list(range(self.remote_node_mem_positions))
         return names, positions
 
