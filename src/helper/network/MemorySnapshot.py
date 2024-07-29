@@ -115,4 +115,4 @@ class MemorySnapshot:
         if end_msg != "":
             print(end_str)
 
-        return start_str + mid_str + end_msg
+        return start_str + mid_str + end_str
