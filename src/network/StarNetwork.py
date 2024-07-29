@@ -157,7 +157,28 @@ class StarNetwork:
         """
         return self._models
 
-        ###########
+    @property
+    def repeater_mem_positions(self) -> int:
+        """
+        :type: int
+        """
+        return self._repeater_mem_positions
+
+    @property
+    def node_mem_positions(self) -> int:
+        """
+        :type: int
+        """
+        return self._node_mem_positions
+
+    @property
+    def remote_node_mem_positions(self) -> int:
+        """
+        :type: int
+        """
+        return self._remote_node_mem_positions
+
+    ###########
 
     # SETTERS #
     ###########
@@ -478,38 +499,33 @@ class StarNetwork:
         tot_num_channels = self._repeater_mem_positions // 2  # 2 memories per channel for the repeater
         assert tot_num_channels == 2
 
-        channels_n = []
-        for i in range(0, 2):
-            channels_n.append(i)
-        # reverse the list to start from the last channel
-        channels_n.reverse()
+        # define memory_snapshot class
+        memory_snapshot = MemorySnapshot(self._network, node1, node2, node3,
+                                         self.repeater_mem_positions,
+                                         self.node_mem_positions,
+                                         self.remote_node_mem_positions)
+
+        channels_n = [i for i in range(0, tot_num_channels)][::-1]  # reverse the list to start from the last channel
+
         for i, channel_n in enumerate(channels_n):
-            if i == 0:
-                first_node = node1
-            elif i == 1:
-                first_node = node2
+            first_node = node1 if i == 0 else node2
 
             # this way uses only 1 mem position0 and 1 qchannel between nodes
             self._perform_entanglement(first_node, node3, channel_n)
 
             if debug:
-                first_node_number = i + 1
-                if i == 0:
-                    expected_output = "If it is working correctly, the output should have 4 Qubits and 4 None"
-                    extra_msg = ""
-                elif i == 1:
-                    expected_output = "If it is working correctly, the output should have all Qubits and 0 None"
-                    extra_msg = " and Before entanglement swapping"
+                expected_output = "4 Qubits and 4 None" if i == 0 else "all Qubits and 0 None"
+                extra_msg = "" if i == 0 else " and Before entanglement swapping"
 
-                MemorySnapshot(self._network, node1, node2, node3).show_all_memory_positions(
-                    initial_msg=f"After entanglement in nodes {first_node_number}-3{extra_msg}:",
+                memory_snapshot.show_all_memory_positions(
+                    initial_msg=f"After entanglement in nodes {first_node}-3{extra_msg}:",
                     end_msg=expected_output)
 
         results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
         if debug:
-            expected_output = "If it is working correctly, the output should have all None"
-            MemorySnapshot(self._network, node1, node2, node3).show_all_memory_positions(
+            expected_output = "all None"
+            memory_snapshot.show_all_memory_positions(
                 initial_msg="After entanglement swapping:",
                 end_msg=expected_output)
 
@@ -652,7 +668,8 @@ class StarNetwork:
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
-            -> List[Dict[str, Union[List[Qubit], float, bool]]]:  # TODO cognitive complexity is too high (sonarlint max is 15, this 20), reduce by extrapolating the logic to a helper function
+            -> List[Dict[str, Union[List[
+                Qubit], float, bool]]]:  # TODO cognitive complexity is too high (sonarlint max is 15, this 20), reduce by extrapolating the logic to a helper function
         """
         Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
 

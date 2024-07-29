@@ -10,13 +10,20 @@ class MemorySnapshot:
     :param node1: The first node of the network.
     :param node2: The second node of the network.
     :param node4: The 4. node of the network equal to the remote node of the network.
+    :param repeater_mem_positions: The number of memory positions in the repeater.
+    :param node_mem_positions: The number of memory positions in each node.
+    :param remote_node_mem_positions: The number of memory positions in the remote node.
     """
 
-    def __init__(self, network: Network, node1: int, node2: int, node4: int):
+    def __init__(self, network: Network, node1: int, node2: int, node4: int,
+                 repeater_mem_positions: int, node_mem_positions: int, remote_node_mem_positions: int):
         self._network = network
         self.node1 = node1
         self.node2 = node2
         assert node4 == 4  # The remote node must be the 4th node of the network.
+        self.repeater_mem_positions = repeater_mem_positions
+        self.node_mem_positions = node_mem_positions
+        self.remote_node_mem_positions = remote_node_mem_positions
 
     def memory_access(self, name: str, position: int) -> Qubit:
         """
@@ -56,8 +63,9 @@ class MemorySnapshot:
         Returns the names and positions of the repeater's memories.
         :return: Tuple of lists of names and positions of the repeater's memories.
         """
-        names = ["Repeater"] * 4  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        positions = [0, 1, 2, 3]
+        names = ["Repeater"] * self.repeater_mem_positions  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
+        # positions = [0, 1, 2, 3] # 0 to repeater_mem_positions-1
+        positions = list(range(self.repeater_mem_positions))
         return names, positions
 
     def nodes(self) -> Tuple[List[str], List[int]]:
@@ -66,7 +74,8 @@ class MemorySnapshot:
         :return: Tuple of lists of names and positions of the nodes' memories.
         """
         names = [f"Node{self.node1}", f"Node{self.node2}"]  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        positions = [0, 0]
+        # positions = [0, 0] # 0 to node_mem_positions-1 *2 for two nodes
+        positions = list(range(self.node_mem_positions)) * 2
         return names, positions
 
     def remote_node(self) -> Tuple[List[str], List[int]]:
@@ -74,18 +83,24 @@ class MemorySnapshot:
         Returns the names and positions of the remote node's memories.
         :return: Tuple of lists of names and positions of the remote node's memories.
         """
-        names = ["RemoteNode"] * 2  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
-        positions = [0, 1]
+        names = ["RemoteNode"] * self.remote_node_mem_positions  # TODO refactor, put the number of memories as a parameter and generate the lists accordingly
+        # positions = [0, 1] # 0 to remote_node_mem_positions-1
+        positions = list(range(self.remote_node_mem_positions))
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: str = 80) -> None:
+    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: int = 80) -> str:
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
+        :param initial_msg: The initial message to print.
+        :param end_msg: The end message to print.
+        :param line_width: The width of the line to print.
+        :return: A string with the initial message, the memory positions and the end message.
         """
         line = "-" * line_width
 
+        start_str = f"{line}\n" + initial_msg
         if initial_msg != "":
-            print(f"{line}\n" + initial_msg)
+            print(start_str)
 
         # run the repeater, nodes and remote node, to get the tuples of names and positions of the memories
         names_positions = [self.repeater(), self.nodes(), self.remote_node()]
@@ -93,7 +108,11 @@ class MemorySnapshot:
         # store the results in a list of dictionaries
         all_mem = [self.multi_access(names_positions) for names_positions in names_positions]
         # print the results in a formatted way for each memory position 1 pro line
-        print("\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()]))
+        mid_str = "\n".join([f"{k}: {v}" for d in all_mem for k, v in d.items()])
+        print(mid_str)
 
+        end_str = "If it is working correctly, the output should have " + end_msg + f"\n{line}"
         if end_msg != "":
-            print(end_msg + f"\n{line}")
+            print(end_str)
+
+        return start_str + mid_str + end_str
