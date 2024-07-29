@@ -2,7 +2,7 @@ from netsquid import sim_run, qubits, b00, sim_time
 from netsquid.components import QuantumChannel, INSTR_MEASURE_BELL, INSTR_Z, INSTR_X
 from netsquid.components.qmemory import MemPositionEmptyError, Qubit
 from netsquid.nodes import Network, node
-from netsquid.qubits import QRepr
+from netsquid.qubits import QRepr, ketstates
 from typing import Tuple, List, Dict, Union
 
 from src.helper.error.error import error_exit
@@ -690,7 +690,11 @@ class StarNetwork:
                 state1 = m1[0]["M"][0]
                 if debug:
                     print('_perform_new_entanglement_swapping: m= ', m, 'm1= ', m1)
-                    print('Bell measurement in repeater: state', state, "state1", state1)
+                    print('Bell measurement in repeater:')
+                    print('M/Indices format for the states: state', state,
+                          "state1", state1)
+                    print('B/Bell states/Ket vectors format for the states: state', ketstates.BellIndex(state),
+                          "state1", ketstates.BellIndex(state1))
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
