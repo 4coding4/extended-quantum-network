@@ -88,7 +88,7 @@ class MemorySnapshot:
         positions = list(range(self.remote_node_mem_positions))
         return names, positions
 
-    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: str = 80) -> None:
+    def show_all_memory_positions(self, initial_msg: str = "", end_msg: str = "", line_width: int = 80) -> None:
         """
         Observer in repeater to check if the q bits are there by peaking in all the memory positions
         """
