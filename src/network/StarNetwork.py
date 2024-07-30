@@ -618,7 +618,7 @@ class StarNetwork:
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
         :param node1: The index of the first node
-        :param node2: The index of the second node
+        :param node2: The index of the second node (Remote Node)
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
@@ -669,7 +669,7 @@ class StarNetwork:
 
         :param node1: The index of the first node
         :param node2: The index of the second node
-        :param node3: The index of the third node
+        :param node3: The index of the third node (Remote Node)
         :return: A dictionary containing the qubits and their fidelity
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
