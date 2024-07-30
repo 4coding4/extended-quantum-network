@@ -11,8 +11,8 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
-from src.helper.network.entanglement_swapping import apply_gates, print_bell_measurement, get_result, get_results, \
-    perform_bell_measurement_and_get_bell_measurement_w_state
+from src.helper.network.entanglement_swapping import apply_gates, get_result, get_results, \
+    perform_and_get_bell_measurement_w_state
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -628,8 +628,7 @@ class StarNetwork:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
                 if debug:
                     print('_perform_entanglement_swapping:')
-                _, state = (
-                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, [], debug))
+                _, state = perform_and_get_bell_measurement_w_state(repeater_memory, [], debug)
 
                 # apply gates in the remote node (no memory position specified)
                 apply_gates(state, remote_node_memory, -1, debug)
@@ -682,10 +681,8 @@ class StarNetwork:
                 m1_mem_positions = [2, 3]
                 if debug:
                     print('_perform_new_entanglement_swapping:')
-                _, state = (
-                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions, debug))
-                _, state1 = (
-                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions, debug))
+                _, state = perform_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions, debug)
+                _, state1 = perform_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions, debug)
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates

@@ -39,8 +39,8 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
             print(msg)
 
 
-def perform_bell_measurement_and_get_bell_measurement_w_state(remote_node_memory, positions: list = [],
-                                                              debug: bool = False):
+def perform_and_get_bell_measurement_w_state(remote_node_memory, positions: list = [],
+                                             debug: bool = False):
     """
     Perform the Bell measurement in the Repeater.
     :param remote_node_memory: The memory of the RemoteNode
