@@ -30,18 +30,15 @@ class Experiment:
     _lengths: ndarray = np.arange(10, 1000 + 10, 10)
     _fig_path: str = "../out/fidelity-over-length.png"
 
-    _verbose: bool = False
     _network: StarNetwork
 
-    def __init__(self, network: StarNetwork, verbose=False):
+    def __init__(self, network: StarNetwork):
         """
         Constructor for the Experiment class.
 
         :param network: The StarNetwork to experiment on
-        :param verbose: If the class needs to print more info
         """
         self._network = network
-        self._verbose = verbose
 
     ###########
     # GETTERS #
@@ -125,7 +122,7 @@ class Experiment:
             fidelity_values = []
             self._network.channels_length = length
 
-            if self._verbose:
+            if debug:
                 print(f"Nodes are entangled after {self._network.channels_length * 1000} meters")
 
             for _ in range(self._num_each_simulation):
@@ -140,10 +137,10 @@ class Experiment:
                 except KeyError:
                     fidelity_values.append(0)
 
-                    if self._verbose:
+                    if debug:
                         print("Either one or both Qubits were lost during transfer")
 
-            if self._verbose:
+            if debug:
                 print(f"Average fidelity: {np.mean(fidelity_values)}")
                 print(f"Not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}/{len(fidelity_values)}")
 
