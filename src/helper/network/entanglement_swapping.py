@@ -5,7 +5,7 @@ from netsquid.qubits import ketstates, QRepr
 from typing import List, Dict, Union
 
 
-def apply_gates(curr_state: int, position: int, remote_node_memory, debug: bool) -> None:
+def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool=False) -> None:
     """
     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
     based on the state (in the repeater).
@@ -26,11 +26,16 @@ def apply_gates(curr_state: int, position: int, remote_node_memory, debug: bool)
     get_instructions = instructions[curr_state]
     # apply the instructions to the qubit in the memory position (in the RemoteNode)
     for instr in get_instructions:
-        remote_node_memory.execute_instruction(instr, [position])
-        # , output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
+        if position == -1:
+            remote_node_memory.execute_instruction(instr)
+        else:
+            remote_node_memory.execute_instruction(instr, [position])
+            # , output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
         if debug:
-            print(f"Applying instruction {instr} to the qubit "
-                  f"in memory position {position} in the RemoteNode")
+            msg = f"Applying instruction {instr} to the qubit "
+            if position != -1:
+                msg += f"in memory position {position} in the RemoteNode"
+            print(msg)
 
 
 def print_bell_measurement(m, state) :

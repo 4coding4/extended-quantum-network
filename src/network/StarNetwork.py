@@ -538,7 +538,7 @@ class StarNetwork:
 
         :param node1: The index of the first node (default is 1)
         :param node2: The index of the second node (default is 4, the Remote Node)
-        :param debug: unused boolean (default is False)
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
         :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
                                 and `node2` are the same node
         :return: A dictionary containing the qubits and their fidelity
@@ -546,7 +546,7 @@ class StarNetwork:
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
-        return self._perform_entanglement_swapping(node1, node2)
+        return self._perform_entanglement_swapping(node1, node2, debug)
 
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
@@ -612,71 +612,63 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def _perform_entanglement_swapping(self, node1: int,
-                                       node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+    def _perform_entanglement_swapping(self, node1: int, node2: int, debug: bool = False):
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
         :param node1: The index of the first node
-        :param node2: The index of the second node
+        :param node2: The index of the second node (Remote Node)
         """
+        repeater_memory = self._network.subcomponents["Repeater"].qmemory
+        remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
-                                                                                        output_key="M")
-                # print(m)  # ({'M': [1]}, 0.0)
+                m = repeater_memory.execute_instruction(INSTR_MEASURE_BELL, output_key="M")
                 state = m[0]["M"][0]
-                # print(state)  # 1
+                if debug:
+                    print('_perform_entanglement_swapping:')
+                    print_bell_measurement(m, state)
 
-                if state == 1:
-                    # |01>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
-                elif state == 2:
-                    # |11>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
-                elif state == 3:
-                    # |10>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
+                # apply gates in the remote node (no memory position specified)
+                apply_gates(state, remote_node_memory, -1, debug)
         except MemPositionEmptyError:
             pass
 
         try:
-            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
+                      for node_n in [node1, node2]]  # the last one is always "RemoteNode"
+            mem_positions = [0, 0]
+            # pop the qubits from the memory positions in the nodes specified by the labels (none repeater) & positions
+            qubit_node1, qubit_node2 = \
+                [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
+                 for label, mem_pos in zip(labels, mem_positions)]
+            # peak in all the repeater memory positions, from 0 to 1 (both included)
+            for i in range(2):
+                _, = repeater_memory.peek(i)
 
-            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
-            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
-            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
-
-            if node1_label == "RemoteNode" or node2_label == "RemoteNode":
-                try:
-                    self._network.subcomponents["Repeater"].qmemory.discard(0)
-                except MemPositionEmptyError:
-                    pass
-
-                try:
-                    self._network.subcomponents["Repeater"].qmemory.discard(1)
-                except MemPositionEmptyError:
-                    pass
-
-            result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
-        except ValueError:
+            pair = [qubit_node1, qubit_node2]
+            result = get_result(pair)
+            if labels[-1] == "RemoteNode":  # same as node2_label: "RemoteNode"
+                # list of the memory positions from 0 to 1 (both included)
+                for i in range(2):
+                    try:
+                        repeater_memory.discard(i)
+                    except MemPositionEmptyError:
+                        pass
+        except ValueError as e:
+            print(e)
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
-
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
             -> List[Dict[str, Union[List[
-                Qubit], float, bool]]]:  # TODO cognitive complexity is too high (sonarlint max is 15, this 20), reduce by extrapolating the logic to a helper function
+                Qubit], float, bool]]]:
         """
         Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
 
         :param node1: The index of the first node
         :param node2: The index of the second node
-        :param node3: The index of the third node
+        :param node3: The index of the third node (Remote Node)
         :return: A dictionary containing the qubits and their fidelity
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
@@ -699,8 +691,8 @@ class StarNetwork:
                 # then do the same for the position 2 and 3
 
                 # apply gates for first and second state/position
-                apply_gates(state, 0, remote_node_memory, debug)
-                apply_gates(state1, 1, remote_node_memory, debug)
+                apply_gates(state, remote_node_memory, 0, debug)
+                apply_gates(state1, remote_node_memory, 1, debug)
         except MemPositionEmptyError as e:
             print(e)
 
