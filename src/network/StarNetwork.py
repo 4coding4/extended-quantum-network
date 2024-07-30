@@ -612,8 +612,7 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def _perform_entanglement_swapping(self, node1: int,
-                                       node2: int, debug: bool = False):
+    def _perform_entanglement_swapping(self, node1: int, node2: int, debug: bool = False):
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
