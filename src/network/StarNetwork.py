@@ -636,11 +636,19 @@ class StarNetwork:
             pass
 
         try:
-            node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
+                      for node_n in [node1, node2]]  # the last one is always "RemoteNode"
+            mem_positions = [0, 0]
+            # pop the qubits from the memory positions in the nodes specified by the labels (none repeater) & positions
+            qubit_node1, qubit_node2 = \
+                [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
+                 for label, mem_pos in zip(labels, mem_positions)]
 
-            qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
-            qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
+            # node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
+            # node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
+            #
+            # qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
+            # qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
             # peak in all the repeater memory positions, from 0 to 1 (both included)
             for i in range(2):
                 _, = repeater_memory.peek(i)
@@ -649,7 +657,7 @@ class StarNetwork:
             # result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
             pair = [qubit_node1, qubit_node2]
             result = get_result(pair)
-            if node1_label == "RemoteNode" or node2_label == "RemoteNode":
+            if labels[-1] == "RemoteNode":  # same as node2_label: "RemoteNode"
                 # list of the memory positions from 0 to 1 (both included)
                 for i in range(2):
                     try:
