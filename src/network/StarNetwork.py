@@ -656,7 +656,8 @@ class StarNetwork:
                         repeater_memory.discard(i)
                     except MemPositionEmptyError:
                         pass
-        except ValueError:
+        except ValueError as e:
+            print(e)
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
         return result
 
