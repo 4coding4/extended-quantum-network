@@ -152,7 +152,6 @@ class Experiment:
             if debug:
                 print("Either one or both Qubits were lost during transfer")
 
-
     def _plot_results(self):
         dataframe = pd.read_csv(self._csv_path)
         a, b = np.polyfit(dataframe["length"], dataframe["fidelity"], 1)
