@@ -126,15 +126,7 @@ class Experiment:
                 print(f"Nodes are entangled after {self._network.channels_length * 1000} meters")
 
             for _ in range(self._num_each_simulation):
-                try:
-                    result = run_method_with_nodes(method, nodes, debug)
-                    # is array
-                    for idx in range(len(result)):
-                        fidelity_values.append(result[idx]["fidelity"])
-                except KeyError:
-                    fidelity_values.append(0)
-                    if debug:
-                        print("Either one or both Qubits were lost during transfer")
+                self.run_one_simulation(method, nodes, fidelity_values, debug)
 
             avg_fidelity = np.mean(fidelity_values)
             if debug:
@@ -145,6 +137,21 @@ class Experiment:
 
         f.close()
         self._plot_results()
+
+    def run_one_simulation(self, method: callable, nodes: list, fidelity_values: list, debug: bool = False):
+        """
+        Run a single simulation.
+        """
+        try:
+            result = run_method_with_nodes(method, nodes, debug)
+            # is array
+            for idx in range(len(result)):
+                fidelity_values.append(result[idx]["fidelity"])
+        except KeyError:
+            fidelity_values.append(0)
+            if debug:
+                print("Either one or both Qubits were lost during transfer")
+
 
     def _plot_results(self):
         dataframe = pd.read_csv(self._csv_path)
