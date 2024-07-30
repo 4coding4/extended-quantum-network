@@ -1,8 +1,10 @@
-from netsquid import b00, qubits
-from netsquid.components import INSTR_X, INSTR_Z, INSTR_MEASURE_BELL
+from netsquid.components import INSTR_X, INSTR_Z
 from netsquid.components.qmemory import Qubit
-from netsquid.qubits import ketstates, QRepr
 from typing import List, Dict, Union
+
+from src.helper.network.entanglement_swapping_utils.bell_measurement import perform_bell_measurement, \
+    print_bell_measurement
+from src.helper.network.entanglement_swapping_utils.results import get_result
 
 
 def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool = False) -> None:
@@ -48,11 +50,7 @@ def perform_and_get_bell_measurement_w_state(remote_node_memory, positions: list
     :param debug: A flag to print the results of the function
     :return: The measurement of the Bell state and the state of the qubit in the Repeater
     """
-    # Perform the Bell measurement in the Repeater
-    if len(positions) == 0:
-        m = remote_node_memory.execute_instruction(INSTR_MEASURE_BELL, output_key="M")
-    else:
-        m = remote_node_memory.execute_instruction(INSTR_MEASURE_BELL, positions, output_key="M")
+    m = perform_bell_measurement(remote_node_memory, positions)
     # Get the state of the qubit in the Repeater
     state = m[0]["M"][0]
     if debug:
@@ -60,50 +58,14 @@ def perform_and_get_bell_measurement_w_state(remote_node_memory, positions: list
     return m, state
 
 
-def print_bell_measurement(m, state):
-    """
-    Print the measurement of the Bell state and the state of the qubit in the Repeater
-    :param m: The measurement of the Bell state
-    :param state: The state of the qubit in the Repeater
-    """
-    print('Bell measurement in repeater:')
-    print('m= ', m, ', state:')
-    print('M/Indices format for the states: ', state)
-    print('B/Bell states/Ket vectors format for the states: ', ketstates.BellIndex(state))
-
-
-def calc_fidelity(pair1: List[Qubit], reference_state: QRepr = b00) \
-        -> float:
-    """
-    Calculate the fidelity between the pairs of qubits.
-
-    :param pair1: The first pair of qubits
-    :param reference_state: The reference state to compare the fidelity to
-    :return: The fidelity of the pair of qubits
-    """
-    return qubits.fidelity(pair1, reference_state)
-
-
-def get_result(pair: List[Qubit]) -> Dict[str, Union[List[Qubit], float, bool]]:
-    """
-    Get the result of the entanglement swapping protocol.
-
-    :param pair: The pair of qubits
-    :return: A dictionary with the results of the entanglement swapping protocol
-    """
-    fidelity = calc_fidelity(pair)
-    result = {"qubits": pair, "fidelity": fidelity, "error": False}
-    return result
-
-
-def get_results(pair1: List[Qubit], pair2: List[Qubit]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+def get_results(pairs: List[List[Qubit]]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
     """
     Get the results of the entanglement swapping protocol.
 
-    :param pair1: The first pair of qubits
-    :param pair2: The second pair of qubits
+    :param pairs: The pairs of qubits
     :return: A list with the results of the entanglement swapping protocol
     """
-    result1 = get_result(pair1)
-    result2 = get_result(pair2)
-    return [result1, result2]
+    results = []
+    for pair in pairs:
+        results.append(get_result(pair))
+    return results
