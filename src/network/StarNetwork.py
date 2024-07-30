@@ -624,8 +624,7 @@ class StarNetwork:
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                m = repeater_memory.execute_instruction(INSTR_MEASURE_BELL, output_key="M")
-                state = m[0]["M"][0]
+                m, state = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory)
                 if debug:
                     print('_perform_entanglement_swapping:')
                     print_bell_measurement(m, state)
