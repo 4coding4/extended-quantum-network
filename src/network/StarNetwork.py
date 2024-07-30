@@ -538,7 +538,7 @@ class StarNetwork:
 
         :param node1: The index of the first node (default is 1)
         :param node2: The index of the second node (default is 4, the Remote Node)
-        :param debug: unused boolean (default is False)
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
         :raises AssertionError: If either `node1` or `node2` is not between 1 and `self._destinations_n - 1` and `node1`
                                 and `node2` are the same node
         :return: A dictionary containing the qubits and their fidelity
@@ -546,7 +546,7 @@ class StarNetwork:
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
-        return self._perform_entanglement_swapping(node1, node2)
+        return self._perform_entanglement_swapping(node1, node2, debug)
 
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
@@ -613,31 +613,25 @@ class StarNetwork:
         self._disconnect_source_from_destination(node2)
 
     def _perform_entanglement_swapping(self, node1: int,
-                                       node2: int):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+                                       node2: int, debug: bool = False):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
         :param node1: The index of the first node
         :param node2: The index of the second node
         """
+        repeater_memory = self._network.subcomponents["Repeater"].qmemory
+        remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                m = self._network.subcomponents["Repeater"].qmemory.execute_instruction(INSTR_MEASURE_BELL,
-                                                                                        output_key="M")
-                # print(m)  # ({'M': [1]}, 0.0)
+                m = repeater_memory.execute_instruction(INSTR_MEASURE_BELL, output_key="M")
                 state = m[0]["M"][0]
-                # print(state)  # 1
+                if debug:
+                    print('_perform_entanglement_swapping:')
+                    print_bell_measurement(m, state)
 
-                if state == 1:
-                    # |01>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
-                elif state == 2:
-                    # |11>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_X)
-                elif state == 3:
-                    # |10>
-                    self._network.subcomponents["RemoteNode"].qmemory.execute_instruction(INSTR_Z)
+                # apply gates in the remote node (no memory position specified)
+                apply_gates(state, remote_node_memory, -1, debug)
         except MemPositionEmptyError:
             pass
 
@@ -699,8 +693,8 @@ class StarNetwork:
                 # then do the same for the position 2 and 3
 
                 # apply gates for first and second state/position
-                apply_gates(state, 0, remote_node_memory, debug)
-                apply_gates(state1, 1, remote_node_memory, debug)
+                apply_gates(state, remote_node_memory, 0, debug)
+                apply_gates(state1, remote_node_memory, 1, debug)
         except MemPositionEmptyError as e:
             print(e)
 
