@@ -128,12 +128,9 @@ class Experiment:
             for _ in range(self._num_each_simulation):
                 try:
                     result = run_method_with_nodes(method, nodes, debug)
-                    if isinstance(result, dict):
-                        fidelity_values.append(result["fidelity"])
-                    else:
-                        # is array
-                        for idx in range(len(result)):
-                            fidelity_values.append(result[idx]["fidelity"])
+                    # is array
+                    for idx in range(len(result)):
+                        fidelity_values.append(result[idx]["fidelity"])
                 except KeyError:
                     fidelity_values.append(0)
 
