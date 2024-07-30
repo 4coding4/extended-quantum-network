@@ -10,7 +10,7 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
-from src.helper.network.entanglement_swapping import apply_gates, get_result, get_results, \
+from src.helper.network.entanglement_swapping import apply_gates, get_results, \
     perform_and_get_bell_measurement_w_state
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
@@ -647,7 +647,7 @@ class StarNetwork:
                 _, = repeater_memory.peek(i)
 
             pair = [qubit_node1, qubit_node2]
-            result = get_result(pair)
+            result = get_results([pair])
             if labels[-1] == "RemoteNode":  # same as node2_label: "RemoteNode"
                 # list of the memory positions from 0 to 1 (both included)
                 for i in range(2):
@@ -707,7 +707,7 @@ class StarNetwork:
 
             channel_1_pair = [qubit_node1, qubit_node3_1]
             channel_0_pair = [qubit_node2, qubit_node3]
-            results = get_results(channel_1_pair, channel_0_pair)
+            results = get_results([channel_1_pair, channel_0_pair])
             # try to discard the memory positions in the repeater
             if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
                 # list of the memory positions from 0 to 3 (both included)
