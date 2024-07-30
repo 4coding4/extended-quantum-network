@@ -30,18 +30,15 @@ class Experiment:
     _lengths: ndarray = np.arange(10, 1000 + 10, 10)
     _fig_path: str = "../out/fidelity-over-length.png"
 
-    _verbose: bool = False
     _network: StarNetwork
 
-    def __init__(self, network: StarNetwork, verbose=False):
+    def __init__(self, network: StarNetwork):
         """
         Constructor for the Experiment class.
 
         :param network: The StarNetwork to experiment on
-        :param verbose: If the class needs to print more info
         """
         self._network = network
-        self._verbose = verbose
 
     ###########
     # GETTERS #
@@ -109,7 +106,7 @@ class Experiment:
     # FUNCTIONS USED TO PERFORM THE EXPERIMENT #
     ############################################
 
-    def run(self, method: callable, nodes: list, debug: bool = False):  # TODO cognitive complexity is too high (sonarlint max is 15, this 22), reduce by extrapolating the logic to a helper function
+    def run(self, method: callable, nodes: list, debug: bool = False):
         """
         Run the simulation between the two given nodes. When the simulation is over, a
         csv file is created with the results and a figure is generated.
@@ -125,32 +122,35 @@ class Experiment:
             fidelity_values = []
             self._network.channels_length = length
 
-            if self._verbose:
+            if debug:
                 print(f"Nodes are entangled after {self._network.channels_length * 1000} meters")
 
             for _ in range(self._num_each_simulation):
-                try:
-                    result = run_method_with_nodes(method, nodes, debug)
-                    if isinstance(result, dict):
-                        fidelity_values.append(result["fidelity"])
-                    else:
-                        # is array
-                        for idx in range(len(result)):
-                            fidelity_values.append(result[idx]["fidelity"])
-                except KeyError:
-                    fidelity_values.append(0)
+                self.run_one_simulation(method, nodes, fidelity_values, debug)
 
-                    if self._verbose:
-                        print("Either one or both Qubits were lost during transfer")
+            avg_fidelity = np.mean(fidelity_values)
+            if debug:
+                print(f"Average fidelity: {avg_fidelity}")
+                print(f"Not decohered qubits: {(avg_fidelity > 0.5).sum()}/{len(fidelity_values)}")
 
-            if self._verbose:
-                print(f"Average fidelity: {np.mean(fidelity_values)}")
-                print(f"Not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}/{len(fidelity_values)}")
-
-            f.write(f"{length},{np.mean(fidelity_values)}\r\n")
+            f.write(f"{length},{avg_fidelity}\r\n")
 
         f.close()
         self._plot_results()
+
+    def run_one_simulation(self, method: callable, nodes: list, fidelity_values: list, debug: bool = False):
+        """
+        Run a single simulation.
+        """
+        try:
+            result = run_method_with_nodes(method, nodes, debug)
+            # is array
+            for idx in range(len(result)):
+                fidelity_values.append(result[idx]["fidelity"])
+        except KeyError:
+            fidelity_values.append(0)
+            if debug:
+                print("Either one or both Qubits were lost during transfer")
 
     def _plot_results(self):
         dataframe = pd.read_csv(self._csv_path)

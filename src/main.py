@@ -25,7 +25,7 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
         underscore = "_"
         run_name = (method_name + underscore + models_name + underscore + str(nodes)
                     + underscore + str(debug) + underscore + str(experiment_num))
-        experiment: Experiment = Experiment(star_network, verbose=debug)
+        experiment: Experiment = Experiment(star_network)
         experiment.csv_path = f"../out/data[{run_name}].csv"
         experiment.fig_path = f"../out/fidelity-over-length[{run_name}].png"
         experiment.num_each_simulation = experiment_num  # set the number of measurements for each run of the simulation
