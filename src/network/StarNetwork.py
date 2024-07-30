@@ -619,6 +619,8 @@ class StarNetwork:
 
         :param node1: The index of the first node
         :param node2: The index of the second node (Remote Node)
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
+        :return: A dictionary containing the qubits and their fidelity
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
@@ -669,7 +671,8 @@ class StarNetwork:
         :param node1: The index of the first node
         :param node2: The index of the second node
         :param node3: The index of the third node (Remote Node)
-        :return: A dictionary containing the qubits and their fidelity
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
+        :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
         """
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
