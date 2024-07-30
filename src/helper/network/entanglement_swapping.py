@@ -1,11 +1,10 @@
-from netsquid import b00, qubits
 from netsquid.components import INSTR_X, INSTR_Z
 from netsquid.components.qmemory import Qubit
-from netsquid.qubits import QRepr
 from typing import List, Dict, Union
 
 from src.helper.network.entanglement_swapping_utils.bell_measurement import perform_bell_measurement, \
     print_bell_measurement
+from src.helper.network.entanglement_swapping_utils.results import get_result
 
 
 def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool = False) -> None:
@@ -59,38 +58,14 @@ def perform_and_get_bell_measurement_w_state(remote_node_memory, positions: list
     return m, state
 
 
-def calc_fidelity(pair1: List[Qubit], reference_state: QRepr = b00) \
-        -> float:
-    """
-    Calculate the fidelity between the pairs of qubits.
-
-    :param pair1: The first pair of qubits
-    :param reference_state: The reference state to compare the fidelity to
-    :return: The fidelity of the pair of qubits
-    """
-    return qubits.fidelity(pair1, reference_state)
-
-
-def get_result(pair: List[Qubit]) -> Dict[str, Union[List[Qubit], float, bool]]:
-    """
-    Get the result of the entanglement swapping protocol.
-
-    :param pair: The pair of qubits
-    :return: A dictionary with the results of the entanglement swapping protocol
-    """
-    fidelity = calc_fidelity(pair)
-    result = {"qubits": pair, "fidelity": fidelity, "error": False}
-    return result
-
-
-def get_results(pair1: List[Qubit], pair2: List[Qubit]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+def get_results(pairs: List[List[Qubit]]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
     """
     Get the results of the entanglement swapping protocol.
 
-    :param pair1: The first pair of qubits
-    :param pair2: The second pair of qubits
+    :param pairs: The pairs of qubits
     :return: A list with the results of the entanglement swapping protocol
     """
-    result1 = get_result(pair1)
-    result2 = get_result(pair2)
-    return [result1, result2]
+    results = []
+    for pair in pairs:
+        results.append(get_result(pair))
+    return results
