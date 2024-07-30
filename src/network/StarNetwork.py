@@ -649,15 +649,12 @@ class StarNetwork:
             pair = [qubit_node1, qubit_node2]
             result = get_result(pair)
             if node1_label == "RemoteNode" or node2_label == "RemoteNode":
-                try:
-                    self._network.subcomponents["Repeater"].qmemory.discard(0)
-                except MemPositionEmptyError:
-                    pass
-
-                try:
-                    self._network.subcomponents["Repeater"].qmemory.discard(1)
-                except MemPositionEmptyError:
-                    pass
+                # list of the memory positions from 0 to 1 (both included)
+                for i in range(2):
+                    try:
+                        repeater_memory.discard(i)
+                    except MemPositionEmptyError:
+                        pass
 
 
         except ValueError:
