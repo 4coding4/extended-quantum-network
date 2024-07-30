@@ -641,8 +641,9 @@ class StarNetwork:
 
             qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
             qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
-            _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
+            # peak in all the repeater memory positions, from 0 to 1 (both included)
+            for i in range(2):
+                _, = repeater_memory.peek(i)
 
             # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
             # result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
