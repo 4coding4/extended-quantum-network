@@ -11,7 +11,8 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
-from src.helper.network.entanglement_swapping import apply_gates, print_bell_measurement, get_result, get_results
+from src.helper.network.entanglement_swapping import apply_gates, print_bell_measurement, get_result, get_results, \
+    perform_bell_measurement_and_get_bell_measurement_w_state
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -677,10 +678,12 @@ class StarNetwork:
             if any(single_node == self._destinations_n - 1 for single_node in [node1, node2, node3]):
                 m_mem_positions = [0, 1]
                 m1_mem_positions = [2, 3]
-                m = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m_mem_positions, output_key="M"))
-                m1 = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m1_mem_positions, output_key="M"))
-                state = m[0]["M"][0]
-                state1 = m1[0]["M"][0]
+                # m = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m_mem_positions, output_key="M"))
+                # m1 = (repeater_memory.execute_instruction(INSTR_MEASURE_BELL, m1_mem_positions, output_key="M"))
+                # state = m[0]["M"][0]
+                # state1 = m1[0]["M"][0]
+                m, state = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions)
+                m1, state1 = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions)
                 if debug:
                     print('_perform_new_entanglement_swapping:')
                     print_bell_measurement(m, state)

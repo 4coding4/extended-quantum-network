@@ -1,5 +1,5 @@
 from netsquid import b00, qubits
-from netsquid.components import INSTR_X, INSTR_Z
+from netsquid.components import INSTR_X, INSTR_Z, INSTR_MEASURE_BELL
 from netsquid.components.qmemory import Qubit
 from netsquid.qubits import ketstates, QRepr
 from typing import List, Dict, Union
@@ -39,7 +39,24 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
             print(msg)
 
 
-def print_bell_measurement(m, state) :
+def perform_bell_measurement_and_get_bell_measurement_w_state(remote_node_memory, positions: list = []):
+    """
+    Perform the Bell measurement in the Repeater.
+    :param remote_node_memory: The memory of the RemoteNode
+    :param positions: The memory positions in the RemoteNode where the qubits are stored
+    :return: The measurement of the Bell state and the state of the qubit in the Repeater
+    """
+    # Perform the Bell measurement in the Repeater
+    if len(positions) == 0:
+        m = remote_node_memory.execute_instruction(INSTR_MEASURE_BELL, output_key="M")
+    else:
+        m = remote_node_memory.execute_instruction(INSTR_MEASURE_BELL, positions, output_key="M")
+    # Get the state of the qubit in the Repeater
+    state = m[0]["M"][0]
+    return m, state
+
+
+def print_bell_measurement(m, state):
     """
     Print the measurement of the Bell state and the state of the qubit in the Repeater
     :param m: The measurement of the Bell state
