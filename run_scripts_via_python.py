@@ -19,10 +19,5 @@ def show_output_terminal(init_msg: str, cmd: subprocess.CompletedProcess, last_m
 # pass the bash name as an argument to Popen
 bash_name = sys.argv[1]
 
-# current_directory = subprocess.run(["pwd"], stdout=subprocess.PIPE, text=True)
-# show_output_terminal("Current directory: ", current_directory)
-# files = subprocess.run(["ls", "-la"], stdout=subprocess.PIPE, text=True)
-# show_output_terminal("Files in directory: ", files)
-
 bash = subprocess.run(["./shell_scripts/" + bash_name], stdout=subprocess.PIPE, text=True, shell=True, executable="/bin/bash")
 show_output_terminal("bash run: \n", bash)
