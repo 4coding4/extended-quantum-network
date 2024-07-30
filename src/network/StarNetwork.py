@@ -643,18 +643,10 @@ class StarNetwork:
             qubit_node1, qubit_node2 = \
                 [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
                  for label, mem_pos in zip(labels, mem_positions)]
-
-            # node1_label = f"Node{node1}" if node1 != self._destinations_n - 1 else "RemoteNode"
-            # node2_label = f"Node{node2}" if node2 != self._destinations_n - 1 else "RemoteNode"
-            #
-            # qubit_node1, = self._network.subcomponents[node1_label].qmemory.pop(0)
-            # qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
             # peak in all the repeater memory positions, from 0 to 1 (both included)
             for i in range(2):
                 _, = repeater_memory.peek(i)
 
-            # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
-            # result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
             pair = [qubit_node1, qubit_node2]
             result = get_result(pair)
             if labels[-1] == "RemoteNode":  # same as node2_label: "RemoteNode"
@@ -664,11 +656,8 @@ class StarNetwork:
                         repeater_memory.discard(i)
                     except MemPositionEmptyError:
                         pass
-
-
         except ValueError:
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
-
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
