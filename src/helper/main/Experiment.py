@@ -133,15 +133,15 @@ class Experiment:
                         fidelity_values.append(result[idx]["fidelity"])
                 except KeyError:
                     fidelity_values.append(0)
-
                     if debug:
                         print("Either one or both Qubits were lost during transfer")
 
+            avg_fidelity = np.mean(fidelity_values)
             if debug:
-                print(f"Average fidelity: {np.mean(fidelity_values)}")
-                print(f"Not decohered qubits: {(np.array(fidelity_values) > 0.5).sum()}/{len(fidelity_values)}")
+                print(f"Average fidelity: {avg_fidelity}")
+                print(f"Not decohered qubits: {(avg_fidelity > 0.5).sum()}/{len(fidelity_values)}")
 
-            f.write(f"{length},{np.mean(fidelity_values)}\r\n")
+            f.write(f"{length},{avg_fidelity}\r\n")
 
         f.close()
         self._plot_results()
