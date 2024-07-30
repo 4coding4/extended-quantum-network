@@ -628,7 +628,7 @@ class StarNetwork:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
                 if debug:
                     print('_perform_entanglement_swapping:')
-                m, state = (
+                _, state = (
                     perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, [], debug))
 
                 # apply gates in the remote node (no memory position specified)
@@ -682,9 +682,9 @@ class StarNetwork:
                 m1_mem_positions = [2, 3]
                 if debug:
                     print('_perform_new_entanglement_swapping:')
-                m, state = (
+                _, state = (
                     perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions, debug))
-                m1, state1 = (
+                _, state1 = (
                     perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions, debug))
 
                 # swap the qubits in memory position 0 and 1,
