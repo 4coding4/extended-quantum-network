@@ -25,4 +25,4 @@ bash_name = sys.argv[1]
 # show_output_terminal("Files in directory: ", files)
 
 bash = subprocess.run(["./shell_scripts/" + bash_name], stdout=subprocess.PIPE, text=True, shell=True, executable="/bin/bash")
-show_output_terminal("bash run: ", bash)
+show_output_terminal("bash run: \n", bash)
