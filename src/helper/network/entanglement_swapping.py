@@ -5,13 +5,14 @@ from netsquid.qubits import ketstates, QRepr
 from typing import List, Dict, Union
 
 
-def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool=False) -> None:
+def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool = False) -> None:
     """
     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
     based on the state (in the repeater).
     :param curr_state: The state of the qubit in the Repeater memory position, w M format(0, 1, 2, or 3)
-    :param position: The memory position in the RemoteNode (0 or 1)
     :param remote_node_memory: The memory of the RemoteNode
+    :param position: The memory position in the RemoteNode (0 or 1) where the qubit is stored,
+    -1 if not specified (default)
     :param debug: A flag to print the steps of the function
     """
     # dictionary with the instructions to apply based on the state of the qubit
