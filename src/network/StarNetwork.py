@@ -643,8 +643,11 @@ class StarNetwork:
             qubit_node2, = self._network.subcomponents[node2_label].qmemory.pop(0)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(0)
             _, = self._network.subcomponents["Repeater"].qmemory.peek(1)
-            entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
 
+            # entanglement_fidelity: float = qubits.fidelity([qubit_node1, qubit_node2], b00)
+            # result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
+            pair = [qubit_node1, qubit_node2]
+            result = get_result(pair)
             if node1_label == "RemoteNode" or node2_label == "RemoteNode":
                 try:
                     self._network.subcomponents["Repeater"].qmemory.discard(0)
@@ -656,7 +659,7 @@ class StarNetwork:
                 except MemPositionEmptyError:
                     pass
 
-            result = {"qubits": (qubit_node1, qubit_node2), "fidelity": entanglement_fidelity, "error": False}
+
         except ValueError:
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
 
