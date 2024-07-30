@@ -613,7 +613,7 @@ class StarNetwork:
         self._disconnect_source_from_destination(node2)
 
     def _perform_entanglement_swapping(self, node1: int,
-                                       node2: int, debug: bool = False):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+                                       node2: int, debug: bool = False):
         """
         Given two nodes, perform entanglement swapping only if either `node1` or `node2` is the Repeater.
 
@@ -663,7 +663,7 @@ class StarNetwork:
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
             -> List[Dict[str, Union[List[
-                Qubit], float, bool]]]:  # TODO cognitive complexity is too high (sonarlint max is 15, this 20), reduce by extrapolating the logic to a helper function
+                Qubit], float, bool]]]:
         """
         Given three nodes, perform entanglement swapping only if either `node1` or `node2` or `node3` is the Repeater.
 
