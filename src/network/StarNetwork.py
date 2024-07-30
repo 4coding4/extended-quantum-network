@@ -626,10 +626,10 @@ class StarNetwork:
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
-                m, state = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory)
                 if debug:
                     print('_perform_entanglement_swapping:')
-                    print_bell_measurement(m, state)
+                m, state = (
+                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, [], debug))
 
                 # apply gates in the remote node (no memory position specified)
                 apply_gates(state, remote_node_memory, -1, debug)
@@ -680,12 +680,12 @@ class StarNetwork:
             if any(single_node == self._destinations_n - 1 for single_node in [node1, node2, node3]):
                 m_mem_positions = [0, 1]
                 m1_mem_positions = [2, 3]
-                m, state = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions)
-                m1, state1 = perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions)
                 if debug:
                     print('_perform_new_entanglement_swapping:')
-                    print_bell_measurement(m, state)
-                    print_bell_measurement(m1, state1)
+                m, state = (
+                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m_mem_positions, debug))
+                m1, state1 = (
+                    perform_bell_measurement_and_get_bell_measurement_w_state(repeater_memory, m1_mem_positions, debug))
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates

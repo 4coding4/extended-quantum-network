@@ -39,11 +39,13 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
             print(msg)
 
 
-def perform_bell_measurement_and_get_bell_measurement_w_state(remote_node_memory, positions: list = []):
+def perform_bell_measurement_and_get_bell_measurement_w_state(remote_node_memory, positions: list = [],
+                                                              debug: bool = False):
     """
     Perform the Bell measurement in the Repeater.
     :param remote_node_memory: The memory of the RemoteNode
     :param positions: The memory positions in the RemoteNode where the qubits are stored
+    :param debug: A flag to print the results of the function
     :return: The measurement of the Bell state and the state of the qubit in the Repeater
     """
     # Perform the Bell measurement in the Repeater
@@ -53,6 +55,8 @@ def perform_bell_measurement_and_get_bell_measurement_w_state(remote_node_memory
         m = remote_node_memory.execute_instruction(INSTR_MEASURE_BELL, positions, output_key="M")
     # Get the state of the qubit in the Repeater
     state = m[0]["M"][0]
+    if debug:
+        print_bell_measurement(m, state)
     return m, state
 
 
