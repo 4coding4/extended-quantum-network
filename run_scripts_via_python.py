@@ -18,6 +18,7 @@ def show_output_terminal(init_msg: str, cmd: subprocess.CompletedProcess, last_m
     print(msg)
     return msg
 
+
 def run_bash_and_return_outputs(bash_name: str) -> str:
     """
     Run a command in the terminal
@@ -33,5 +34,3 @@ def run_bash_and_return_outputs(bash_name: str) -> str:
 # pass the bash name as an argument to Popen
 bash_name = sys.argv[1]
 run_bash_and_return_outputs(bash_name)
-
-
