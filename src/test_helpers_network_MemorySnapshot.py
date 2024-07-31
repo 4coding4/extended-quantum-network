@@ -9,7 +9,7 @@ from src.network.StarNetwork import StarNetwork
 
 
 class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
-    sim_reset()
+    # sim_reset()
 
     def test_show_all_memory_positions(self):
         # test w default values in protocol a
@@ -46,11 +46,11 @@ class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
                                          repeater_mem_positions,
                                          node_mem_positions,
                                          remote_node_mem_positions)
-        msg = memory_snapshot.show_all_memory_positions()
-        expected = ("--------------------------------------------------------------------------------\nRepeater_m0: "
+        msg = memory_snapshot.show_all_memory_positions(initial_msg=" ",end_msg=" ",line_width=0)
+        expected = ("\n Repeater_m0: "
                     "None\nRepeater_m1: None\nRepeater_m2: None\nRepeater_m3: None\nNode1_m0: None\nNode2_m0: "
                     "None\nRemoteNode_m0: None\nRemoteNode_m1: NoneIf it is working correctly, the output should have "
-                    "\n--------------------------------------------------------------------------------")
+                    " \n")
         self.assertEqual(expected, msg)
 
 
