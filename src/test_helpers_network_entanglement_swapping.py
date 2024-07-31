@@ -3,7 +3,7 @@ import unittest
 from netsquid.qubits import create_qubits
 
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
-from src.helper.network.entanglement_swapping import perform_and_get_bell_measurement_w_state, get_results
+from src.helper.network.entanglement_swapping import perform_and_get_bell_measurement_w_state, get_results, apply_gates
 
 from src.network.StarNetwork import StarNetwork
 
@@ -16,6 +16,11 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
     # place the qubits in the repeater memory
     repeater_memory.put(qubits)
 
+    rqubits = [rq0, rq1] = create_qubits(num_qubits=2, system_name="Q")  # Create two qubits w default state |0>
+    remote_node_memory = star_network.network.subcomponents["RemoteNode"].qmemory
+    # place the qubits in the remote_node_memory
+    remote_node_memory.put(rqubits)
+
     # m_0_positions = perform_bell_measurement(repeater_memory)
     # m_mem_positions = [2, 3]
     # m_2_positions = perform_bell_measurement(repeater_memory, m_mem_positions)
@@ -24,7 +29,24 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
     # state_2_positions = m_2_positions[0]["M"][0]
 
     def test_apply_gates(self):
-        pass
+        states = [0, 1, 2, 3]
+        for state in states:
+            position = 0
+            if state == 2 or state == 3:
+                position = 1
+            msg = apply_gates(state, self.remote_node_memory, position, debug=True)
+            # check that the message is a string
+            self.assertIsInstance(msg, str)
+            if state == 0:
+                self.assertEqual("", msg)
+            elif state == 1:
+                self.assertEqual("Applying instruction Instruction: x_gate to the qubit in memory position 0 in the RemoteNode, ", msg)
+            elif state == 2:
+                self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
+            elif state == 3:
+                self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
+            print(state)
+            print(msg)
 
     def test_perform_and_get_bell_measurement_w_state(self):
         m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory)
