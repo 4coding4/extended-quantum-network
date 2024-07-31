@@ -27,5 +27,5 @@ class TestHelpersNetworkPortPair(unittest.TestCase):
                          self.pp.show())
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()

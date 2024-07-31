@@ -64,5 +64,5 @@ class TestHelpersMainConverterConverter(unittest.TestCase):
                          converter_string_list_int("1.2"))
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()

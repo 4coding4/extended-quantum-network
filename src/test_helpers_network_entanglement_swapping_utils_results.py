@@ -19,5 +19,5 @@ class TestHelpersNetworkEntanglementSwappingUtilsResults(unittest.TestCase):
                          get_result(self.qbits_pair))
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()
