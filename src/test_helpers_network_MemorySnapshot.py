@@ -1,16 +1,12 @@
 import unittest
 
-from netsquid import sim_reset
 from netsquid.nodes import Network
 
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.MemorySnapshot import MemorySnapshot
-from src.network.StarNetwork import StarNetwork
 
 
 class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
-    # sim_reset()
-
     def test_show_all_memory_positions(self):
         # test w default values in protocol a
         node1: int = 1
@@ -54,5 +50,5 @@ class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
         self.assertEqual(expected, msg)
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()
