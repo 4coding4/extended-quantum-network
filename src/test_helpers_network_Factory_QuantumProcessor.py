@@ -11,9 +11,10 @@ class TestHelpersNetworkFactoryQuantumProcessor(unittest.TestCase):
     def test_get(self):
         name = "name"
         pos = 2
-        self.factory.get(name, pos)
-        self.assertEqual(self.factory.get(name, pos).name, "name")
-        self.assertEqual(self.factory.get(name, pos).properties, ConstrainedMap({'num_positions': 2}))
+        self.assertEqual(name,
+                         self.factory.get(name, pos).name)
+        self.assertEqual(ConstrainedMap({'num_positions': 2}),
+                         self.factory.get(name, pos).properties)
 
 
 
