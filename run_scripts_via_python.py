@@ -33,5 +33,4 @@ def run_bash_and_return_outputs(bash_name: str) -> str:
 
 if __name__ == "__main__":
     # The first argument is the name of the bash script to run
-    input_bash_name = sys.argv[1]
-    run_bash_and_return_outputs(input_bash_name)
+    run_bash_and_return_outputs(sys.argv[1])
