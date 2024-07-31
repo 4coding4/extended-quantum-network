@@ -55,19 +55,23 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
                                  msg)
 
     def test_perform_and_get_bell_measurement_w_state(self):
-        m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, debug=True)
-        # check that the state M values are between 0 and 3
-        self.assertTrue(0 <= state <= 3)
-        # extract the key of the M values in the dictionary ('M')
-        expected_key = 'M'
-        key = list(m[0].keys())[0]
-        self.assertEqual(expected_key,
-                         key)
-        # extract the second position
-        expected_second = 0.0
-        second = m[1]
-        self.assertEqual(expected_second,
-                         second)
+        m_mem_positions = [0, 1]
+        empty = []
+        positions = [empty, m_mem_positions]
+        for positions in positions:
+            m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, positions, debug=True)
+            # check that the state M values are between 0 and 3
+            self.assertTrue(0 <= state <= 3)
+            # extract the key of the M values in the dictionary ('M')
+            expected_key = 'M'
+            key = list(m[0].keys())[0]
+            self.assertEqual(expected_key,
+                             key)
+            # extract the second position
+            expected_second = 0.0
+            second = m[1]
+            self.assertEqual(expected_second,
+                             second)
 
     def test_get_results(self):
         channel_1_pair = [self.q0, self.q3]
