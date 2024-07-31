@@ -5,19 +5,33 @@ import sys
 import subprocess
 
 
-def show_output_terminal(init_msg: str, cmd: subprocess.CompletedProcess, last_msg: str = "\nExit code: ") -> None:
+def show_output_terminal(init_msg: str, cmd: subprocess.CompletedProcess, last_msg: str = "\nExit code: ") -> str:
     """
     Show the output of the command in the terminal;
     it will print the following: the message before, the standard output, the message after, and the exit code.
     :param init_msg: The message to print before the output of the command
     :param cmd: The CompletedProcess of the command that has been run
     :param last_msg: The message before the exit code and after the output of the command
+    :return: The message that has been printed
     """
-    print(init_msg, cmd.stdout, last_msg, cmd.returncode)
+    msg = "{}\n{}\n{}{}".format(init_msg, cmd.stdout, last_msg, cmd.returncode)
+    print(msg)
+    return msg
+
+def run_bash_and_return_outputs(bash_name: str) -> str:
+    """
+    Run a command in the terminal
+    :param bash_name: The name of the bash script to run
+    :return: The output of the command
+    """
+    bash = subprocess.run(["./shell_scripts/" + bash_name], stdout=subprocess.PIPE, text=True, shell=True,
+                          executable="/bin/bash")
+    out = show_output_terminal("bash run: \n", bash)
+    return out
 
 
 # pass the bash name as an argument to Popen
 bash_name = sys.argv[1]
+run_bash_and_return_outputs(bash_name)
 
-bash = subprocess.run(["./shell_scripts/" + bash_name], stdout=subprocess.PIPE, text=True, shell=True, executable="/bin/bash")
-show_output_terminal("bash run: \n", bash)
+
