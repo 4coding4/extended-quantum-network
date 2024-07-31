@@ -32,5 +32,5 @@ def run_bash_and_return_outputs(bash_name: str) -> str:
 
 
 # pass the bash name as an argument to Popen
-bash_name = sys.argv[1]
-run_bash_and_return_outputs(bash_name)
+input_bash_name = sys.argv[1]
+run_bash_and_return_outputs(input_bash_name)
