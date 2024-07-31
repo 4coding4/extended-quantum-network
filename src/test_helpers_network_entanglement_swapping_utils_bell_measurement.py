@@ -60,5 +60,5 @@ class TestHelpersNetworkEntanglementSwappingUtilsBellMeasurement(unittest.TestCa
                          print_bell_measurement(self.m_2_positions, self.state_2_positions))
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()
