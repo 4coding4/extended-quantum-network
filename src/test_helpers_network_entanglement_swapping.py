@@ -49,7 +49,7 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
             print(msg)
 
     def test_perform_and_get_bell_measurement_w_state(self):
-        m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory)
+        m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, debug=True)
         # check that the state M values are between 0 and 3
         self.assertTrue(0 <= state <= 3)
         # extract the key of the M values in the dictionary ('M')
