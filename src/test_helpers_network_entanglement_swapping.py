@@ -42,28 +42,36 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
             if state == 0:
                 self.assertEqual("", msg)
             elif state == 1:
-                self.assertEqual("Applying instruction Instruction: x_gate to the qubit in memory position 0 in the RemoteNode, ", msg)
+                self.assertEqual(
+                    "Applying instruction Instruction: x_gate to the qubit in memory position 0 in the RemoteNode, ",
+                    msg)
             elif state == 2:
-                self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
+                self.assertEqual(
+                    "Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, "
+                    "Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ",
+                    msg)
             elif state == 3:
-                self.assertEqual("Applying instruction Instruction: z_gate to the qubit ", msg)
-            print(state)
-            print(msg)
+                self.assertEqual("Applying instruction Instruction: z_gate to the qubit ",
+                                 msg)
 
     def test_perform_and_get_bell_measurement_w_state(self):
-        m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, debug=True)
-        # check that the state M values are between 0 and 3
-        self.assertTrue(0 <= state <= 3)
-        # extract the key of the M values in the dictionary ('M')
-        expected_key = 'M'
-        key = list(m[0].keys())[0]
-        self.assertEqual(expected_key,
-                         key)
-        # extract the second position
-        expected_second = 0.0
-        second = m[1]
-        self.assertEqual(expected_second,
-                         second)
+        m_mem_positions = [0, 1]
+        empty = []
+        positions = [empty, m_mem_positions]
+        for positions in positions:
+            m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, positions, debug=True)
+            # check that the state M values are between 0 and 3
+            self.assertTrue(0 <= state <= 3)
+            # extract the key of the M values in the dictionary ('M')
+            expected_key = 'M'
+            key = list(m[0].keys())[0]
+            self.assertEqual(expected_key,
+                             key)
+            # extract the second position
+            expected_second = 0.0
+            second = m[1]
+            self.assertEqual(expected_second,
+                             second)
 
     def test_get_results(self):
         channel_1_pair = [self.q0, self.q3]
