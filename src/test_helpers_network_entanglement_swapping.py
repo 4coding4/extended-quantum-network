@@ -42,13 +42,17 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
             if state == 0:
                 self.assertEqual("", msg)
             elif state == 1:
-                self.assertEqual("Applying instruction Instruction: x_gate to the qubit in memory position 0 in the RemoteNode, ", msg)
+                self.assertEqual(
+                    "Applying instruction Instruction: x_gate to the qubit in memory position 0 in the RemoteNode, ",
+                    msg)
             elif state == 2:
-                self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
+                self.assertEqual(
+                    "Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, "
+                    "Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ",
+                    msg)
             elif state == 3:
-                self.assertEqual("Applying instruction Instruction: z_gate to the qubit ", msg)
-            print(state)
-            print(msg)
+                self.assertEqual("Applying instruction Instruction: z_gate to the qubit ",
+                                 msg)
 
     def test_perform_and_get_bell_measurement_w_state(self):
         m, state = perform_and_get_bell_measurement_w_state(self.repeater_memory, debug=True)
