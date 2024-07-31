@@ -6,8 +6,7 @@ from src.helper.network.entanglement_swapping_utils.results import calc_fidelity
 
 
 class TestHelpersNetworkEntanglementSwappingUtilsResults(unittest.TestCase):
-    q1, q2 = create_qubits(num_qubits=2, system_name="Q")  # Create two qubits w default state |0>
-    qbits_pair = [q1, q2]
+    qbits_pair = [q1, q2] = create_qubits(num_qubits=2, system_name="Q")  # Create two qubits w default state |0>
 
     def test_calc_fidelity(self):
         self.assertEqual(type(calc_fidelity(self.qbits_pair)), float)
