@@ -7,7 +7,7 @@ from src.helper.network.entanglement_swapping_utils.bell_measurement import perf
 from src.helper.network.entanglement_swapping_utils.results import get_result
 
 
-def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool = False) -> None:
+def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: bool = False) -> str:
     """
     Apply the necessary gates to the qubit in the memory position (in the RemoteNode),
     based on the state (in the repeater).
@@ -16,6 +16,7 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
     :param position: The memory position in the RemoteNode (0 or 1) where the qubit is stored,
     -1 if not specified (default)
     :param debug: A flag to print the steps of the function
+    :return: The message with the steps of the function
     """
     # dictionary with the instructions to apply based on the state of the qubit
     # (represented w numbers, input of the function curr_state or as bell states in the comments)
@@ -28,6 +29,7 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
     # get the instructions based on the state of the qubit in the memory position
     get_instructions = instructions[curr_state]
     # apply the instructions to the qubit in the memory position (in the RemoteNode)
+    msg = ''
     for instr in get_instructions:
         if position == -1:
             remote_node_memory.execute_instruction(instr)
@@ -35,10 +37,12 @@ def apply_gates(curr_state: int, remote_node_memory, position: int = -1, debug: 
             remote_node_memory.execute_instruction(instr, [position])
             # , output_key="M" , inplace=True, repetitions=1, position=position)  # position=position
         if debug:
-            msg = f"Applying instruction {instr} to the qubit "
+            msg += f"Applying instruction {instr} to the qubit "
             if position != -1:
-                msg += f"in memory position {position} in the RemoteNode"
-            print(msg)
+                msg += f"in memory position {position} in the RemoteNode, "
+    if debug:
+        print(msg)
+    return msg
 
 
 def perform_and_get_bell_measurement_w_state(remote_node_memory, positions: list = [],
