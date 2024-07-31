@@ -11,11 +11,12 @@ class TestHelpersNetworkFactoryQuantumChannel(unittest.TestCase):
 
     def test_get(self):
         name = "name"
-        self.factory.get(name)
-        self.assertEqual(self.factory.get(name).name, "Qname")
-        self.assertEqual(self.factory.get(name).properties, ConstrainedMap({'length': 1}))
+        self.assertEqual("Q" + name,
+                         self.factory.get(name).name)
+        self.assertEqual(ConstrainedMap({'length': 1}),
+                         self.factory.get(name).properties)
 
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()

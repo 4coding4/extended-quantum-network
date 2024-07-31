@@ -13,12 +13,14 @@ class TestHelpersNetworkFactoryQuantumSource(unittest.TestCase):
 
     def test_get(self):
         name = "name"
-        self.factory.get(name)
-        self.assertEqual(self.factory.get(name).name, "name")
-        self.assertEqual(self.factory.get(name).properties, ConstrainedMap({'trigger_delay': 0.0}))
-        self.assertEqual(type(self.factory.get(name).state_sampler), type(StateSampler([b00])))
+        self.assertEqual(name,
+                         self.factory.get(name).name)
+        self.assertEqual(ConstrainedMap({'trigger_delay': 0.0}),
+                         self.factory.get(name).properties)
+        self.assertEqual(type(StateSampler([b00])),
+                         type(self.factory.get(name).state_sampler))
 
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()

@@ -9,12 +9,15 @@ class TestHelpersNetworkEntanglementSwappingUtilsResults(unittest.TestCase):
     qbits_pair = [q1, q2] = create_qubits(num_qubits=2, system_name="Q")  # Create two qubits w default state |0>
 
     def test_calc_fidelity(self):
-        self.assertEqual(type(calc_fidelity(self.qbits_pair)), float)
-        self.assertEqual(calc_fidelity(self.qbits_pair), 0.7071067811865475)
+        self.assertEqual(float,
+                         type(calc_fidelity(self.qbits_pair)))
+        self.assertEqual(0.7071067811865475,
+                         calc_fidelity(self.qbits_pair))
 
     def test_get_results(self):
-        self.assertEqual(get_result(self.qbits_pair), {"qubits": self.qbits_pair, "fidelity": calc_fidelity(self.qbits_pair), "error": False} )
+        self.assertEqual({"qubits": self.qbits_pair, "fidelity": calc_fidelity(self.qbits_pair), "error": False},
+                         get_result(self.qbits_pair))
 
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()
