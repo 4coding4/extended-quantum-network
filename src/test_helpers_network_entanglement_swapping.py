@@ -32,8 +32,10 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
         states = [0, 1, 2, 3]
         for state in states:
             position = 0
-            if state == 2 or state == 3:
+            if state == 2:
                 position = 1
+            if state == 3:
+                position = -1
             msg = apply_gates(state, self.remote_node_memory, position, debug=True)
             # check that the message is a string
             self.assertIsInstance(msg, str)
@@ -44,7 +46,7 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
             elif state == 2:
                 self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, Applying instruction Instruction: x_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
             elif state == 3:
-                self.assertEqual("Applying instruction Instruction: z_gate to the qubit in memory position 1 in the RemoteNode, ", msg)
+                self.assertEqual("Applying instruction Instruction: z_gate to the qubit ", msg)
             print(state)
             print(msg)
 
