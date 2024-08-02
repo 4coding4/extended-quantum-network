@@ -80,12 +80,13 @@ def select_models(models_name_str: str, test: bool = False):
     return models
 
 
-def select_method(star_network: StarNetwork, method_name_str: str, nodes_len) -> callable:
+def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: int, test: bool = False) -> callable:
     """
     Select the method to be used in the network, based on the provided name.
     :param star_network: StarNetwork
     :param method_name_str: str
     :param nodes_len: int
+    :param test: bool (default False)
     :return: method to be used in the network
     """
 
@@ -109,5 +110,5 @@ def select_method(star_network: StarNetwork, method_name_str: str, nodes_len) ->
     method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str)
     # Check if the number of nodes is allowed for the selected method
     checker(nodes_len not in allowed_nodes_num,
-            f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}")
+            f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}", test)
     return method
