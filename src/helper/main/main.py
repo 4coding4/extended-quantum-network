@@ -27,7 +27,7 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, te
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        checker(True, msg, test)
+        return checker(True, msg, test)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
