@@ -1,6 +1,6 @@
 import unittest
 
-from src.helper.main.main import run_method_with_nodes, show_help, select_models
+from src.helper.main.main import run_method_with_nodes, show_help, select_models, select_method
 from src.models.Combined import Combined
 from src.models.Empty import Empty
 
@@ -40,6 +40,27 @@ class TestHelpersMainMain(unittest.TestCase):
                          select_models("combined"))
         self.assertEqual(Empty.empty_models,
                          select_models("empty"))
+
+    # skipped since tests below are sufficient
+    # def test_select_method_uncheck(self):
+    def test_select_method(self):
+        # create a class for testing
+        class StarNetwork:
+            def protocol_a(self, node1: int, node2: int, node3: int, debug: bool = False) -> float:
+                return node1 + node2 + node3
+
+            def entangle_nodes(self, node1: int, node2: int, debug: bool = False) -> float:
+                return node1 + node2
+
+        fake_star_network = StarNetwork()
+        self.assertEqual(fake_star_network.protocol_a,
+                         select_method(fake_star_network, "protocol_a", 3, True))
+        self.assertEqual(fake_star_network.entangle_nodes,
+                         select_method(fake_star_network, "entangle_nodes", 2, True))
+        self.assertEqual("Invalid number of nodes for the selected method 'protocol_a', allowed nodes: [0, 3]",
+                         select_method(fake_star_network, "protocol_a", 4, True))
+        self.assertEqual("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']",
+                         select_method(fake_star_network, "invalid", 0, True))
 
 
 if __name__ == "__main__":

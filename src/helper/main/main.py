@@ -80,6 +80,28 @@ def select_models(models_name_str: str, test: bool = False):
     return models
 
 
+def select_method_uncheck(star_network: StarNetwork, method_name_str: str, test: bool = False):
+    """
+    Select the method to be used in the network, based on the provided name.
+    :param star_network: StarNetwork
+    :param method_name_str: str
+    :param test: bool (default False)
+    :return: method to be used in the network and the allowed number of nodes for this method
+    """
+    allowed_nodes_num = [0]
+    if method_name_str == "protocol_a":
+        method = star_network.protocol_a
+        allowed_nodes_num.append(3)
+    elif method_name_str == "entangle_nodes":
+        method = star_network.entangle_nodes
+        allowed_nodes_num.append(2)
+    else:
+        return checker(True,
+                       "Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']",
+                       test), allowed_nodes_num
+    return method, allowed_nodes_num
+
+
 def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: int, test: bool = False) -> callable:
     """
     Select the method to be used in the network, based on the provided name.
@@ -89,26 +111,14 @@ def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: in
     :param test: bool (default False)
     :return: method to be used in the network
     """
-
-    def select_method_uncheck(star_network: StarNetwork, method_name_str: str) -> tuple:
-        """
-        Select the method to be used in the network, based on the provided name.
-        :param star_network: StarNetwork
-        :param method_name_str: str
-        :return: method to be used in the network and the allowed number of nodes for this method
-        """
-        method = None
-        allowed_nodes_num = [0]
-        if method_name_str == "protocol_a":
-            method = star_network.protocol_a
-            allowed_nodes_num.append(3)
-        elif method_name_str == "entangle_nodes":
-            method = star_network.entangle_nodes
-            allowed_nodes_num.append(2)
-        return method, allowed_nodes_num
-
-    method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str)
+    method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str, test)
     # Check if the number of nodes is allowed for the selected method
-    checker(nodes_len not in allowed_nodes_num,
-            f"Invalid number of nodes, please provide one of the following: {allowed_nodes_num}", test)
-    return method
+    if nodes_len not in allowed_nodes_num:
+        return checker(True,
+                       f"Invalid number of nodes for the selected method '{method_name_str}', "
+                       f"allowed nodes: {allowed_nodes_num}",
+                       test)
+    elif type(method) is str:
+        return method
+    else:
+        return method
