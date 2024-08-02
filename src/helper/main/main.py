@@ -4,12 +4,13 @@ from src.models.Empty import Empty
 from src.network.StarNetwork import StarNetwork
 
 
-def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
+def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, test: bool = False):
     """
     Run the selected method with the provided nodes.
     :param method: callable
     :param nodes: list
     :param debug: bool
+    :param test: bool (default False)
     """
     nodes_len = len(nodes)
     # run with the default nodes
@@ -25,7 +26,11 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
         # run protocol_a
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
-        error_exit("Invalid number of nodes, please provide 0 or 2 or 3 nodes")
+        msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
+        if test:
+            return msg
+        else:
+            error_exit(msg)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
