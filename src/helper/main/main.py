@@ -63,10 +63,11 @@ def show_help() -> str:
     return msg
 
 
-def select_models(models_name_str: str) -> dict:
+def select_models(models_name_str: str, test: bool = False):
     """
     Select the models to be used in the network, based on the provided name.
     :param models_name_str: str
+    :param test: bool (default False)
     :return: dict of models to be used in the network
     """
     models: dict
@@ -74,6 +75,8 @@ def select_models(models_name_str: str) -> dict:
         models = Combined.models
     elif models_name_str == "empty":
         models = Empty.empty_models
+    else:
+        return checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']", test)
     return models
 
 
