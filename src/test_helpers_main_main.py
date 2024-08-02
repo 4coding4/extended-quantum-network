@@ -25,7 +25,12 @@ class TestHelpersMainMain(unittest.TestCase):
     # def test_checker(self):
 
     def test_show_help(self):
-        self.assertEqual("Command line arguments:- models_name: str, default='empty', choices=['combined', 'empty']- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')- debug: bool, default=False, if True, print debug information- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite",
+        self.assertEqual("Command line arguments:- models_name: str, default='empty', choices=['combined', 'empty']- "
+                         "method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']- nodes: "
+                         "str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],use ',' to separate the "
+                         "nodes (e.g. '1,2,4' or '1,4' or '1,3')- debug: bool, default=False, if True, print debug "
+                         "information- experiment_num: int, default=0, if 0, run a single experiment, if >0, "
+                         "run the experiment suite",
                          show_help())
 
     def test_select_models(self):
@@ -35,7 +40,6 @@ class TestHelpersMainMain(unittest.TestCase):
                          select_models("combined"))
         self.assertEqual(Empty.empty_models,
                          select_models("empty"))
-
 
 
 if __name__ == "__main__":
