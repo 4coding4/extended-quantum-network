@@ -27,10 +27,7 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, te
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        if test:
-            return msg
-        else:
-            error_exit(msg)
+        checker(True, msg, test)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
@@ -50,17 +47,20 @@ def checker(condition: bool, msg: str, test: bool = False):
             error_exit(msg)
 
 
-def show_help() -> None:
+def show_help() -> str:
     """
     Show the help message with the command line arguments.
+    :return: str
     """
-    print("Command line arguments:")
-    print("- models_name: str, default='empty', choices=['combined', 'empty']")
-    print("- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']")
-    print("- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],"
-          "use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')")
-    print("- debug: bool, default=False, if True, print debug information")
-    print("- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite")
+    msg = "Command line arguments:"
+    msg += "- models_name: str, default='empty', choices=['combined', 'empty']"
+    msg += "- method_name: str, default='protocol_a', choices=['protocol_a', 'entangle_nodes']"
+    msg += "- nodes: str, default='1,2,4', choices of int=[1, 2, 3, 4], length=[0, 2, 3],"
+    msg += "use ',' to separate the nodes (e.g. '1,2,4' or '1,4' or '1,3')"
+    msg += "- debug: bool, default=False, if True, print debug information"
+    msg += "- experiment_num: int, default=0, if 0, run a single experiment, if >0, run the experiment suite"
+    print(msg)
+    return msg
 
 
 def select_models(models_name_str: str) -> dict:
