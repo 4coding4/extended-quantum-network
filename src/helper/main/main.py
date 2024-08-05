@@ -26,7 +26,7 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        return checker(True, msg)
+        checker(True, msg)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
@@ -70,7 +70,7 @@ def select_models(models_name_str: str):
     elif models_name_str == "empty":
         models = Empty.empty_models
     else:
-        return checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']")
+        checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']")
     return models
 
 
@@ -107,9 +107,9 @@ def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: in
     method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str)
     # Check if the number of nodes is allowed for the selected method
     if nodes_len not in allowed_nodes_num:
-        return checker(True,
-                       f"Invalid number of nodes for the selected method '{method_name_str}', "
-                       f"allowed nodes: {allowed_nodes_num}")
+        checker(True,
+                f"Invalid number of nodes for the selected method '{method_name_str}', "
+                f"allowed nodes: {allowed_nodes_num}")
     elif type(method) is str:
         return method
     else:
