@@ -4,13 +4,12 @@ from src.models.Empty import Empty
 from src.network.StarNetwork import StarNetwork
 
 
-def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, test: bool = False):
+def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
     """
     Run the selected method with the provided nodes.
     :param method: callable
     :param nodes: list
     :param debug: bool
-    :param test: bool (default False)
     """
     nodes_len = len(nodes)
     # run with the default nodes
@@ -27,13 +26,13 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, te
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        return checker(True, msg, test)
+        return checker(True, msg)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
 
 
-def checker(condition: bool, msg: str, test: bool = False):
+def checker(condition: bool, msg: str, test: bool = False):  # TODO remove test
     """
     Check if the condition is True, exit the program with an error message.
     :param condition: bool
@@ -63,11 +62,10 @@ def show_help() -> str:
     return msg
 
 
-def select_models(models_name_str: str, test: bool = False):
+def select_models(models_name_str: str):
     """
     Select the models to be used in the network, based on the provided name.
     :param models_name_str: str
-    :param test: bool (default False)
     :return: dict of models to be used in the network
     """
     models: dict
@@ -76,7 +74,7 @@ def select_models(models_name_str: str, test: bool = False):
     elif models_name_str == "empty":
         models = Empty.empty_models
     else:
-        return checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']", test)
+        return checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']")
     return models
 
 

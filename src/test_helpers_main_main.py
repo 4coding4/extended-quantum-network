@@ -18,8 +18,10 @@ class TestHelpersMainMain(unittest.TestCase):
                          run_method_with_nodes(method, [1, 1]))
         self.assertEqual(3,
                          run_method_with_nodes(method, [1, 1, 1]))
-        self.assertEqual("Invalid number of nodes, please provide 0 or 2 or 3 nodes",
-                         run_method_with_nodes(method, [1, 1, 1, 1], True, True))
+
+        with self.assertRaises(SystemExit) as cm:
+            run_method_with_nodes(method, [1, 1, 1, 1], True)
+        self.assertEqual("Invalid number of nodes, please provide 0 or 2 or 3 nodes", cm.exception.args[0])
 
     # skipped since previous tests are sufficient
     # def test_checker(self):
@@ -34,12 +36,14 @@ class TestHelpersMainMain(unittest.TestCase):
                          show_help())
 
     def test_select_models(self):
-        self.assertEqual("Invalid models name, please provide one of the following: ['combined', 'empty']",
-                         select_models("invalid", True))
         self.assertEqual(Combined.models,
                          select_models("combined"))
         self.assertEqual(Empty.empty_models,
                          select_models("empty"))
+        with self.assertRaises(SystemExit) as cm:
+            select_models("invalid")
+        self.assertEqual("Invalid models name, please provide one of the following: ['combined', 'empty']",
+                         cm.exception.args[0])
 
     # skipped since tests below are sufficient
     # def test_select_method_uncheck(self):
