@@ -42,9 +42,7 @@ class TestMain(unittest.TestCase):
         sys.argv = ["main.py", "help"]
         with self.assertRaises(SystemExit) as cm:
             handle_args()
-            self.assertEqual(0, cm.exception.code)
-            self.assertEqual(show_help(), cm.exception.args[0].message)
-            sys.exit()
+        self.assertEqual(show_help(), cm.exception.args[0])
 
     def test_main(self):
         # remove 2 files from the out directory
