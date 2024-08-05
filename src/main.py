@@ -49,10 +49,7 @@ def handle_args(test: bool = False):
     """
     if len(sys.argv) == 2 and sys.argv[1] == "help":
         help_msg = show_help()
-        if test:
-            return help_msg
-        else:
-            sys.exit()
+        checker(True, help_msg, test)
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
     models_name_input: str = "empty"  # "combined"

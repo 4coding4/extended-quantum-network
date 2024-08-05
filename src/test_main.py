@@ -8,7 +8,7 @@ from src.main import handle_args, main
 
 
 class TestMain(unittest.TestCase):
-    test = True
+    test = False
     test_files = ["data[entangle_nodes_empty_[2, 4]_True_1].csv",
                   "fidelity-over-length[entangle_nodes_empty_[2, 4]_True_1].png"]
     out_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../out")
@@ -42,10 +42,14 @@ class TestMain(unittest.TestCase):
 
         # inject the command line arguments
         sys.argv = ["main.py", "help"]
-        self.assertEqual(show_help(), handle_args(self.test))
-        # with self.assertRaises(SystemExit):
-        #     handle_args(self.test
-        # sys.exit()
+        # self.assertEqual(show_help(), handle_args(self.test))
+        with self.assertRaises(SystemExit) as cm:
+            handle_args(self.test)
+            self.assertEqual(show_help(), handle_args(self.test))
+            self.assertEqual(cm.exception.code, 0)
+            self.assertEqual(cm.exception.args[0].message, show_help())
+            sys.exit()
+
 
     def test_main(self):
         # remove 2 files from the out directory
