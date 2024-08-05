@@ -90,8 +90,7 @@ def select_method_uncheck(star_network: StarNetwork, method_name_str: str):
         method = star_network.entangle_nodes
         allowed_nodes_num.append(2)
     else:
-        return (error_exit("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']"),
-        allowed_nodes_num)
+        error_exit("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']")
     return method, allowed_nodes_num
 
 
@@ -108,7 +107,5 @@ def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: in
     if nodes_len not in allowed_nodes_num:
         error_exit(f"Invalid number of nodes for the selected method '{method_name_str}', "
                    f"allowed nodes: {allowed_nodes_num}")
-    elif type(method) is str:
-        return method
     else:
         return method
