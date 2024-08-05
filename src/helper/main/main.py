@@ -4,13 +4,12 @@ from src.models.Empty import Empty
 from src.network.StarNetwork import StarNetwork
 
 
-def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, test: bool = False):
+def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
     """
     Run the selected method with the provided nodes.
     :param method: callable
     :param nodes: list
     :param debug: bool
-    :param test: bool (default False)
     """
     nodes_len = len(nodes)
     # run with the default nodes
@@ -27,24 +26,20 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False, te
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        return checker(True, msg, test)
+        error_exit(msg)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
 
 
-def checker(condition: bool, msg: str, test: bool = False):
+def checker(condition: bool, msg: str):
     """
     Check if the condition is True, exit the program with an error message.
     :param condition: bool
     :param msg: str
-    :param test: bool (default False)
     """
     if condition:
-        if test:
-            return msg
-        else:
-            error_exit(msg)
+        error_exit(msg)
 
 
 def show_help() -> str:
@@ -63,11 +58,10 @@ def show_help() -> str:
     return msg
 
 
-def select_models(models_name_str: str, test: bool = False):
+def select_models(models_name_str: str):
     """
     Select the models to be used in the network, based on the provided name.
     :param models_name_str: str
-    :param test: bool (default False)
     :return: dict of models to be used in the network
     """
     models: dict
@@ -76,11 +70,11 @@ def select_models(models_name_str: str, test: bool = False):
     elif models_name_str == "empty":
         models = Empty.empty_models
     else:
-        return checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']", test)
+        error_exit("Invalid models name, please provide one of the following: ['combined', 'empty']")
     return models
 
 
-def select_method_uncheck(star_network: StarNetwork, method_name_str: str, test: bool = False):
+def select_method_uncheck(star_network: StarNetwork, method_name_str: str):
     """
     Select the method to be used in the network, based on the provided name.
     :param star_network: StarNetwork
@@ -96,28 +90,24 @@ def select_method_uncheck(star_network: StarNetwork, method_name_str: str, test:
         method = star_network.entangle_nodes
         allowed_nodes_num.append(2)
     else:
-        return checker(True,
-                       "Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']",
-                       test), allowed_nodes_num
+        return (error_exit("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']"),
+        allowed_nodes_num)
     return method, allowed_nodes_num
 
 
-def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: int, test: bool = False) -> callable:
+def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: int) -> callable:
     """
     Select the method to be used in the network, based on the provided name.
     :param star_network: StarNetwork
     :param method_name_str: str
     :param nodes_len: int
-    :param test: bool (default False)
     :return: method to be used in the network
     """
-    method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str, test)
+    method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str)
     # Check if the number of nodes is allowed for the selected method
     if nodes_len not in allowed_nodes_num:
-        return checker(True,
-                       f"Invalid number of nodes for the selected method '{method_name_str}', "
-                       f"allowed nodes: {allowed_nodes_num}",
-                       test)
+        error_exit(f"Invalid number of nodes for the selected method '{method_name_str}', "
+                   f"allowed nodes: {allowed_nodes_num}")
     elif type(method) is str:
         return method
     else:
