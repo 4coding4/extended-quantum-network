@@ -1,5 +1,6 @@
 import sys
 
+from src.helper.error.error import error_exit
 from src.helper.main.converter.converter import converter_exit, converter_string_list_int, converter_string_boolean, \
     converter_string_int
 from src.helper.main.main import run_method_with_nodes, checker, show_help, select_models, select_method
@@ -47,7 +48,7 @@ def handle_args() -> tuple:
     """
     if len(sys.argv) == 2 and sys.argv[1] == "help":
         help_msg = show_help()
-        checker(True, help_msg)
+        error_exit(help_msg)
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
     models_name_input: str = "empty"  # "combined"

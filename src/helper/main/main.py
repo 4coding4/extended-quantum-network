@@ -26,7 +26,7 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
         fidelity = method(nodes[0], nodes[1], nodes[2], debug=debug)
     else:
         msg = "Invalid number of nodes, please provide 0 or 2 or 3 nodes"
-        checker(True, msg)
+        error_exit(msg)
     # always print it, since it is the result of the simulation
     print("Results: ", fidelity)
     return fidelity
@@ -70,7 +70,7 @@ def select_models(models_name_str: str):
     elif models_name_str == "empty":
         models = Empty.empty_models
     else:
-        checker(True, "Invalid models name, please provide one of the following: ['combined', 'empty']")
+        error_exit("Invalid models name, please provide one of the following: ['combined', 'empty']")
     return models
 
 
@@ -90,9 +90,8 @@ def select_method_uncheck(star_network: StarNetwork, method_name_str: str):
         method = star_network.entangle_nodes
         allowed_nodes_num.append(2)
     else:
-        return (checker(True,
-                        "Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']"),
-                allowed_nodes_num)
+        return (error_exit("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']"),
+        allowed_nodes_num)
     return method, allowed_nodes_num
 
 
@@ -107,9 +106,8 @@ def select_method(star_network: StarNetwork, method_name_str: str, nodes_len: in
     method, allowed_nodes_num = select_method_uncheck(star_network, method_name_str)
     # Check if the number of nodes is allowed for the selected method
     if nodes_len not in allowed_nodes_num:
-        checker(True,
-                f"Invalid number of nodes for the selected method '{method_name_str}', "
-                f"allowed nodes: {allowed_nodes_num}")
+        error_exit(f"Invalid number of nodes for the selected method '{method_name_str}', "
+                   f"allowed nodes: {allowed_nodes_num}")
     elif type(method) is str:
         return method
     else:
