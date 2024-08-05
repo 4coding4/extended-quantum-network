@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from src.helper.main.converter.converter import converter_string_boolean, converter_string_int, \
@@ -22,8 +23,11 @@ class TestHelpersMainConverterConverter(unittest.TestCase):
         self.assertEqual("input",
                          converter_exit(method, "input", "error"))
         crash = True
-        self.assertEqual("error",
-                         converter_exit(method, "input", "error", True))
+        with self.assertRaises(SystemExit) as cm:
+            converter_exit(method, "input", "error")
+            self.assertEqual(0, cm.exception.code)
+            self.assertEqual("error", cm.exception.args[0].message)
+            sys.exit()
 
     def test_converter_string_boolean(self):
         self.assertEqual((True, False),

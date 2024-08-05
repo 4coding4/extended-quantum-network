@@ -1,21 +1,17 @@
 from src.helper.main.main import error_exit
 
 
-def converter_exit(method: callable, input: any, msg: str, test: bool = False) -> any:
+def converter_exit(method: callable, input: any, msg: str) -> any:
     """
     Try to convert the input to the desired type, if it fails, exit the program with an error message.
     :param method: callable
     :param input: any
     :param msg: str
-    :param test: bool (default False)
     :return: any
     """
     output, error = method(input)
     if error:
-        if test:
-            return msg
-        else:
-            error_exit(msg)
+        error_exit(msg)
     else:
         return output
 
