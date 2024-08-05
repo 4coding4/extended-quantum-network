@@ -8,9 +8,15 @@ from src.network.StarNetwork import StarNetwork
 from src.helper.main.Experiment import Experiment
 
 
-def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
+def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0, test: bool = False):
     """
     Main function to run the simulation.
+    :param models_name: str
+    :param method_name: str
+    :param nodes: list (default [])
+    :param debug: bool (default False)
+    :param experiment_num: int (default 0)
+    :param test: bool (default False) to check if the function is being tested
     """
     # Initialize Network and run experiment
     models: dict = select_models(models_name)
@@ -35,13 +41,18 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     reset_restart = check_reset_restart(reset_restart)
 
 
-def handle_args() -> tuple:
+def handle_args(test: bool = False):
     """
     Handle the command line arguments.
+    :param test: bool (default False) to check if the function is being tested
+    :return: tuple of models_name, method_name, nodes, debug, experiment_num
     """
     if len(sys.argv) == 2 and sys.argv[1] == "help":
-        show_help()
-        sys.exit()
+        help_msg = show_help()
+        if test:
+            return help_msg
+        else:
+            sys.exit()
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
     models_name_input: str = "empty"  # "combined"
@@ -54,31 +65,31 @@ def handle_args() -> tuple:
             models_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
             checker(models_name_input not in ["combined", "empty"],
-                    "Invalid models_name, please provide 'combined' or 'empty'")
+                    "Invalid models_name, please provide 'combined' or 'empty'", test)
         elif i == 2:
             method_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
             checker(method_name_input not in ["protocol_a", "entangle_nodes"],
-                    "Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'")
+                    "Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'", test)
         elif i == 3:
             nodes_input = converter_exit(converter_string_list_int, sys.argv[i],
-                                         "Invalid nodes, please provide a list of integers separated by ','")
+                                         "Invalid nodes, please provide a list of integers separated by ','", test)
 
             # check that nodes is a list of non-duplicate integers (between 1 and 4) and the length is either 0, 2 or 3
             checker(len(nodes_input) not in [0, 2, 3],
-                    "Invalid number of nodes, please provide a list of length 0, 2 or 3")
+                    "Invalid number of nodes, please provide a list of length 0, 2 or 3", test)
             checker(len(nodes_input) != len(set(nodes_input)),
-                    "Invalid nodes, please provide a list of unique integers")
+                    "Invalid nodes, please provide a list of unique integers", test)
             checker(any(node < 1 or node > 4 for node in nodes_input),
-                    "Invalid nodes, please provide a list of integers between 1 and 4")
+                    "Invalid nodes, please provide a list of integers between 1 and 4", test)
         elif i == 4:
             debug_input = converter_exit(converter_string_boolean, sys.argv[i],
-                                         "Invalid debug, please provide 'True' or 'False")
+                                         "Invalid debug, please provide 'True' or 'False", test)
         elif i == 5:
             experiment_num_input = converter_exit(converter_string_int, sys.argv[i],
-                                                  "Invalid experiment_num, please provide an integer")
+                                                  "Invalid experiment_num, please provide an integer", test)
             checker(experiment_num_input < 0,
-                    "Invalid experiment_num, please provide a non-negative integer")
+                    "Invalid experiment_num, please provide a non-negative integer", test)
 
     return models_name_input, method_name_input, nodes_input, debug_input, experiment_num_input
 
