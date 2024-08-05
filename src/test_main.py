@@ -7,7 +7,6 @@ from src.main import handle_args, main
 
 
 class TestMain(unittest.TestCase):
-    test = True
     test_files = ["data[entangle_nodes_empty_[2, 4]_True_1].csv",
                   "fidelity-over-length[entangle_nodes_empty_[2, 4]_True_1].png"]
     out_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../out")
@@ -58,7 +57,7 @@ class TestMain(unittest.TestCase):
         # get list of files in the out directory
         before_files = os.listdir(self.out_folder)
         main(models_name="empty", method_name="entangle_nodes", nodes=[2, 4], debug=True,
-             experiment_num=0, test=self.test)
+             experiment_num=0)
         after_files = os.listdir(self.out_folder)
         self.assertEqual(before_files, after_files)
 
@@ -69,7 +68,7 @@ class TestMain(unittest.TestCase):
         for file in self.test_files:
             self.assertNotIn(file, before_files)
         main(models_name="empty", method_name="entangle_nodes", nodes=[2, 4], debug=True,
-             experiment_num=1, test=self.test)
+             experiment_num=1)
         after_files = os.listdir(self.out_folder)
         self.assertNotEqual(before_files, after_files)
         # after_files contains the 2 files in test_files

@@ -8,7 +8,7 @@ from src.network.StarNetwork import StarNetwork
 from src.helper.main.Experiment import Experiment
 
 
-def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0, test: bool = False):
+def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
     """
     Main function to run the simulation.
     :param models_name: str
@@ -16,7 +16,6 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     :param nodes: list (default [])
     :param debug: bool (default False)
     :param experiment_num: int (default 0)
-    :param test: bool (default False) to check if the function is being tested
     """
     # Initialize Network and run experiment
     models: dict = select_models(models_name)
