@@ -41,15 +41,14 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     reset_restart = check_reset_restart(reset_restart)
 
 
-def handle_args(test: bool = False):
+def handle_args() -> tuple:
     """
     Handle the command line arguments.
-    :param test: bool (default False) to check if the function is being tested
     :return: tuple of models_name, method_name, nodes, debug, experiment_num
     """
     if len(sys.argv) == 2 and sys.argv[1] == "help":
         help_msg = show_help()
-        checker(True, help_msg, test)
+        checker(True, help_msg)
     # make the following variables the default values
     # global models_name, method_name, nodes, debug, experiment_num
     models_name_input: str = "empty"  # "combined"
@@ -62,31 +61,31 @@ def handle_args(test: bool = False):
             models_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
             checker(models_name_input not in ["combined", "empty"],
-                    "Invalid models_name, please provide 'combined' or 'empty'", test)
+                    "Invalid models_name, please provide 'combined' or 'empty'")
         elif i == 2:
             method_name_input = sys.argv[i]
             # check that models_name is either "combined" or "empty"
             checker(method_name_input not in ["protocol_a", "entangle_nodes"],
-                    "Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'", test)
+                    "Invalid method_name, please provide 'protocol_a' or 'entangle_nodes'")
         elif i == 3:
             nodes_input = converter_exit(converter_string_list_int, sys.argv[i],
-                                         "Invalid nodes, please provide a list of integers separated by ','", test)
+                                         "Invalid nodes, please provide a list of integers separated by ','")
 
             # check that nodes is a list of non-duplicate integers (between 1 and 4) and the length is either 0, 2 or 3
             checker(len(nodes_input) not in [0, 2, 3],
-                    "Invalid number of nodes, please provide a list of length 0, 2 or 3", test)
+                    "Invalid number of nodes, please provide a list of length 0, 2 or 3")
             checker(len(nodes_input) != len(set(nodes_input)),
-                    "Invalid nodes, please provide a list of unique integers", test)
+                    "Invalid nodes, please provide a list of unique integers")
             checker(any(node < 1 or node > 4 for node in nodes_input),
-                    "Invalid nodes, please provide a list of integers between 1 and 4", test)
+                    "Invalid nodes, please provide a list of integers between 1 and 4")
         elif i == 4:
             debug_input = converter_exit(converter_string_boolean, sys.argv[i],
-                                         "Invalid debug, please provide 'True' or 'False", test)
+                                         "Invalid debug, please provide 'True' or 'False")
         elif i == 5:
             experiment_num_input = converter_exit(converter_string_int, sys.argv[i],
-                                                  "Invalid experiment_num, please provide an integer", test)
+                                                  "Invalid experiment_num, please provide an integer")
             checker(experiment_num_input < 0,
-                    "Invalid experiment_num, please provide a non-negative integer", test)
+                    "Invalid experiment_num, please provide a non-negative integer")
 
     return models_name_input, method_name_input, nodes_input, debug_input, experiment_num_input
 
