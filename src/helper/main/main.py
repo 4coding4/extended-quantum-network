@@ -32,18 +32,14 @@ def run_method_with_nodes(method: callable, nodes: list, debug: bool = False):
     return fidelity
 
 
-def checker(condition: bool, msg: str, test: bool = False):  # TODO remove test
+def checker(condition: bool, msg: str):
     """
     Check if the condition is True, exit the program with an error message.
     :param condition: bool
     :param msg: str
-    :param test: bool (default False)
     """
     if condition:
-        if test:
-            return msg
-        else:
-            error_exit(msg)
+        error_exit(msg)
 
 
 def show_help() -> str:
