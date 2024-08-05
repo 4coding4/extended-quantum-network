@@ -1,6 +1,6 @@
 import unittest
 
-from src.helper.main.main import run_method_with_nodes, show_help, select_models, select_method
+from src.helper.main.main import run_method_with_nodes, show_help, select_models, select_method, checker
 from src.models.Combined import Combined
 from src.models.Empty import Empty
 
@@ -23,8 +23,10 @@ class TestHelpersMainMain(unittest.TestCase):
             run_method_with_nodes(method, [1, 1, 1, 1], True)
         self.assertEqual("Invalid number of nodes, please provide 0 or 2 or 3 nodes", cm.exception.args[0])
 
-    # skipped since previous tests are sufficient
-    # def test_checker(self):
+    def test_checker(self):
+        with self.assertRaises(SystemExit) as cm:
+            checker(True, "error")
+        self.assertEqual("error", cm.exception.args[0])
 
     def test_show_help(self):
         self.assertEqual("Command line arguments:- models_name: str, default='empty', choices=['combined', 'empty']- "
