@@ -58,13 +58,18 @@ class TestHelpersMainMain(unittest.TestCase):
 
         fake_star_network = StarNetwork()
         self.assertEqual(fake_star_network.protocol_a,
-                         select_method(fake_star_network, "protocol_a", 3, True))
+                         select_method(fake_star_network, "protocol_a", 3))
         self.assertEqual(fake_star_network.entangle_nodes,
-                         select_method(fake_star_network, "entangle_nodes", 2, True))
+                         select_method(fake_star_network, "entangle_nodes", 2))
+        # invalid tests
+        with self.assertRaises(SystemExit) as cm:
+            select_method(fake_star_network, "protocol_a", 4)
         self.assertEqual("Invalid number of nodes for the selected method 'protocol_a', allowed nodes: [0, 3]",
-                         select_method(fake_star_network, "protocol_a", 4, True))
+                         cm.exception.args[0])
+        with self.assertRaises(SystemExit) as cm:
+            select_method(fake_star_network, "invalid", 0)
         self.assertEqual("Invalid method name, please provide one of the following: ['protocol_a', 'entangle_nodes']",
-                         select_method(fake_star_network, "invalid", 0, True))
+                         cm.exception.args[0])
         # test fake run, for coverage
         self.assertEqual("protocol_a",
                          fake_star_network.protocol_a())
