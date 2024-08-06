@@ -11,12 +11,6 @@ from netsquid.qubits import StateSampler
 
 from src.models.Combined import Combined
 
-# PROCESS_POSITIONS: int = 3
-
-
-# SOURCE_MODEL_DELAY: int = 5
-# QUANTUM_CHANNEL_DELAY: int = 100
-
 
 class EntangleNodes(NodeProtocol):
     """
@@ -179,7 +173,8 @@ def plot_fidelity(csv_file: str, plot_file: str = "fidelity-over-length.png"):
     fig.savefig(plot_file)
 
 
-def main(verbose: bool = False, num_each_sim: int = 100, csv_file: str = "data.csv", plot_file: str = "fidelity-over-length.png"):
+def main(verbose: bool = False, num_each_sim: int = 100, csv_file: str = "data.csv",
+         plot_file: str = "fidelity-over-length.png"):
     """
     Main function to run the simulation.
     :param verbose: Whether to print the fidelity values
@@ -188,9 +183,6 @@ def main(verbose: bool = False, num_each_sim: int = 100, csv_file: str = "data.c
     """
     # array of lengths of the quantum channel, in meters, from 0 to 2000 meters 10 meter apart
     lengths = np.arange(10, 1000 + 10, 10)
-    # verbose = False
-    # num_each_sim = 100
-    # csv_file = "data.csv"
     f = open(csv_file, "w+")
     f.write("length,fidelity\r\n")
     for length in lengths:
