@@ -2,7 +2,6 @@ import unittest
 
 from netsquid.qubits import create_qubits
 
-from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.entanglement_swapping import perform_and_get_bell_measurement_w_state, get_results, apply_gates
 
 from src.network.StarNetwork import StarNetwork
