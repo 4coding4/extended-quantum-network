@@ -199,7 +199,7 @@ if __name__ == '__main__':
         f.write(f"{length},{np.mean(fidelity_values)}\r\n")
 
     f.close()
-    #Plot the results
+    # Plot the results
     df = pd.read_csv(csv_file)
     a, b = np.polyfit(df["length"], df["fidelity"], 1)
 
