@@ -3,7 +3,7 @@
 # https://youtrack.jetbrains.com/issue/IJPL-531/Command-Line-Run-Configuration
 import sys
 
-from src.terminal.terminal_utils import run_command_in_terminal_and_show_output
+from src.helper.terminal.utils import run_command_in_terminal_and_show_output
 
 
 def run_bash_and_return_outputs(bash_name: str) -> str:

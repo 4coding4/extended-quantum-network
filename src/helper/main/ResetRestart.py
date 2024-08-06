@@ -1,6 +1,6 @@
 from netsquid import sim_reset
 
-from src.terminal.terminal_utils import run_command_in_terminal_and_show_output
+from src.helper.terminal.utils import run_command_in_terminal_and_show_output
 
 
 def reset_simulation() -> None:
