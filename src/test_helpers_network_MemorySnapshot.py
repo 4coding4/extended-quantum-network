@@ -32,10 +32,10 @@ class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
             quantum_processor_factory.get("QP_RemoteNode", remote_node_mem_positions)
         )
         network.nodes["Node1"].add_subcomponent(
-            quantum_processor_factory.get(f"QP_Node1", node_mem_positions)
+            quantum_processor_factory.get("QP_Node1", node_mem_positions)
         )
         network.nodes["Node2"].add_subcomponent(
-            quantum_processor_factory.get(f"QP_Node2", node_mem_positions)
+            quantum_processor_factory.get("QP_Node2", node_mem_positions)
         )
 
         memory_snapshot = MemorySnapshot(network, node1, node2, node3,
