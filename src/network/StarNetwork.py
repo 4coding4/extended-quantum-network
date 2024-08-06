@@ -223,7 +223,6 @@ class StarNetwork:
     def models(self, models_dict: dict):
         """
         Set the dictionary of the models for the quantum channels.
-        
         :param models_dict: The dictionary of models
         """
         self._models = models_dict
