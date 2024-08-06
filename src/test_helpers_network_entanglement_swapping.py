@@ -104,8 +104,3 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
         # check that the 'error' key has a boolean value
         self.assertIsInstance(results[0]['error'], bool)
         self.assertIsInstance(results[1]['error'], bool)
-
-
-
-# if __name__ == "__main__":
-#     unittest.main()

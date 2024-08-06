@@ -48,7 +48,3 @@ class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
                     "None\nRemoteNode_m0: None\nRemoteNode_m1: NoneIf it is working correctly, the output should have "
                     " \n")
         self.assertEqual(expected, msg)
-
-
-# if __name__ == "__main__":
-#     unittest.main()

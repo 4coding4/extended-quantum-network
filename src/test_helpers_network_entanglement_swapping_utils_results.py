@@ -17,7 +17,3 @@ class TestHelpersNetworkEntanglementSwappingUtilsResults(unittest.TestCase):
     def test_get_results(self):
         self.assertEqual({"qubits": self.qbits_pair, "fidelity": calc_fidelity(self.qbits_pair), "error": False},
                          get_result(self.qbits_pair))
-
-
-# if __name__ == "__main__":
-#     unittest.main()

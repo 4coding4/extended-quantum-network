@@ -77,7 +77,3 @@ class TestHelpersMainMain(unittest.TestCase):
                          fake_star_network.protocol_a())
         self.assertEqual("entangle_nodes",
                          fake_star_network.entangle_nodes())
-
-
-# if __name__ == "__main__":
-#     unittest.main()

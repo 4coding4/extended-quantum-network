@@ -10,7 +10,4 @@ class TestRunScriptsViaPython(unittest.TestCase):
         self.assertIn("bash run:", out)
         self.assertIn("Exit code: 1", out)
 
-
-# if __name__ == "__main__":
-#     unittest.main()
 # via this, the function above cannot file the bash script, but by running coverage.sh it works as expected
