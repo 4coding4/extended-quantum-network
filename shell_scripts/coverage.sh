@@ -1,5 +1,6 @@
 #!/bin/bash
-coverage run --source=./ -m unittest -v
+coverage run --parallel-mode --source=./ -m unittest -v
+coverage combine
 coverage report -m
 coverage html
 #open htmlcov/index.html
