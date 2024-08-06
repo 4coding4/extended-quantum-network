@@ -23,11 +23,12 @@ class TestExampleEntanglementDistribution(unittest.TestCase):
         csv_file = "test-data.csv"
         plot_file = "test-fidelity-over-length.png"
         # delete the files if they already exist
-        try:
-            os.remove(csv_file)
-            os.remove(plot_file)
-        except FileNotFoundError:
-            pass
+        files = [csv_file, plot_file]
+        for file in files:
+            try:
+                os.remove(file)
+            except FileNotFoundError:
+                pass
 
         # run the main function with the provided arguments
         main(verbose=verbose, num_each_sim=num_each_sim, csv_file=csv_file, plot_file=plot_file)
