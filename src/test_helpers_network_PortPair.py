@@ -25,7 +25,3 @@ class TestHelpersNetworkPortPair(unittest.TestCase):
     def test_show(self):
         self.assertEqual("source -> destination, name",
                          self.pp.show())
-
-
-# if __name__ == "__main__":
-#     unittest.main()

@@ -15,8 +15,3 @@ class TestHelpersNetworkFactoryQuantumChannel(unittest.TestCase):
                          self.factory.get(name).name)
         self.assertEqual(ConstrainedMap({'length': 1}),
                          self.factory.get(name).properties)
-
-
-
-# if __name__ == "__main__":
-#     unittest.main()

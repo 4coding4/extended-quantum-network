@@ -63,7 +63,3 @@ class TestHelpersMainConverterConverter(unittest.TestCase):
                          converter_string_list_int("1,2,3,a"))
         self.assertEqual(self.fail_tuple,
                          converter_string_list_int("1.2"))
-
-
-# if __name__ == "__main__":
-#     unittest.main()

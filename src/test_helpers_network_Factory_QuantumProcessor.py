@@ -15,8 +15,3 @@ class TestHelpersNetworkFactoryQuantumProcessor(unittest.TestCase):
                          self.factory.get(name, pos).name)
         self.assertEqual(ConstrainedMap({'num_positions': 2}),
                          self.factory.get(name, pos).properties)
-
-
-
-# if __name__ == "__main__":
-#     unittest.main()

@@ -223,7 +223,6 @@ class StarNetwork:
     def models(self, models_dict: dict):
         """
         Set the dictionary of the models for the quantum channels.
-        
         :param models_dict: The dictionary of models
         """
         self._models = models_dict
@@ -342,7 +341,9 @@ class StarNetwork:
     ###################################################################
 
     def _connect_source_to_destination(self, n: int,
-                                       channel_n=0):  # TODO cognitive complexity is too high (sonarlint max is 15, this 16), reduce by extrapolating the logic to a helper function
+                                       channel_n=0):
+        # TODO cognitive complexity is too high (sonarlint max is 15, this 16),
+        #  reduce by extrapolating the logic to a helper function
         """
         Given the number of a node, connect it to the source's quantum source component.
 

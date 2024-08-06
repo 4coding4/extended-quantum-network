@@ -73,9 +73,8 @@ class Experiment:
     def num_each_simulation(self, value: int):
         """
         Set the number of measurements for each run of the simulation.
-        
         :param value: The number of measurements for each run of the simulation
-        :raises AssertionError: If the value is smaller than 0 
+        :raises AssertionError: If the value is smaller than 0
         """
         assert (value > 0)
         self._num_each_simulation = value

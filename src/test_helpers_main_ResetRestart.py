@@ -23,6 +23,3 @@ class TestHelpersMainResetRestart(unittest.TestCase):
 
         new_flag1 = check_reset_restart(False, self.debug)
         self.assertFalse(new_flag1)
-
-# if __name__ == "__main__":
-#     unittest.main()

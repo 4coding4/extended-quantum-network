@@ -32,23 +32,19 @@ class TestHelpersNetworkMemorySnapshot(unittest.TestCase):
             quantum_processor_factory.get("QP_RemoteNode", remote_node_mem_positions)
         )
         network.nodes["Node1"].add_subcomponent(
-            quantum_processor_factory.get(f"QP_Node1", node_mem_positions)
+            quantum_processor_factory.get("QP_Node1", node_mem_positions)
         )
         network.nodes["Node2"].add_subcomponent(
-            quantum_processor_factory.get(f"QP_Node2", node_mem_positions)
+            quantum_processor_factory.get("QP_Node2", node_mem_positions)
         )
 
         memory_snapshot = MemorySnapshot(network, node1, node2, node3,
                                          repeater_mem_positions,
                                          node_mem_positions,
                                          remote_node_mem_positions)
-        msg = memory_snapshot.show_all_memory_positions(initial_msg=" ",end_msg=" ",line_width=0)
+        msg = memory_snapshot.show_all_memory_positions(initial_msg=" ", end_msg=" ", line_width=0)
         expected = ("\n Repeater_m0: "
                     "None\nRepeater_m1: None\nRepeater_m2: None\nRepeater_m3: None\nNode1_m0: None\nNode2_m0: "
                     "None\nRemoteNode_m0: None\nRemoteNode_m1: NoneIf it is working correctly, the output should have "
                     " \n")
         self.assertEqual(expected, msg)
-
-
-# if __name__ == "__main__":
-#     unittest.main()

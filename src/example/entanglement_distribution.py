@@ -162,7 +162,7 @@ if __name__ == '__main__':
     verbose = False
     num_each_sim = 100
     csv_file = "data.csv"
-    f=open(csv_file, "w+")
+    f = open(csv_file, "w+")
     f.write("length,fidelity\r\n")
     for length in lengths:
         print(f"Nodes are entangled after {length} meters")
@@ -199,7 +199,7 @@ if __name__ == '__main__':
         f.write(f"{length},{np.mean(fidelity_values)}\r\n")
 
     f.close()
-    #Plot the results
+    # Plot the results
     df = pd.read_csv(csv_file)
     a, b = np.polyfit(df["length"], df["fidelity"], 1)
 

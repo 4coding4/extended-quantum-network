@@ -19,8 +19,3 @@ class TestHelpersNetworkFactoryQuantumSource(unittest.TestCase):
                          self.factory.get(name).properties)
         self.assertEqual(type(StateSampler([b00])),
                          type(self.factory.get(name).state_sampler))
-
-
-
-# if __name__ == "__main__":
-#     unittest.main()
