@@ -15,11 +15,15 @@ def restart_simulation(debug: bool = False) -> str:
     :return: The output of the program
     """
     flags = ["text", "stdout"]
+    folder_path = ""
     if debug:
-        run_command_in_terminal_and_show_output(["pwd"], flags, "Current directory: ")
-        run_command_in_terminal_and_show_output(["ls", "-la"], flags, "Files in directory: ")
+        curr_dir = run_command_in_terminal_and_show_output(["pwd"], flags, "Current directory: ")
+        files = run_command_in_terminal_and_show_output(["ls", "-la"], flags, "Files in directory: ")
+        if "main.py" not in files and not curr_dir.endswith("/src"):
+            folder_path = "src/"
 
-    program = run_command_in_terminal_and_show_output(["python", "main.py"], flags, "Standard output of the program: ")
+    program = run_command_in_terminal_and_show_output(["python", folder_path + "main.py"], flags,
+                                                      "Standard output of the program: ")
     return program
 
 
