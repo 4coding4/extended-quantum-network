@@ -40,7 +40,3 @@ class TestExampleEntanglementDistribution(unittest.TestCase):
         # delete the files after checking
         os.remove(csv_file)
         os.remove(plot_file)
-
-
-
-
