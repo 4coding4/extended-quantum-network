@@ -88,29 +88,31 @@ class StarNetwork:
     repeater_mem_positions (default: 2):
         The memory positions of the repeater's quantum memory
     """
-    _models: dict
-    _destinations_n: int = 5
-    _source_delay: float = 1e5
     _channels_length: float = 1
-    _node_mem_positions: int = 1
-    _repeater_mem_positions: int = 4
-    _source_num_ports: int = 4
-    _remote_source_num_ports: int = 4
-    _remote_node_mem_positions: int = 2
-
-    # Network object and network components
-    _network: Network = Network("StarNetwork")
-
-    _source: node = None
-    _destinations: [node] = []
-
-    _quantum_channels: [QuantumChannel] = []
-    _quantum_channels_port_pairs: [PortPair] = []
 
     def __init__(self, models: dict = None, lengths: float = _channels_length):
         """
         Constructor for the StarNetwork class.
         """
+        self._models: dict
+        self._destinations_n: int = 5
+        self._source_delay: float = 1e5
+        # self._channels_length: float = 1
+        self._node_mem_positions: int = 1
+        self._repeater_mem_positions: int = 4
+        self._source_num_ports: int = 4
+        self._remote_source_num_ports: int = 4
+        self._remote_node_mem_positions: int = 2
+
+        # Network object and network components
+        self._network: Network = Network("StarNetwork")
+
+        self._source: node = None
+        self._destinations: [node] = []
+
+        self._quantum_channels: [QuantumChannel] = []
+        self._quantum_channels_port_pairs: [PortPair] = []
+
         self._models = models
         self._channels_length = lengths
 
