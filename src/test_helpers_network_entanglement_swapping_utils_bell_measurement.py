@@ -4,14 +4,13 @@ from netsquid.qubits import create_qubits, ketstates
 
 from src.helper.network.entanglement_swapping_utils.bell_measurement import perform_bell_measurement, \
     print_bell_measurement
-from src.helper.network.entanglement_swapping_utils.results import calc_fidelity, get_result
 from src.network.StarNetwork import StarNetwork
 
 
 class TestHelpersNetworkEntanglementSwappingUtilsBellMeasurement(unittest.TestCase):
     qubits = [q0, q1, q2, q3] = create_qubits(num_qubits=4, system_name="Q")  # Create two qubits w default state |0>
     # create a star network
-    star_network: StarNetwork = StarNetwork({})
+    star_network: StarNetwork = StarNetwork()
     repeater_memory = star_network.network.subcomponents["Repeater"].qmemory
     # place the qubits in the repeater memory
     repeater_memory.put(qubits)
@@ -58,7 +57,3 @@ class TestHelpersNetworkEntanglementSwappingUtilsBellMeasurement(unittest.TestCa
                     f"B/Bell states/Ket vectors format for the states: {ketstates.BellIndex(self.state_2_positions)}\n"
         self.assertEqual(expected2,
                          print_bell_measurement(self.m_2_positions, self.state_2_positions))
-
-
-# if __name__ == "__main__":
-#     unittest.main()
