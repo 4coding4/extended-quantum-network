@@ -9,7 +9,8 @@ from src.network.StarNetwork import StarNetwork
 from src.helper.main.Experiment import Experiment
 
 
-def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0):
+def main(models_name: str, method_name: str, nodes: list = [], debug: bool = False, experiment_num: int = 0,
+         reset_restart: bool = False):
     """
     Main function to run the simulation.
     :param models_name: str
@@ -17,6 +18,7 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
     :param nodes: list (default [])
     :param debug: bool (default False)
     :param experiment_num: int (default 0)
+    :param reset_restart: bool (default False)
     """
     # Initialize Network and run experiment
     models: dict = select_models(models_name)
@@ -37,8 +39,7 @@ def main(models_name: str, method_name: str, nodes: list = [], debug: bool = Fal
         experiment.num_each_simulation = experiment_num  # set the number of measurements for each run of the simulation
         experiment.run(method, nodes, debug)
     # reset restart simulation
-    reset_restart = False  # True
-    reset_restart = check_reset_restart(reset_restart)
+    _ = check_reset_restart(reset_restart)
 
 
 def handle_args() -> tuple:
