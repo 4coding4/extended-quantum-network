@@ -511,19 +511,38 @@ class StarNetwork:
 
         channels_n = [i for i in range(0, tot_num_channels)][::-1]  # reverse the list to start from the last channel
 
+        # sets of protocols and nodes
+        set_protocols = set()
+        set_nodes = set()
+
         for i, channel_n in enumerate(channels_n):
             first_node = node1 if i == 0 else node2
 
             # this way uses only 1 mem position0 and 1 qchannel between nodes
-            self._perform_entanglement(first_node, node3, channel_n)
+            protocols, nodes = self._perform_entanglement(first_node, node3, channel_n)
+            set_protocols.update(protocols)
+            set_nodes.update(nodes)
 
-            if debug:
-                expected_output = "4 Qubits and 4 None" if i == 0 else "all Qubits and 0 None"
-                extra_msg = "" if i == 0 else " and Before entanglement swapping"
+            # if debug:
+            #     expected_output = "4 Qubits and 4 None" if i == 0 else "all Qubits and 0 None"
+            #     extra_msg = "" if i == 0 else " and Before entanglement swapping"
+            #
+            #     memory_snapshot.show_all_memory_positions(
+            #         initial_msg=f"After entanglement in nodes {first_node}-3{extra_msg}:",
+            #         end_msg=expected_output)
 
-                memory_snapshot.show_all_memory_positions(
-                    initial_msg=f"After entanglement in nodes {first_node}-3{extra_msg}:",
-                    end_msg=expected_output)
+        # start the protocols
+        print(set_protocols)
+        for protocol in set_protocols:
+            protocol.start()
+
+        # Run the simulation
+        sim_run()
+        print(f"Entanglement simulation run in {sim_time()} nanoseconds")
+
+        # Disconnect the source from the nodes
+        for single_node in set_nodes:
+            self._disconnect_source_from_destination(single_node)
 
         results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
 
@@ -548,7 +567,19 @@ class StarNetwork:
         """
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
-        self._perform_entanglement(node1, node2)
+        protocols, nodes = self._perform_entanglement(node1, node2)
+        # start the protocols
+        for protocol in protocols:
+            protocol.start()
+
+        # Run the simulation
+        sim_run()
+        print(f"Entanglement simulation run in {sim_time()} nanoseconds")
+
+        # Disconnect the source from the nodes
+        for single_node in nodes:
+            self._disconnect_source_from_destination(single_node)
+
         return self._perform_entanglement_swapping(node1, node2, debug)
 
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
@@ -578,7 +609,7 @@ class StarNetwork:
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
                                                                      is_source=True, name="ProtocolSource",
                                                                      qsource_name=source_name)
-
+        protocol_remote = None
         if node1 == self._destinations_n - 1 or node2 == self._destinations_n - 1:
             protocol_remote = GenerateEntanglement(on_node=self._network.subcomponents["RemoteNode"],
                                                    is_remote=True, name="ProtocolRemote",
@@ -596,24 +627,31 @@ class StarNetwork:
                                                       name=f"ProtocolNode{node1}")
                 protocol_node2 = protocol_repeater
 
-            protocol_remote.start()
+            # protocol_remote.start()
         else:
             protocol_node1 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node1}"],
                                                   name=f"ProtocolNode{node1}")
             protocol_node2 = GenerateEntanglement(on_node=self._network.subcomponents[f"Node{node2}"],
                                                   name=f"ProtocolNode{node2}")
 
-        protocol_source.start()
-        protocol_node1.start()
-        protocol_node2.start()
+        # protocol_source.start()
+        # protocol_node1.start()
+        # protocol_node2.start()
+        #
+        # # Run the simulation
+        # sim_run()
+        # print(f"Entanglement simulation run in {sim_time()} nanoseconds")
+        #
+        # # Disconnect the source from the nodes
+        # self._disconnect_source_from_destination(node1)
+        # self._disconnect_source_from_destination(node2)
+        protocols = [protocol_source, protocol_node1, protocol_node2]
+        if protocol_remote is not None:
+            # add protocol_remote at the beginning of the list
+            protocols.insert(0, protocol_remote)
 
-        # Run the simulation
-        sim_run()
-        print(f"Entanglement simulation run in {sim_time()} nanoseconds")
-
-        # Disconnect the source from the nodes
-        self._disconnect_source_from_destination(node1)
-        self._disconnect_source_from_destination(node2)
+        nodes = [node1, node2]
+        return protocols, nodes
 
     def _perform_entanglement_swapping(self, node1: int, node2: int, debug: bool = False):
         """
