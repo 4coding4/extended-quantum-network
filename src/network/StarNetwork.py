@@ -401,6 +401,8 @@ class StarNetwork:
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
         source.subcomponents["QuantumSource1"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+
+        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         if n == self._destinations_n - 1:  # remote node
             if channel_n == 0:
                 destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
