@@ -11,6 +11,7 @@ class TestHelpersMainExperiment(unittest.TestCase):
     e = Experiment(star_network)
 
     test_name = "_test"
+    out_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../out")
 
     def test_experiment_setters_getters(self):
         old_num_each_simulation = self.e.num_each_simulation
@@ -35,6 +36,12 @@ class TestHelpersMainExperiment(unittest.TestCase):
         nodes: list = [1, 2, 4]
         debug: bool = False
         method = select_method(self.star_network, method_name, len(nodes))
+
+        self.e.num_each_simulation = 1
+        new_csv = self.out_folder + "/data" + self.test_name + ".csv"
+        self.e.csv_path = new_csv
+        new_fig = self.out_folder + "/fidelity-over-length" + self.test_name + ".png"
+        self.e.fig_path = new_fig
 
         self.e.run(method, nodes, debug)
 
