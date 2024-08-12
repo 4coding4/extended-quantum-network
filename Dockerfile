@@ -6,4 +6,5 @@ ARG PASSWORD
 ENV USERNAME_ENV=$USERNAME
 ENV PASSWORD_ENV=$PASSWORD
 
-RUN pip3 install --extra-index-url https://"$USERNAME_ENV":"$PASSWORD_ENV"@pypi.netsquid.org netsquid matplotlib tqdm seaborn flake8 pipreqs coverage genbadge[all]
+RUN pip3 install --extra-index-url https://$USERNAME_ENV:$PASSWORD_ENV@pypi.netsquid.org netsquid
+RUN pip3 install matplotlib tqdm seaborn flake8 pipreqs coverage genbadge[all]
