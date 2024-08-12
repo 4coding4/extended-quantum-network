@@ -1,0 +1,5 @@
+/opt/project/src/test_protocols_GenerateEntanglement.py:41:1: W391 blank line at end of file
+/opt/project/src/network/StarNetwork.py:384:13: F841 local variable 'selected_source_ports' is assigned to but never used
+/opt/project/src/network/StarNetwork.py:385:13: F841 local variable 'component_name' is assigned to but never used
+2     F841 local variable 'selected_source_ports' is assigned to but never used
+1     W391 blank line at end of file
