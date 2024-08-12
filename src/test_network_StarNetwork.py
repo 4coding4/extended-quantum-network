@@ -27,7 +27,7 @@ class TestNetworkStarNetwork(unittest.TestCase):
         self.assertEqual(2 / 1000, self.star_network.channels_length)
 
         old_models = self.star_network.models
-        self.assertEqual(None, old_models)
+        self.assertIsNone(old_models)
         self.star_network.models = {}
         self.assertEqual({}, self.star_network.models)
 
