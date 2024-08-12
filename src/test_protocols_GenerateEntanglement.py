@@ -37,5 +37,3 @@ class TestProtocolsGenerateEntanglement(unittest.TestCase):
 
         self.assertTrue(ps.is_connected)
         self.assertTrue(ps1.is_connected)
-
-
