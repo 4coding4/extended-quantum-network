@@ -34,7 +34,7 @@ class TestHelpersMainExperiment(unittest.TestCase):
     def test_run(self):
         method_name = "protocol_a"
         nodes: list = [1, 2, 4]
-        debug: bool = False
+        debug: bool = True
         method = select_method(self.star_network, method_name, len(nodes))
 
         self.e.num_each_simulation = 1
