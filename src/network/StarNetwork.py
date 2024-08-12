@@ -344,8 +344,6 @@ class StarNetwork:
 
     def _connect_source_to_destination(self, n: int,
                                        channel_n=0):
-        # TODO cognitive complexity is too high (sonarlint max is 15, this 16),
-        #  reduce by extrapolating the logic to a helper function
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -386,35 +384,25 @@ class StarNetwork:
         else:
             error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
-        # if channel_n == 0:
-        #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        # else:
-        #     source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        #     if n == self._destinations_n - 2:  # repeater
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        #     else:
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
-
         # old (keep it since we still need for simple cases/routing)
-        source.subcomponents["QuantumSource"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # source.subcomponents["QuantumSource"].ports
+        source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
-        source.subcomponents["QuantumSource1"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # source.subcomponents["QuantumSource1"].ports
+        source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+
         if n == self._destinations_n - 1:  # remote node
             if channel_n == 0:
-                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+                port_n_out = 0
             else:
-                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
+                port_n_out = 2
         elif n == self._destinations_n - 2:  # repeater
-            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+            port_n_out = 1
         else:
-            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+            port_n_out = 0
 
-        # new
-        # source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])  # enabled
-        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])  # enabled
+        destination.ports[port_pair.destination].forward_input(destination.qmemory.ports[f"qin{port_n_out}"])
 
     def _disconnect_source_from_destination(self, n: int):
         """
@@ -720,6 +708,9 @@ class StarNetwork:
                     except MemPositionEmptyError:
                         pass
         except ValueError as e:
+            print(e)
+            results = {"message": "Some Qubits were lost during transfer", "error": True}
+        except AttributeError as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
         return results
