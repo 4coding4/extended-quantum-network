@@ -3,7 +3,7 @@ coverage run --parallel-mode --source=./ -m unittest -v
 coverage combine
 coverage report
 #-m --skip-covered --skip-empty
-coverage xml
+coverage xml -o /opt/project/reports/coverage/coverage.xml
 coverage html
 #--skip-covered --skip-empty
 #open htmlcov/index.html
