@@ -401,16 +401,26 @@ class StarNetwork:
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
         source.subcomponents["QuantumSource1"].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # if n == self._destinations_n - 1:  # remote node
+        #     if channel_n == 0:
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        #     else:
+        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
+        # elif n == self._destinations_n - 2:  # repeater
+        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+        # else:
+        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
         if n == self._destinations_n - 1:  # remote node
             if channel_n == 0:
-                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+                port_n_out = 0
             else:
-                destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
+                port_n_out = 2
         elif n == self._destinations_n - 2:  # repeater
-            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
+            port_n_out = 1
         else:
-            destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+            port_n_out = 0
 
+        destination.ports[port_pair.destination].forward_input(destination.qmemory.ports[f"qin{port_n_out}"])
         # new
         # source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])  # enabled
         # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
