@@ -401,15 +401,7 @@ class StarNetwork:
 
         # source.subcomponents["QuantumSource1"].ports
         source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        # if n == self._destinations_n - 1:  # remote node
-        #     if channel_n == 0:
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        #     else:
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin2"])
-        # elif n == self._destinations_n - 2:  # repeater
-        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
-        # else:
-        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+
         if n == self._destinations_n - 1:  # remote node
             if channel_n == 0:
                 port_n_out = 0
