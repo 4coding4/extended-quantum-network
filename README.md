@@ -1,7 +1,7 @@
 # Quantum Network
-[![Tests Status](./reports/junit/junit-badge.svg?dummy=8484744)](./reports/junit/report.html)
-[![Coverage Status](./reports/coverage/coverage-badge.svg?dummy=8484744)](./reports/coverage/index.html)
-[![Flake8 Status](./reports/flake8/flake8-badge.svg?dummy=8484744)](./reports/flake8/index.html)
+[![Tests Status](./badges/tests-badge.svg?dummy=8484744)](./reports/junit/report.html)
+[![Coverage Status](./badges/coverage-badge.svg?dummy=8484744)](./reports/coverage/index.html)
+[![Flake8 Status](./badges/flake8-badge.svg?dummy=8484744)](./reports/flake8/index.html)
 
 This is an implementation of a Quantum Network in python using the NetSquid library. The topology of the network is a Star topology, this means that the center of the network is a Quantum Source that generates entangled Bell pairs. On the other hand, the points of the star are nodes with quantum memories.
 
