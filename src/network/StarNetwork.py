@@ -384,16 +384,6 @@ class StarNetwork:
         else:
             error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
-        # if channel_n == 0:
-        #     source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        #     destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        # else:
-        #     source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        #     if n == self._destinations_n - 2:  # repeater
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
-        #     else:
-        #         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin1"])
-
         # old (keep it since we still need for simple cases/routing)
         # source.subcomponents["QuantumSource"].ports
         source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
