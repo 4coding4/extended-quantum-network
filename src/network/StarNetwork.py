@@ -403,10 +403,6 @@ class StarNetwork:
             port_n_out = 0
 
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports[f"qin{port_n_out}"])
-        # new
-        # source.subcomponents[component_name].ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])  # enabled
-        # selected_source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])  # enabled
 
     def _disconnect_source_from_destination(self, n: int):
         """
