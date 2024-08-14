@@ -418,6 +418,10 @@ class StarNetwork:
         q0: dict = ports["qout0"].forwarded_ports
         q1: dict = ports["qout1"].forwarded_ports
 
+        ports1: dict = self._source.subcomponents["QuantumSource1"].ports
+        q01: dict = ports1["qout0"].forwarded_ports
+        q11: dict = ports1["qout1"].forwarded_ports
+
         # Look for the node n and disconnect it. If not found, raises an exception
         if len(q0) != 0 and (q0["output"].name == f"conn|{n}|C_Source->Node{n}"
                              or q0["output"].name == f"conn|{n}|C_Source->Repeater"):
@@ -425,6 +429,12 @@ class StarNetwork:
         elif len(q1) != 0 and (q1["output"].name == f"conn|{n}|C_Source->Node{n}"
                                or q1["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout1"].disconnect()
+        elif len(q01) != 0 and (q01["output"].name == f"conn|{n}|C_Source1->Node{n}"
+                             or q01["output"].name == f"conn|{n}|C_Source1->Repeater"):
+            ports1["qout0"].disconnect()
+        elif len(q11) != 0 and (q11["output"].name == f"conn|{n}|C_Source1->Node{n}"
+                               or q11["output"].name == f"conn|{n}|C_Source1->Repeater"):
+            ports1["qout1"].disconnect()
         else:
             error_exit(f"The source node is not connected to Node {n}")
 
