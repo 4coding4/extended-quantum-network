@@ -667,6 +667,9 @@ class StarNetwork:
         except ValueError as e:
             print(e)
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
+        except AttributeError as e:
+            print(e)
+            result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
         return result
 
     def _perform_new_entanglement_swapping(self, node1: int, node2: int, node3: int, debug: bool = False) \
