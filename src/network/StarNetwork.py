@@ -565,12 +565,17 @@ class StarNetwork:
         self._connect_source_to_destination(node1, channel_n)
         self._connect_source_to_destination(node2, channel_n)
 
-        if channel_n == 0:
-            source_name = "QuantumSource"
-            remote_source_name = "RemoteQuantumSource"
-        else:
-            source_name = "QuantumSource" + str(channel_n)
-            remote_source_name = "RemoteQuantumSource" + str(channel_n)
+        # select the sources that should be connected to the quantum channels and generate entanglement
+        channel_n_str = "" if channel_n == 0 else str(channel_n)
+        source_name = "QuantumSource" + channel_n_str
+        remote_source_name = "Remote" + source_name
+
+        # if channel_n == 0:
+        #     source_name = "QuantumSource"
+        #     remote_source_name = "RemoteQuantumSource"
+        # else:
+        #     source_name = "QuantumSource" + str(channel_n)
+        #     remote_source_name = "RemoteQuantumSource" + str(channel_n)
 
         # Initialize and start the protocols
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
