@@ -570,13 +570,6 @@ class StarNetwork:
         source_name = "QuantumSource" + channel_n_str
         remote_source_name = "Remote" + source_name
 
-        # if channel_n == 0:
-        #     source_name = "QuantumSource"
-        #     remote_source_name = "RemoteQuantumSource"
-        # else:
-        #     source_name = "QuantumSource" + str(channel_n)
-        #     remote_source_name = "RemoteQuantumSource" + str(channel_n)
-
         # Initialize and start the protocols
         protocol_source: GenerateEntanglement = GenerateEntanglement(on_node=self._network.subcomponents["Source"],
                                                                      is_source=True, name="ProtocolSource",
