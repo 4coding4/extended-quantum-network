@@ -342,8 +342,27 @@ class StarNetwork:
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
-    def _connect_source_to_destination(self, n: int,
-                                       channel_n=0):
+    def get_port_n_out(self, n: int, channel_n: int) -> int:
+        """
+        Given the number of a node and the index of a quantum channel, return the index of the output port for the node.
+
+        :param n: The number of the node
+        :param channel_n: The index of the quantum channel
+        :return: The index of the output port for the node
+        """
+        if n == self._destinations_n - 1:  # remote node
+            if channel_n == 0:
+                port_n_out = 0
+            else:
+                port_n_out = 2
+        elif n == self._destinations_n - 2:  # repeater
+            port_n_out = 1
+        else:
+            port_n_out = 0
+
+        return port_n_out
+
+    def _connect_source_to_destination(self, n: int, channel_n=0):
         """
         Given the number of a node, connect it to the source's quantum source component.
 
@@ -364,7 +383,6 @@ class StarNetwork:
             if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
                 error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
-        # TODO REFACTOR THIS
         if len(source_ports["qout0"].forwarded_ports) == 0:
             port_n = 0
             selected_source_ports = source_ports
@@ -392,15 +410,7 @@ class StarNetwork:
         # source.subcomponents["QuantumSource1"].ports
         source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
 
-        if n == self._destinations_n - 1:  # remote node
-            if channel_n == 0:
-                port_n_out = 0
-            else:
-                port_n_out = 2
-        elif n == self._destinations_n - 2:  # repeater
-            port_n_out = 1
-        else:
-            port_n_out = 0
+        port_n_out = self.get_port_n_out(n, channel_n)
 
         destination.ports[port_pair.destination].forward_input(destination.qmemory.ports[f"qin{port_n_out}"])
 
@@ -655,6 +665,9 @@ class StarNetwork:
                     except MemPositionEmptyError:
                         pass
         except ValueError as e:
+            print(e)
+            result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
+        except AttributeError as e:
             print(e)
             result = {"message": "Either one or both Qubits were lost during transfer", "error": True}
         return result

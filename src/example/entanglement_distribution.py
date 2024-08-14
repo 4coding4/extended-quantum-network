@@ -188,7 +188,7 @@ def main(verbose: bool = False, num_each_sim: int = 100, csv_file: str = "data.c
     for length in lengths:
         print(f"Nodes are entangled after {length} meters")
         fidelity_values = []
-        for i in range(num_each_sim):
+        for _ in range(num_each_sim):
             # Create a network with a quantum channel of length `length`
             qnetwork: Network = network_setup(length=length)
             # Create a protocol that entangles the nodes Alice and Bob
