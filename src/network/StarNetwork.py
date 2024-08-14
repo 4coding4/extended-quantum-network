@@ -383,7 +383,6 @@ class StarNetwork:
             if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
                 error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
-        # TODO REFACTOR THIS
         if len(source_ports["qout0"].forwarded_ports) == 0:
             port_n = 0
             selected_source_ports = source_ports
