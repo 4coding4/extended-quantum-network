@@ -430,10 +430,10 @@ class StarNetwork:
                                or q1["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports["qout1"].disconnect()
         elif len(q01) != 0 and (q01["output"].name == f"conn|{n}|C_Source1->Node{n}"
-                             or q01["output"].name == f"conn|{n}|C_Source1->Repeater"):
+                                or q01["output"].name == f"conn|{n}|C_Source1->Repeater"):
             ports1["qout0"].disconnect()
         elif len(q11) != 0 and (q11["output"].name == f"conn|{n}|C_Source1->Node{n}"
-                               or q11["output"].name == f"conn|{n}|C_Source1->Repeater"):
+                                or q11["output"].name == f"conn|{n}|C_Source1->Repeater"):
             ports1["qout1"].disconnect()
         else:
             error_exit(f"The source node is not connected to Node {n}")
