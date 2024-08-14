@@ -361,8 +361,8 @@ class StarNetwork:
             port_n_out = 0
 
         return port_n_out
-    def _connect_source_to_destination(self, n: int,
-                                       channel_n=0):
+
+    def _connect_source_to_destination(self, n: int, channel_n=0):
         """
         Given the number of a node, connect it to the source's quantum source component.
 
