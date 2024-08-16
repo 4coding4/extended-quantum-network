@@ -366,20 +366,8 @@ class StarNetwork:
         # can only be 0 or 1
         if len(source_ports["qout0"].forwarded_ports) == 0:
             port_n = 0
-            # selected_source_ports = source_ports
-            # component_name = "QuantumSource"
         elif len(source_ports["qout1"].forwarded_ports) == 0:
             port_n = 1
-            # selected_source_ports = source_ports
-            # component_name = "QuantumSource"
-        # elif len(source_ports1["qout0"].forwarded_ports) == 0:
-        #     port_n = 0
-        #     selected_source_ports = source_ports1
-        #     component_name = "QuantumSource1"
-        # elif len(source_ports1["qout1"].forwarded_ports) == 0:
-        #     port_n = 1
-        #     selected_source_ports = source_ports1
-        #     component_name = "QuantumSource1"
         else:
             error_exit("get_port_n_in: Two nodes have already been connected to the source's QuantumSource component called: " + component_name)
 
