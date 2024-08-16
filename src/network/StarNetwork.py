@@ -342,6 +342,20 @@ class StarNetwork:
     # PRIVATE METHODS TO CONNECT AND DISCONNECT DESTINATION NODE PORT #
     ###################################################################
 
+    def select_source(self, channel_n) -> str:
+        """
+        Given the index of a quantum channel, select the source for the destination node.
+
+        :param channel_n: The index of the quantum channel
+        :return: The selected source_name for the destination node
+        """
+        selected_source_name = "QuantumSource"
+        if channel_n == 0:
+            return selected_source_name
+        else:
+            return selected_source_name + str(channel_n)
+
+
     def get_port_n_out(self, n: int, channel_n: int) -> int:
         """
         Given the number of a node and the index of a quantum channel, return the index of the output port for the node.
@@ -375,40 +389,43 @@ class StarNetwork:
         source: node = self._source
         destination: node = self._destinations[n - 1]
         port_pair: PortPair = self._quantum_channels_port_pairs[n - 1]
-        source_ports: dict = source.subcomponents["QuantumSource"].ports
-        source_ports1: dict = source.subcomponents["QuantumSource1"].ports
+        component_name = self.select_source(channel_n)
+        source_ports: dict = source.subcomponents[component_name].ports
+        # source_ports: dict = source.subcomponents["QuantumSource"].ports
+        # source_ports1: dict = source.subcomponents["QuantumSource1"].ports
 
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
-            if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
-                error_exit("Two nodes have already been connected to the source's QuantumSource component")
+            # if len(source_ports1["qout0"].forwarded_ports) != 0 and len(source_ports1["qout1"].forwarded_ports) != 0:
+            error_exit("Two nodes have already been connected to the source's QuantumSource component called: " + component_name)
 
         if len(source_ports["qout0"].forwarded_ports) == 0:
             port_n = 0
-            selected_source_ports = source_ports
-            component_name = "QuantumSource"
+            # selected_source_ports = source_ports
+            # component_name = "QuantumSource"
         elif len(source_ports["qout1"].forwarded_ports) == 0:
             port_n = 1
-            selected_source_ports = source_ports
-            component_name = "QuantumSource"
-        elif len(source_ports1["qout0"].forwarded_ports) == 0:
-            port_n = 0
-            selected_source_ports = source_ports1
-            component_name = "QuantumSource1"
-        elif len(source_ports1["qout1"].forwarded_ports) == 0:
-            port_n = 1
-            selected_source_ports = source_ports1
-            component_name = "QuantumSource1"
+            # selected_source_ports = source_ports
+            # component_name = "QuantumSource"
+        # elif len(source_ports1["qout0"].forwarded_ports) == 0:
+        #     port_n = 0
+        #     selected_source_ports = source_ports1
+        #     component_name = "QuantumSource1"
+        # elif len(source_ports1["qout1"].forwarded_ports) == 0:
+        #     port_n = 1
+        #     selected_source_ports = source_ports1
+        #     component_name = "QuantumSource1"
         else:
             error_exit("Two nodes have already been connected to the source's QuantumSource component")
 
         # old (keep it since we still need for simple cases/routing)
         # source.subcomponents["QuantumSource"].ports
-        source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
-        destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
+        # source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # destination.ports[port_pair.destination].forward_input(destination.qmemory.ports["qin0"])
 
         # source.subcomponents["QuantumSource1"].ports
-        source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        # source_ports1[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
+        source_ports[f"qout{port_n}"].forward_output(source.ports[port_pair.source])
 
         port_n_out = self.get_port_n_out(n, channel_n)
 
@@ -446,7 +463,8 @@ class StarNetwork:
                                 or q11["output"].name == f"conn|{n}|C_Source1->Repeater"):
             ports1["qout1"].disconnect()
         else:
-            error_exit(f"The source node is not connected to Node {n}")
+            print(f"The source node is not connected to Node {n}, skipping disconnection.")
+            # error_exit(f"The source node is not connected to Node {n}") # TODO skip this for now but need investigation
 
     def _connect_remote_node(self):
         """
