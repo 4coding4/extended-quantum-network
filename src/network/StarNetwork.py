@@ -434,37 +434,12 @@ class StarNetwork:
         assert (1 <= n <= self._destinations_n - 1)
 
         ports: dict = self._source.subcomponents["QuantumSource"].ports
-        print("ports", ports)
         q0: dict = ports["qout0"].forwarded_ports
-        print("q0", q0)
-        try:
-            print("q0['output'].name", q0["output"].name)
-        except Exception:
-            pass
         q1: dict = ports["qout1"].forwarded_ports
-        print("q1", q1)
-        try:
-            print("q1['output'].name", q1["output"].name)
-        except Exception:
-            pass
 
         ports1: dict = self._source.subcomponents["QuantumSource1"].ports
-        print("ports1", ports1)
         q01: dict = ports1["qout0"].forwarded_ports
-        print("q01", q01)
-        print("len(q01)", len(q01))
-        try:
-            print("q01['output'].name", q01["output"].name)
-            flag: bool = q0["output"].name == f"conn|{n}|C_Source->Node{n}"
-            print("flag", flag)
-        except Exception:
-            pass
         q11: dict = ports1["qout1"].forwarded_ports
-        print("q11", q11)
-        try:
-            print("q11['output'].name", q11["output"].name)
-        except Exception:
-            pass
 
         # Look for the node n and disconnect it. If not found, raises an exception
         if len(q0) != 0 and (q0["output"].name == f"conn|{n}|C_Source->Node{n}"
@@ -480,8 +455,7 @@ class StarNetwork:
                                 or q11["output"].name == f"conn|{n}|C_Source->Repeater"):
             ports1["qout1"].disconnect()
         else:
-            # print(f"The source node is not connected to Node {n}, skipping disconnection.")
-            error_exit(f"The source node is not connected to Node {n}") # TODO skip this for now but need investigation
+            error_exit(f"The source node is not connected to Node {n}")
 
     def _connect_remote_node(self):
         """
