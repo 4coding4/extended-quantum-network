@@ -373,7 +373,6 @@ class StarNetwork:
 
         return port_n
 
-
     def get_port_n_out(self, n: int, channel_n: int) -> int:
         """
         Given the number of a node and the index of a quantum channel, return the index of the output port for the node.
