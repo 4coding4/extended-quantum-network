@@ -369,7 +369,8 @@ class StarNetwork:
         elif len(source_ports["qout1"].forwarded_ports) == 0:
             port_n = 1
         else:
-            error_exit("get_port_n_in: Two nodes have already been connected to the source's QuantumSource component called: " + component_name)
+            error_exit("get_port_n_in: Two nodes have already been connected to the "
+                       "source's QuantumSource component called: " + component_name)
 
         return port_n
 
@@ -411,7 +412,8 @@ class StarNetwork:
 
         # Check if both the ports are already connected to a node
         if len(source_ports["qout0"].forwarded_ports) != 0 and len(source_ports["qout1"].forwarded_ports) != 0:
-            error_exit("_connect_source_to_destination: Two nodes have already been connected to the source's QuantumSource component called: " + component_name)
+            error_exit("_connect_source_to_destination: Two nodes have already been connected to the "
+                       "source's QuantumSource component called: " + component_name)
 
         port_n = self.get_port_n_in(source_ports, component_name)
 
