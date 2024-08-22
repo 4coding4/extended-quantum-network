@@ -10,7 +10,7 @@ from src.helper.network.PortPair import PortPair
 from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
-from src.helper.network.entanglement_swapping import apply_gates, get_results, \
+from src.helper.network.entanglement_swapping import apply_gates, \
     perform_and_get_bell_measurement_w_state, get_results_qubits
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
