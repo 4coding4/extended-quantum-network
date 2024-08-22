@@ -2,7 +2,7 @@ from netsquid import sim_run, sim_time
 from netsquid.components import QuantumChannel
 from netsquid.components.qmemory import MemPositionEmptyError, Qubit
 from netsquid.nodes import Network, node
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
 
 from src.helper.error.error import error_exit
 from src.helper.network.MemorySnapshot import MemorySnapshot
@@ -629,15 +629,7 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def entanglement_swapping(self, nodes: List[int], debug: bool = False) \
-            -> List[Dict[str, Union[List[Qubit], float, bool]]]:
-        """
-        Given 2 or 3 nodes, perform entanglement swapping only if 1 of the nodes is the Repeater.
-
-        :param nodes: The  nodes, where the last one is the Remote Node
-        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
-        :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
-        """
+    def get_entanglement_swapping_parameters(self, nodes) -> Tuple[List[List[int]], List[int], List[int], List[int]]:
         l = len(nodes)
         if l == 2:
             m_mem_positions = [[]]
@@ -654,6 +646,20 @@ class StarNetwork:
             repeater_memory_positions = 4
         else:
             error_exit("Invalid number of nodes for entanglement swapping")
+
+        return m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions
+
+    def entanglement_swapping(self, nodes: List[int], debug: bool = False) \
+            -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+        """
+        Given 2 or 3 nodes, perform entanglement swapping only if 1 of the nodes is the Repeater.
+
+        :param nodes: The  nodes, where the last one is the Remote Node
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
+        :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
+        """
+        l = len(nodes)
+        m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions = self.get_entanglement_swapping_parameters(nodes)
 
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
@@ -701,10 +707,7 @@ class StarNetwork:
                         repeater_memory.discard(i)
                     except MemPositionEmptyError:
                         pass
-        except ValueError as e:
-            print(e)
-            results = {"message": "Some Qubits were lost during transfer", "error": True}
-        except AttributeError as e:
+        except (ValueError, AttributeError) as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
         return results
