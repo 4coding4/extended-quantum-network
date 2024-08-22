@@ -567,6 +567,7 @@ class StarNetwork:
 
         self._perform_entanglement(node1, node2)
         return self.entanglement_swapping([node1, node2], debug)
+
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
         Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
