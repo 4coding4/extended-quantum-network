@@ -542,7 +542,6 @@ class StarNetwork:
                     initial_msg=f"After entanglement in nodes {first_node}-3{extra_msg}:",
                     end_msg=expected_output)
 
-        # results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
         results = self.entanglement_swapping([node1, node2, node3], debug)
 
         if debug:
@@ -567,7 +566,6 @@ class StarNetwork:
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
-        # return self._perform_entanglement_swapping(node1, node2, debug)
         return self.entanglement_swapping([node1, node2], debug)
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
