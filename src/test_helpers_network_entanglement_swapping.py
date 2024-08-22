@@ -90,7 +90,6 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
         # test with an empty list
         empty_list = []
         expected_error_msg = "Invalid number of qubits in get_results_qubits"
-        # expected_exit_code = 1
         with self.assertRaises(SystemExit) as cm:
             _ = get_results_qubits(empty_list)
         self.assertEqual(expected_error_msg, cm.exception.args[0])
