@@ -691,7 +691,7 @@ class StarNetwork:
                 # then do the same for the position 2 and 3
 
                 # check that len(states) ==  len(positions)
-                if len(states)!= len(positions):
+                if len(states) != len(positions):
                     error_exit("Mismatch length between states and positions in entanglement swapping")
                 # apply gates for first and second state/position for l=3 otherwise -1
                 for i in range(len(states)):
