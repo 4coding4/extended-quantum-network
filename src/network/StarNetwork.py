@@ -703,8 +703,8 @@ class StarNetwork:
             print(e)
 
         try:
-            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
-                      for node_n in nodes_list]  # the last 2 are always "RemoteNode" if l=3 otherwise only the last one is always "RemoteNode"
+            # the last 2 are always "RemoteNode" if l=3 otherwise only the last one is always "RemoteNode"
+            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode" for node_n in nodes_list]
             # pop the qubits from the memory positions in the nodes specified by the labels (none repeater) & positions
             qubits = [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
                       for label, mem_pos in zip(labels, mem_positions)]
