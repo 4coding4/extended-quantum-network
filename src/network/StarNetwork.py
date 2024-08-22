@@ -629,7 +629,7 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def get_entanglement_swapping_parameters(self, nodes) -> Tuple[List[List[int]], List[int], List[int], List[int]]:
+    def get_entanglement_swapping_parameters(self, nodes) -> Tuple[List[List[int]], List[int], List[int], int]:
         l = len(nodes)
         if l == 2:
             m_mem_positions = [[]]
@@ -657,7 +657,7 @@ class StarNetwork:
             states.append(state)
         return states
 
-    def try_discard_mem_positions_repeater(self, repeater_memory, repeater_memory_positions) -> None:
+    def try_discard_mem_positions_repeater(self, repeater_memory, repeater_memory_positions: int) -> None:
         for i in range(repeater_memory_positions):
             try:
                 repeater_memory.discard(i)
