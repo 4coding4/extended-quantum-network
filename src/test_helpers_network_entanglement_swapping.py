@@ -2,7 +2,8 @@ import unittest
 
 from netsquid.qubits import create_qubits
 
-from src.helper.network.entanglement_swapping import perform_and_get_bell_measurement_w_state, get_results, apply_gates
+from src.helper.network.entanglement_swapping import perform_and_get_bell_measurement_w_state, get_results, apply_gates, \
+    get_results_qubits
 
 from src.network.StarNetwork import StarNetwork
 
@@ -71,6 +72,31 @@ class TestHelpersNetworkEntanglementSwapping(unittest.TestCase):
             second = m[1]
             self.assertEqual(expected_second,
                              second)
+
+    def test_get_results_qubits_comparison(self):
+        pair_w_2 = [self.q0, self.q1]
+        results_w_2 = get_results_qubits(pair_w_2)
+        result_w_2 = get_results([pair_w_2])
+        # check that the results are the exact same
+        self.assertEqual(results_w_2, result_w_2)
+
+        channel_1_pair = [self.q0, self.q3]
+        channel_0_pair = [self.q1, self.q2]
+        results_w_4 = get_results_qubits(self.qubits)
+        result_w_4 = get_results([channel_1_pair, channel_0_pair])
+        # check that the results are the exact same
+        self.assertEqual(results_w_4, result_w_4)
+
+        # test with an empty list
+        empty_list = []
+        expected_error_msg = "Invalid number of qubits in get_results_qubits"
+        # expected_exit_code = 1
+        with self.assertRaises(SystemExit) as cm:
+            _ = get_results_qubits(empty_list)
+        self.assertEqual(expected_error_msg, cm.exception.args[0])
+
+        result_empty_list1 = get_results(empty_list)
+        self.assertEqual([], result_empty_list1)
 
     def test_get_results(self):
         channel_1_pair = [self.q0, self.q3]
