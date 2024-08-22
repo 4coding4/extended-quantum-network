@@ -631,7 +631,15 @@ class StarNetwork:
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
 
-    def entanglement_swapping(self, nodes: List[int], debug: bool = False):
+    def entanglement_swapping(self, nodes: List[int], debug: bool = False) \
+            -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+        """
+        Given 2 or 3 nodes, perform entanglement swapping only if 1 of the nodes is the Repeater.
+
+        :param nodes: The  nodes, where the last one is the Remote Node
+        :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
+        :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
+        """
         l = len(nodes)
         if l == 2:
             m_mem_positions = [[]]
