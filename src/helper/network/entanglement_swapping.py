@@ -83,13 +83,13 @@ def get_results_qubits(qubits: List[Qubit]) -> List[Dict[str, Union[List[Qubit],
     :param qubits: qubits
     :return: A list with the results of the entanglement swapping protocol
     """
-    l = len(qubits)
+    length = len(qubits)
     pairs = []
-    if l == 2:
+    if length == 2:
         # pair = [qubit_node1, qubit_node2]
         pair = [qubits[0], qubits[1]]
         pairs.append(pair)
-    elif l == 4:
+    elif length == 4:
         # channel_1_pair = [qubit_node1, qubit_node3_1]
         # channel_0_pair = [qubit_node2, qubit_node3]
         # results = get_results([channel_1_pair, channel_0_pair])

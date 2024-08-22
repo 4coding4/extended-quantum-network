@@ -631,14 +631,14 @@ class StarNetwork:
         self._disconnect_source_from_destination(node2)
 
     def get_entanglement_swapping_parameters(self, nodes) -> Tuple[List[List[int]], List[int], List[int], int]:
-        l = len(nodes)
-        if l == 2:
+        length = len(nodes)
+        if length == 2:
             m_mem_positions = [[]]
             positions = [-1]
             nodes_list = nodes
             mem_positions = [0, 0]
             repeater_memory_positions = 2
-        elif l == 3:
+        elif length == 3:
             m_mem_positions = [[0, 1], [2, 3]]
             positions = [0, 1]
             nodes_list = nodes
@@ -674,7 +674,6 @@ class StarNetwork:
         :param debug: If True, print the memory positions, before the entanglement swapping (default is False)
         :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
         """
-        l = len(nodes)
         m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions = \
             self.get_entanglement_swapping_parameters(nodes)
 
@@ -683,7 +682,7 @@ class StarNetwork:
         try:
             if any(single_node == self._destinations_n - 1 for single_node in nodes):
                 if debug:
-                    print('entanglement_swapping with #nodes:' + str(l))
+                    print('entanglement_swapping with #nodes:' + str(len(nodes)))
                 states = self.get_bell_states(m_mem_positions, debug)
 
                 # swap the qubits in memory position 0 and 1,
