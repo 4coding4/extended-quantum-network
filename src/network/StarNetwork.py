@@ -715,7 +715,7 @@ class StarNetwork:
             # try to discard the memory positions in the repeater
             if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
                 # list of the memory positions from 0 to 3 (both included)
-                self.try_discard_mem_positions_repeater(repeater_memory, mem_positions)
+                self.try_discard_mem_positions_repeater(repeater_memory, repeater_memory_positions)
         except (ValueError, AttributeError) as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
