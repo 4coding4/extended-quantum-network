@@ -642,7 +642,7 @@ class StarNetwork:
             m_mem_positions = [[0, 1], [2, 3]]
             positions = [0, 1]
             nodes_list = nodes
-            nodes_list.append(nodes_list[-1]) # the last element again
+            nodes_list.append(nodes_list[-1])  # the last element again
             mem_positions = [0, 0, 0, 1]  # 1 because "RemoteNode" has 2 mem positions
             repeater_memory_positions = 4
         else:
