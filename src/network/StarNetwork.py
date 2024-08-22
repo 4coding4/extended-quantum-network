@@ -647,7 +647,6 @@ class StarNetwork:
             nodes_list = nodes
             mem_positions = [0, 0]
             repeater_memory_positions = 2
-            # return self._perform_entanglement_swapping(nodes[0], nodes[1], debug)
         elif l == 3:
             m_mem_positions = [[0, 1], [2, 3]]
             positions = [0, 1]
@@ -655,7 +654,6 @@ class StarNetwork:
             nodes_list.append(nodes_list[-1]) # the last element again
             mem_positions = [0, 0, 0, 1]  # 1 because "RemoteNode" has 2 mem positions
             repeater_memory_positions = 4
-            # return self._perform_new_entanglement_swapping(nodes[0], nodes[1], nodes[2], debug)
         else:
             error_exit("Invalid number of nodes for entanglement swapping")
 
@@ -663,8 +661,6 @@ class StarNetwork:
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
         try:
             if any(single_node == self._destinations_n - 1 for single_node in nodes):
-                # m_mem_positions = [0, 1]
-                # m1_mem_positions = [2, 3]
                 if debug:
                     print('entanglement_swapping with #nodes:' + str(l))
                 states = []
@@ -698,9 +694,6 @@ class StarNetwork:
             for i in range(repeater_memory_positions):
                 _, = repeater_memory.peek(i)
 
-            # channel_1_pair = [qubit_node1, qubit_node3_1]
-            # channel_0_pair = [qubit_node2, qubit_node3]
-            # results = get_results([channel_1_pair, channel_0_pair])
             results = get_results_qubits(qubits)
             # try to discard the memory positions in the repeater
             if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
