@@ -75,6 +75,7 @@ def get_results(pairs: List[List[Qubit]]) -> List[Dict[str, Union[List[Qubit], f
         results.append(get_result(pair))
     return results
 
+
 def get_results_qubits(qubits: List[Qubit]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
     """
     Get the results of the entanglement swapping protocol.
