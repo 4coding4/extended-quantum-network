@@ -2,6 +2,7 @@ from netsquid.components import INSTR_X, INSTR_Z
 from netsquid.components.qmemory import Qubit
 from typing import List, Dict, Union
 
+from src.helper.error.error import error_exit
 from src.helper.network.entanglement_swapping_utils.bell_measurement import perform_bell_measurement, \
     print_bell_measurement
 from src.helper.network.entanglement_swapping_utils.results import get_result
@@ -73,3 +74,29 @@ def get_results(pairs: List[List[Qubit]]) -> List[Dict[str, Union[List[Qubit], f
     for pair in pairs:
         results.append(get_result(pair))
     return results
+
+def get_results_qubits(qubits: List[Qubit]) -> List[Dict[str, Union[List[Qubit], float, bool]]]:
+    """
+    Get the results of the entanglement swapping protocol.
+
+    :param qubits: qubits
+    :return: A list with the results of the entanglement swapping protocol
+    """
+    l = len(qubits)
+    pairs = []
+    if l == 2:
+        # pair = [qubit_node1, qubit_node2]
+        pair = [qubits[0], qubits[1]]
+        pairs.append(pair)
+    elif l == 4:
+        # channel_1_pair = [qubit_node1, qubit_node3_1]
+        # channel_0_pair = [qubit_node2, qubit_node3]
+        # results = get_results([channel_1_pair, channel_0_pair])
+        pair1 = [qubits[0], qubits[3]]
+        pair2 = [qubits[1], qubits[2]]
+        pairs.append(pair1)
+        pairs.append(pair2)
+    else:
+        error_exit("Invalid number of qubits in get_results_qubits")
+
+    return get_results(pairs)

@@ -11,7 +11,7 @@ from src.helper.network.Factory.QuantumChannel import QuantumChannelFactory
 from src.helper.network.Factory.QuantumProcessor import QuantumProcessorFactory
 from src.helper.network.Factory.QuantumSource import QuantumSourceFactory
 from src.helper.network.entanglement_swapping import apply_gates, get_results, \
-    perform_and_get_bell_measurement_w_state
+    perform_and_get_bell_measurement_w_state, get_results_qubits
 from src.protocols.GenerateEntanglement import GenerateEntanglement
 
 
@@ -542,7 +542,8 @@ class StarNetwork:
                     initial_msg=f"After entanglement in nodes {first_node}-3{extra_msg}:",
                     end_msg=expected_output)
 
-        results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
+        # results = self._perform_new_entanglement_swapping(node1, node2, node3, debug)
+        results = self.entanglement_swapping([node1, node2, node3], debug)
 
         if debug:
             expected_output = "all None"
@@ -566,8 +567,8 @@ class StarNetwork:
         assert (1 <= node1 <= self._destinations_n - 1 and 1 <= node2 <= self._destinations_n - 1 and node1 != node2)
 
         self._perform_entanglement(node1, node2)
-        return self._perform_entanglement_swapping(node1, node2, debug)
-
+        # return self._perform_entanglement_swapping(node1, node2, debug)
+        return self.entanglement_swapping([node1, node2], debug)
     def _perform_entanglement(self, node1: int, node2: int, channel_n=0):
         """
         Given two node indices, generate a bell pair and send one qubit to `node1` and one qubit to `node2`. The
@@ -629,6 +630,85 @@ class StarNetwork:
         # Disconnect the source from the nodes
         self._disconnect_source_from_destination(node1)
         self._disconnect_source_from_destination(node2)
+
+    def entanglement_swapping(self, nodes: List[int], debug: bool = False):
+        l = len(nodes)
+        if l == 2:
+            m_mem_positions = [[]]
+            positions = [-1]
+            nodes_list = nodes
+            mem_positions = [0, 0]
+            repeater_memory_positions = 2
+            # return self._perform_entanglement_swapping(nodes[0], nodes[1], debug)
+        elif l == 3:
+            m_mem_positions = [[0, 1], [2, 3]]
+            positions = [0, 1]
+            nodes_list = nodes
+            nodes_list.append(nodes_list[-1]) # the last element again
+            mem_positions = [0, 0, 0, 1]  # 1 because "RemoteNode" has 2 mem positions
+            repeater_memory_positions = 4
+            # return self._perform_new_entanglement_swapping(nodes[0], nodes[1], nodes[2], debug)
+        else:
+            error_exit("Invalid number of nodes for entanglement swapping")
+
+        repeater_memory = self._network.subcomponents["Repeater"].qmemory
+        remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
+        try:
+            if any(single_node == self._destinations_n - 1 for single_node in nodes):
+                # m_mem_positions = [0, 1]
+                # m1_mem_positions = [2, 3]
+                if debug:
+                    print('entanglement_swapping with #nodes:' + str(l))
+                states = []
+                for m_mem_position_pair in m_mem_positions:
+                    _, state = perform_and_get_bell_measurement_w_state(repeater_memory, m_mem_position_pair, debug)
+                    states.append(state)
+
+                # swap the qubits in memory position 0 and 1,
+                # and then apply the necessary gates
+                # then do the same for the position 2 and 3
+
+                # check that len(states) ==  len(positions)
+                if len(states)!= len(positions):
+                    error_exit("Mismatch length between states and positions in entanglement swapping")
+                # apply gates for first and second state/position for l=3 otherwise -1
+                for i in range(len(states)):
+                    state = states[i]
+                    position = positions[i]
+                    apply_gates(state, remote_node_memory, position, debug)
+
+        except MemPositionEmptyError as e:
+            print(e)
+
+        try:
+            labels = [f"Node{node_n}" if node_n != self._destinations_n - 1 else "RemoteNode"
+                      for node_n in nodes_list]  # the last 2 are always "RemoteNode" if l=3 otherwise only the last one is always "RemoteNode"
+            # pop the qubits from the memory positions in the nodes specified by the labels (none repeater) & positions
+            qubits = [self._network.subcomponents[label].qmemory.pop(mem_pos)[0]
+                      for label, mem_pos in zip(labels, mem_positions)]
+            # peak in all the repeater memory positions, from 0 to 3 (both included)
+            for i in range(repeater_memory_positions):
+                _, = repeater_memory.peek(i)
+
+            # channel_1_pair = [qubit_node1, qubit_node3_1]
+            # channel_0_pair = [qubit_node2, qubit_node3]
+            # results = get_results([channel_1_pair, channel_0_pair])
+            results = get_results_qubits(qubits)
+            # try to discard the memory positions in the repeater
+            if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
+                # list of the memory positions from 0 to 3 (both included)
+                for i in range(repeater_memory_positions):
+                    try:
+                        repeater_memory.discard(i)
+                    except MemPositionEmptyError:
+                        pass
+        except ValueError as e:
+            print(e)
+            results = {"message": "Some Qubits were lost during transfer", "error": True}
+        except AttributeError as e:
+            print(e)
+            results = {"message": "Some Qubits were lost during transfer", "error": True}
+        return results
 
     def _perform_entanglement_swapping(self, node1: int, node2: int, debug: bool = False):
         """
