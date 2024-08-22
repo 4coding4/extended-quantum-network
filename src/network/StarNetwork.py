@@ -649,6 +649,21 @@ class StarNetwork:
 
         return m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions
 
+    def get_bell_states(self, m_mem_positions: List[List[int]], debug: bool) -> List[int]:
+        repeater_memory = self._network.subcomponents["Repeater"].qmemory
+        states = []
+        for m_mem_position_pair in m_mem_positions:
+            _, state = perform_and_get_bell_measurement_w_state(repeater_memory, m_mem_position_pair, debug)
+            states.append(state)
+        return states
+
+    def try_discard_mem_positions_repeater(self, repeater_memory, repeater_memory_positions) -> None:
+        for i in range(repeater_memory_positions):
+            try:
+                repeater_memory.discard(i)
+            except MemPositionEmptyError:
+                pass
+
     def entanglement_swapping(self, nodes: List[int], debug: bool = False) \
             -> List[Dict[str, Union[List[Qubit], float, bool]]]:
         """
@@ -659,7 +674,8 @@ class StarNetwork:
         :return: A dictionary containing the qubits and their fidelity (list of dictionaries)
         """
         l = len(nodes)
-        m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions = self.get_entanglement_swapping_parameters(nodes)
+        m_mem_positions, positions, nodes_list, mem_positions, repeater_memory_positions = \
+            self.get_entanglement_swapping_parameters(nodes)
 
         repeater_memory = self._network.subcomponents["Repeater"].qmemory
         remote_node_memory = self._network.subcomponents["RemoteNode"].qmemory
@@ -667,10 +683,7 @@ class StarNetwork:
             if any(single_node == self._destinations_n - 1 for single_node in nodes):
                 if debug:
                     print('entanglement_swapping with #nodes:' + str(l))
-                states = []
-                for m_mem_position_pair in m_mem_positions:
-                    _, state = perform_and_get_bell_measurement_w_state(repeater_memory, m_mem_position_pair, debug)
-                    states.append(state)
+                states = self.get_bell_states(m_mem_positions, debug)
 
                 # swap the qubits in memory position 0 and 1,
                 # and then apply the necessary gates
@@ -702,11 +715,7 @@ class StarNetwork:
             # try to discard the memory positions in the repeater
             if labels[-1] == "RemoteNode":  # same as node3_label: "RemoteNode"
                 # list of the memory positions from 0 to 3 (both included)
-                for i in range(repeater_memory_positions):
-                    try:
-                        repeater_memory.discard(i)
-                    except MemPositionEmptyError:
-                        pass
+                self.try_discard_mem_positions_repeater(repeater_memory, mem_positions)
         except (ValueError, AttributeError) as e:
             print(e)
             results = {"message": "Some Qubits were lost during transfer", "error": True}
