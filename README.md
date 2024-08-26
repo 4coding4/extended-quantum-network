@@ -79,7 +79,7 @@ python3 main.py combined entangle_nodes 1,4 True 100
 On request, the used PyCharm run configuration files can be shared.
 ## Docker Setup
 
-### Download
+### Download (Not Recommended, limited support for scripts and libraries)
 A pre-built docker image can be downloaded by running the following command:
 
 ```bash
@@ -92,7 +92,7 @@ Alternatively, you can directly include the image in your Dockerfile by using th
 FROM ghcr.io/edoriggio/quantum-network:main
 ```
 
-### Build
+### Build (Recommended)
 To build the docker image, use the following line of code
 
 ```bash
