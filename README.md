@@ -7,7 +7,7 @@ This is an implementation of a Quantum Network in python using the NetSquid libr
 
 One of the points of the network is a Quantum Repeater. This repeater is connected to a remote node which has a Quantum Source as well as a quantum memory. The repeater will receive one qubit from the source, one qubit from the remote node, and will perform Entanglement Swapping on those qubits.
 
-A more detailed report on the old project (method `entangle_nodes`) can be found [here](https://github.com/edoriggio/quantum-network/blob/main/docs/report.pdf)
+A more detailed report on the [old project](https://github.com/edoriggio/quantum-network) (method `entangle_nodes`) can be found [here](https://github.com/edoriggio/quantum-network/blob/main/docs/report.pdf)
 
 ## Program usage:
 To show the usage in the terminal use the following command
