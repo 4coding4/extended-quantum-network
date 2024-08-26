@@ -44,6 +44,39 @@ automatically (in the folder called `out`) with name of the inputted values;
 otherwise (with 0) it does not collect and generates anything (by not using the experiment wrapper) and 
 simply displays the results in the standard output (in the terminal).
 
+## Examples
+Default, an unrealistic (almost perfect system) simulation for `protocol_a`:
+```bash
+python3 main.py
+```
+is equivalent to the following:
+```bash
+python3 main.py empty protocol_a 1,2,4 True 0
+```
+
+Realistic simulation for `protocol_a` with 1 execution and no data collection and plot generation
+```bash
+python3 main.py combined protocol_a 1,2,4 True 0
+```
+Realistic simulation for `protocol_a` with 100 execution and data collection and plot generation
+```bash
+python3 main.py combined protocol_a 1,2,4 True 100
+```
+
+Unrealistic (almost perfect system) simulation for `entangle_nodes`:
+```bash
+python3 main.py empty entangle_nodes 1,4 True 0
+```
+Realistic simulation for `entangle_nodes` with 1 execution and no data collection and plot generation
+```bash
+python3 main.py combined entangle_nodes 1,4 True 0
+```
+Realistic simulation for `entangle_nodes` with 100 execution and data collection and plot generation
+```bash
+python3 main.py combined entangle_nodes 1,4 True 100
+```
+
+On request, the used PyCharm run configuration files can be shared.
 ## Docker Setup
 
 ### Download
