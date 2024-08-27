@@ -13,6 +13,7 @@ and
 This is an implementation of a Quantum Network in [python](https://www.python.org) using the [NetSquid](https://netsquid.org) library. 
 
 The method `protocol_a` is the implementation of the example in page 4 of the following scientific paper:
+
 [Anita Buckley](https://orcid.org/0000-0002-4493-2999), 
 [Pavel Chuprikov](https://orcid.org/0000-0002-6673-1143), 
 [Rodrigo Otoni](https://orcid.org/0000-0003-1097-2367), 
