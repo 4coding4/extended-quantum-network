@@ -4,21 +4,29 @@
 [![Flake8 Status](./badges/flake8-badge.svg?dummy=8484744)](./reports/flake8/flake8stats.txt)
 
 ![Protocol a high-level architecture](./docs/protocol-a-high-level-architecture-only.drawio.png "Protocol a high-level architecture")
-For more information about the architecture (legend, port and memories mapping and swapping in the repeater), see the 2 following diagrams 
+For more information about the architecture (legend, port and memories mapping and swapping in the repeater), see the 2 following diagrams: 
 [Protocol a](./docs/protocol-a.drawio.png) 
 and
 [Detailed protocol a](./docs/detailed-protocol-a.drawio.png)
 ----------------------------------------------------------------
 This is an implementation of a Quantum Network in python using the NetSquid library. 
+
+The method `protocol_a` is the implementation of the example in page 4 of the following scientific paper:
+
+[An Algebraic Language for Specifying Quantum Networks](https://dl.acm.org/doi/10.1145/3656430) published the 20 June 2024 
+in the [ACM (Association for Computing Machinery)](https://www.acm.org) 
+with identifier [https://doi.org/10.1145/3656430](https://doi.org/10.1145/3656430).
+
+A more detailed report on the [old project](https://github.com/edoriggio/quantum-network) (method `entangle_nodes`) can be found [here](./docs/old/report.pdf).
+
+----------------------------------------------------------------
+
 The topology of the network is a Star topology, this means that the center of the network is a Quantum Source that generates entangled Bell pairs. 
 On the other hand, the points of the star are nodes with quantum memories.
 
 One of the points of the network is a Quantum Repeater. 
 This repeater is connected to a remote node which has a Quantum Source as well as a quantum memory. 
 The repeater will receive one qubit from the source, one qubit from the remote node, and will perform Entanglement Swapping on those qubits.
-
-A more detailed report on the [old project](https://github.com/edoriggio/quantum-network) (method `entangle_nodes`) can be found [here](https://github.com/edoriggio/quantum-network/blob/main/docs/report.pdf)
-
 
 ----------------------------------------------------------------
 ## Program usage:
