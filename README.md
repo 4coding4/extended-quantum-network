@@ -10,7 +10,7 @@ For more information about the architecture (legend, port and memories mapping a
 and
 [Detailed protocol a](./docs/detailed-protocol-a.drawio.png)
 ----------------------------------------------------------------
-This is an implementation of a Quantum Network in python using the NetSquid library. 
+This is an implementation of a Quantum Network in [python](https://www.python.org) using the [NetSquid](https://netsquid.org) library. 
 
 The method `protocol_a` is the implementation of the example in page 4 of the following scientific paper:
 [Anita Buckley](https://orcid.org/0000-0002-4493-2999), 
