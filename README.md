@@ -4,6 +4,7 @@
 [![Flake8 Status](./badges/flake8-badge.svg?dummy=8484744)](./reports/flake8/flake8stats.txt)
 
 ![Protocol a high-level architecture](./docs/protocol-a-high-level-architecture-only.drawio.png "Protocol a high-level architecture")
+
 For more information about the architecture (legend, port and memories mapping and swapping in the repeater), see the 2 following diagrams: 
 [Protocol a](./docs/protocol-a.drawio.png) 
 and
@@ -12,10 +13,23 @@ and
 This is an implementation of a Quantum Network in python using the NetSquid library. 
 
 The method `protocol_a` is the implementation of the example in page 4 of the following scientific paper:
+[Anita Buckley](https://orcid.org/0000-0002-4493-2999), 
+[Pavel Chuprikov](https://orcid.org/0000-0002-6673-1143), 
+[Rodrigo Otoni](https://orcid.org/0000-0003-1097-2367), 
+[Robert Soulé](https://orcid.org/0000-0002-2825-6660), 
+[Robert Rand](https://orcid.org/0000-0001-6842-5505) and 
+[Patrick Eugster](https://orcid.org/0000-0003-3864-9078).
+[An Algebraic Language for Specifying Quantum Networks](https://dl.acm.org/doi/10.1145/3656430). 
+[Proceedings of the ACM on Programming Languages 8, PLDI](https://dl.acm.org/toc/pacmpl/2024/8/PLDI), 
+Article 200 (20 June 2024), 23 pages. 
+[https://doi.org/10.1145/3656430](https://doi.org/10.1145/3656430).
 
-[An Algebraic Language for Specifying Quantum Networks](https://dl.acm.org/doi/10.1145/3656430) published the 20 June 2024 
-in the [ACM (Association for Computing Machinery)](https://www.acm.org) 
-with identifier [https://doi.org/10.1145/3656430](https://doi.org/10.1145/3656430).
+This academic research work was founded via the 
+[Undergraduate Research Opportunities Program (UROP)](https://www.inf.usi.ch/en/informatics-research/internships/students) 
+program and was supervised by 
+[Anita Buckley](https://orcid.org/0000-0002-4493-2999) and
+[Pavel Chuprikov](https://orcid.org/0000-0002-6673-1143) 
+in [Università della Svizzera Italiana (USI)](https://www.usi.ch/).
 
 A more detailed report on the [old project](https://github.com/edoriggio/quantum-network) (method `entangle_nodes`) can be found [here](./docs/old/report.pdf).
 
