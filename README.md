@@ -4,6 +4,9 @@
 [![Flake8 Status](./badges/flake8-badge.svg?dummy=8484744)](./reports/flake8/flake8stats.txt)
 
 ![Protocol a high-level architecture](./docs/protocol-a-high-level-architecture-only.drawio.png "Protocol a high-level architecture")
+For more information about the architecture (legend, port and memories mapping and swapping in the repeater), see the 2 diagrams below:
+* [Protocol a](./docs/protocol-a.drawio.png)
+* [Detailed protocol a](./docs/detailed-protocol-a.drawio.png)
 
 This is an implementation of a Quantum Network in python using the NetSquid library. The topology of the network is a Star topology, this means that the center of the network is a Quantum Source that generates entangled Bell pairs. On the other hand, the points of the star are nodes with quantum memories.
 
