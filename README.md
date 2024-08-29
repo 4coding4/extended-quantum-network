@@ -32,6 +32,8 @@ program and was supervised by
 [Pavel Chuprikov](https://orcid.org/0000-0002-6673-1143) 
 in [Università della Svizzera Italiana (USI)](https://www.usi.ch/).
 
+The report of the project can be found [here](./docs/Extended_Quantum_Network_Manual.pdf).
+
 A more detailed report on the [old project](https://github.com/edoriggio/quantum-network) (method `entangle_nodes`) can be found [here](./docs/old/report.pdf).
 
 ----------------------------------------------------------------
